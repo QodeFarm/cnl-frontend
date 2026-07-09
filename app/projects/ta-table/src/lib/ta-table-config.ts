@@ -29,6 +29,9 @@ export interface TaTableConfig {
   rowSelectionEnabled?: boolean
   rowSelection?: (row: any) => any;
   hideFilters?: boolean; // Controls whether to hide filters regardless of URL
+  showDateFilters?: boolean; // Force Quick Period + From/To Date filters on (used by report pages not matched by URL)
+  periodOnly?: boolean; // With showDateFilters: show only Quick Period, hide From/To date (e.g. Stock Forecast)
+  quickPeriodOptions?: { value: string; label: string }[]; // Override the Quick Period choices (e.g. Stock Forecast = meaningful periods only)
   hideRefreshBtn?: boolean; // Hides the refresh button (useful in selection popups)
   hideColChooser?: boolean; // Hides the Columns chooser button (useful in selection popups)
   /** IDs of rows that just arrived — table will blink them for 8 s then clear */

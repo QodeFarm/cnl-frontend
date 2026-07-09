@@ -77,6 +77,7 @@ import { NzNotificationService } from 'ng-zorro-antd/notification';
 export class TaTableComponent implements OnDestroy {
   @Input() options!: TaTableConfig;
   @Output() doAction: EventEmitter<any> = new EventEmitter();
+  @Output() dataLoaded: EventEmitter<any> = new EventEmitter();
   @ViewChild('taTable') taTable!: NzTableComponent<any> | any;
   @Input() customProductTemplate!: TemplateRef<any>;
   // selectedProducts: any[] = []; // This holds the selected products
@@ -102,6 +103,7 @@ export class TaTableComponent implements OnDestroy {
   isLegerAccountFilterVisible: boolean;
   isStockStatusFilterVisible: boolean = false;
   isStockForecastPage: boolean = false;
+  isSalesReportPage: boolean = false;
 
   // Stock status options for inventory reports (RED/YELLOW/GREEN)
   stockStatusOptions = [
@@ -725,6 +727,7 @@ applyFilters() {
         console.log("Response data in table : ", response.data);
         this.rows = response.data;
         this.total = response.totalCount || response.count || response.data.length;
+        this.dataLoaded.emit(response);
         
         // Sync balance summary with Account Ledger Component
         if (window['accountLedgerComponentInstance'] && this.isAccountLedgerPage) {
@@ -877,12 +880,21 @@ applyFilters() {
     const queryParts: string[] = [];
 
     // For Stock Forecast page: Quick Period sends period_name for avg sales calculation
+    // For Sales Report pages: period name sent directly; custom dates use from_date/to_date
     // For Other pages: Quick Period sets fromDate/toDate for date filtering
     if (this.isStockForecastPage) {
-      // Stock Forecast uses period_name parameter (not date filtering)
       if (filters.quickPeriod) {
         queryParts.push(`period_name=${encodeURIComponent(filters.quickPeriod)}`);
       }
+    } else if (this.isSalesReportPage || this.options?.showDateFilters) {
+      // Report pages: period sent as-is; custom dates use from_date/to_date
+      if (filters.quickPeriod) {
+        queryParts.push(`period=${encodeURIComponent(filters.quickPeriod)}`);
+      } else {
+        if (filters.fromDate) queryParts.push(`from_date=${encodeURIComponent(this.formatDate(filters.fromDate))}`);
+        if (filters.toDate) queryParts.push(`to_date=${encodeURIComponent(this.formatDate(filters.toDate))}`);
+      }
+      return queryParts.length ? '&' + queryParts.join('&') : '';
     } else {
       // Other modules use date filtering
       if (filters.fromDate) {
@@ -1251,10 +1263,11 @@ applyFilters() {
     this.loadWarehouses();
     this.ledgerAccount();
 
-    // Show status filter for specific URLs    
-    this.isButtonVisible = this.options.hideFilters ? false : visibleUrls.includes(currentUrl);
+    // Show date/period filters: URL-based OR explicitly requested via options
+    const wantDateFilters = visibleUrls.includes(currentUrl) || this.isSalesReportPage || !!this.options?.showDateFilters;
+    this.isButtonVisible = this.options.hideFilters ? false : wantDateFilters;
 
-    // Hide status button for specific URLs
+    // Hide status button for specific URLs and whenever date filters are active (report pages)
     const hideStatusUrls = [
       '/admin/hrms/employee-attendance',
       '/admin/employees',// Added employees URL
@@ -1270,7 +1283,7 @@ applyFilters() {
       '/admin/reports/ledgers-reports',
       '/admin/reports/inventory-reports' // Hide order status for stock forecast page
     ];
-    this.isStatusButtonVisible = this.options.hideFilters ? false : !hideStatusUrls.includes(currentUrl);
+    this.isStatusButtonVisible = this.options.hideFilters ? false : (!hideStatusUrls.includes(currentUrl) && !this.isSalesReportPage && !this.options?.showDateFilters);
 
     // Show employee filter for specific URLs
     const employeeFilterUrls = [
@@ -1298,6 +1311,9 @@ applyFilters() {
     // Stock Forecast Page flag for showing appropriate filters
     const stockForecastUrls = ['/admin/reports/inventory-reports'];
     this.isStockForecastPage = stockForecastUrls.includes(currentUrl);
+
+    // Sales Report pages — any /admin/reports/sales/ sub-route
+    this.isSalesReportPage = currentUrl.startsWith('/admin/reports/sales/');
     
     // Reset filter values when component is initialized
     // This ensures filters are cleared when modal is reopened
@@ -1418,6 +1434,8 @@ applyFilters() {
           this.refreshCheckedStatus();
         }
         this.cdr.detectChanges();
+        // Emit full response so parent components can read summary, totals, etc.
+        this.dataLoaded.emit(data);
       }, (error) => {
         this.loading = false;
       });

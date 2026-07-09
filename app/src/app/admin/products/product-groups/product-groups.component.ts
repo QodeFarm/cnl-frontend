@@ -67,13 +67,13 @@ export class ProductGroupsComponent   {
     fields: 
       [ 
         {
-          fieldGroupClassName: "row col-12 p-0 m-0 custom-form field-no-bottom-space",
+          fieldGroupClassName: "row col-12 p-0 m-0 custom-form",
           fieldGroup: 
         [
 	       {
             key: 'group_name',
             type: 'text',
-            className: 'col-md-6 col-12 px-1 pb-md-0 pb-3',
+            className: 'col-md-6 col-12 px-1 pb-3',
             templateOptions: {
               label: 'Group Name',
               required: true
@@ -85,7 +85,7 @@ export class ProductGroupsComponent   {
             }
           },
           {
-            className: 'col-md-6 col-12 px-1 pb-md-0 pb-3',
+            className: 'col-md-6 col-12 px-1 pb-3',
             key: 'code',
             type: 'input',
             templateOptions: {
@@ -94,7 +94,7 @@ export class ProductGroupsComponent   {
             }
           },
           {
-            className: 'col-md-6 col-12 px-1 pb-md-0 pb-3',
+            className: 'col-md-6 col-12 px-1 pb-3',
             key: 'product_mode_id',
             type: 'select',
             templateOptions: {
@@ -119,7 +119,7 @@ export class ProductGroupsComponent   {
             // }
           },
           {
-            className: 'col-md-6 col-12 px-1 pb-md-0 pb-3',
+            className: 'col-md-6 col-12 px-1 pb-3',
             key: 'under_group_id',
             type: 'productGroups-dropdown',
             templateOptions: {
@@ -127,7 +127,7 @@ export class ProductGroupsComponent   {
               dataKey: 'product_group_id',
               dataLabel: "group_name",
               options: [],
-              required: true,
+              required: false,
               lazy: {
                 url: 'products/product_groups/',
                 lazyOneTime: true
@@ -148,7 +148,7 @@ export class ProductGroupsComponent   {
           {
             key: 'description',
             type: 'textarea',
-            className: 'col-md-6 col-12 px-1 pb-md-0 pb-3',
+            className: 'col-md-6 col-12 px-1 pb-3',
             templateOptions: {
               label: 'Description',
               required: true

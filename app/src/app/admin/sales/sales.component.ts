@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, ViewChild, ElementRef, ChangeDetectorRef, OnDestroy, TemplateRef } from '@angular/core';
 import { TaFormComponent, TaFormConfig } from '@ta/ta-form';
 import { Observable, forkJoin, Subject, Subscription } from 'rxjs';
-import { tap, switchMap, map, filter, debounceTime } from 'rxjs/operators';
+import { tap, switchMap, map, filter, debounceTime, takeUntil } from 'rxjs/operators';
 import { LocalStorageService, TaLocalStorage } from '@ta/ta-core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
@@ -76,6 +76,10 @@ export class SalesComponent {
 
   // ========== DRAFT AUTO-SAVE PROPERTIES ==========
   private draftSaveSubject = new Subject<void>();
+  // Torn down in ngOnDestroy; every per-row field valueChanges pipes through this.
+  private destroy$ = new Subject<void>();
+  // Last-rendered Product-Info banner signature, for the idempotency guard.
+  private _lastProductInfoKey = '';
   private draftSaveSubscription: Subscription | null = null;
   private readonly DRAFT_KEY_PREFIX = 'cnl_sale_order_draft_';
   private readonly DRAFT_EXPIRY_HOURS = 24;
@@ -1638,23 +1642,21 @@ closeNoQuantityWarning() {
   // FETCH CUSTOMER OUTSTANDING
   // =========================
 
-  this.http.get(`sales/payment_transactions/?customer_id=${customerId}`).subscribe(
+  // Customer outstanding = live pending balance across the customer's invoices,
+  // computed server-side. Do NOT sum payment_transactions.outstanding_amount here:
+  // that column is a per-payment running snapshot, so multi-installment invoices
+  // double-count (an already-cleared balance still showed as outstanding).
+  this.http.get(`customers/outstanding/${customerId}/`).subscribe(
 
     (outRes: any) => {
 
-      if (outRes?.data) {
+      const totalOutstanding = parseFloat(outRes?.outstanding_amount) || 0;
 
-        const totalOutstanding = outRes.data.reduce((sum: number, trx: any) => {
-          return sum + (parseFloat(trx.outstanding_amount) || 0);
-        }, 0);
+      this.customerOutstandingAmount = totalOutstanding;
 
-        this.customerOutstandingAmount = totalOutstanding;
-
-        // Show banner also if outstanding exists
-        if (totalOutstanding > 0) {
-          this.showCustomerInfoBanner = true;
-        }
-
+      // Show banner also if outstanding exists
+      if (totalOutstanding > 0) {
+        this.showCustomerInfoBanner = true;
       }
 
     },
@@ -1866,6 +1868,8 @@ closeNoQuantityWarning() {
   }
 
   ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
     this.drilldownSub?.unsubscribe();
     // Ensure modals are disposed of correctly
     document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
@@ -3838,6 +3842,22 @@ createSaleOrder() {
     console.log("Sale Order/Estimate modal closed.");
     this.isConfirmationModalOpen = false;
   }
+  /**
+   * Subscribe to a formly field control's valueChanges EXACTLY ONCE, auto-torn-down
+   * on component destroy. Formly re-runs a field's onInit whenever rows are
+   * added/removed/re-created; without this guard each re-init stacked another
+   * subscription, so one value change fired the handler N times — that pileup is
+   * what caused the Product-Info flicker and the runaway product_variations calls.
+   */
+  private bindFieldValueChange(field: any, key: string, handler: (value: any) => void): void {
+    const flag = '__vcBound_' + key;
+    if (!field || field[flag]) { return; }
+    field[flag] = true;
+    field.formControl.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(handler);
+  }
+
   loadProductVariations(field: FormlyFieldConfig, productValuechange: boolean = false) {
     const parentArray = field.parent;
 
@@ -3848,8 +3868,10 @@ createSaleOrder() {
       const sizeField: any = parentArray.fieldGroup.find((f: any) => f.key === 'size');
       const colorField: any = parentArray.fieldGroup.find((f: any) => f.key === 'color');
       if (productValuechange) {
-        sizeField.formControl.setValue(null);
-        colorField.formControl.setValue(null);
+        // emitEvent:false — clearing size/color here must NOT re-fire their hooks
+        // (that re-entrancy fed the runaway product_variations calls / flicker).
+        sizeField.formControl.setValue(null, { emitEvent: false });
+        colorField.formControl.setValue(null, { emitEvent: false });
       }
       // Clear previous options for both size and color fields before adding new ones
       if (sizeField) sizeField.templateOptions.options = [];
@@ -5432,8 +5454,14 @@ createChildOrdersForProducts(productDetails, saleOrderDetails, orderAttachments,
     const cardWrapper = document.querySelector('.ant-card-head-wrapper') as HTMLElement;
     if (!cardWrapper || !product) return;
 
-    console.log('Product data in html:', product);
-    console.log('unitData data in html:', unitData);
+    // Idempotency guard: if the banner already shows this exact product/size/color/
+    // balance, do nothing. Stops the flicker + wasted DOM work when the row hooks
+    // fire repeatedly for the same state.
+    const infoKey = `${product?.product_id}|${size?.size_id ?? ''}|${color?.color_id ?? ''}|${sizeBalance ?? ''}|${colorBalance ?? ''}|${product?.balance ?? ''}`;
+    if (infoKey === this._lastProductInfoKey && cardWrapper.querySelector('.center-message')) {
+      return;
+    }
+    this._lastProductInfoKey = infoKey;
 
     // ✅ Always-safe unit info
     const stockInfo = `
@@ -7276,25 +7304,29 @@ createChildOrdersForProducts(productDetails, saleOrderDetails, orderAttachments,
 
                     this.loadProductVariations(field);
 
-                    // Subscribe to value changes (to update sizes dynamically)
-                    field.formControl.valueChanges.subscribe((data: any) => {
-                      if (!this.formConfig.model['sale_order_items'][currentRowIndex]) {
-                        console.error(`Products at index ${currentRowIndex} is not defined. Initializing...`);
-                        this.formConfig.model['sale_order_items'][currentRowIndex] = {};
-                      }
-                      this.formConfig.model['sale_order_items'][currentRowIndex]['product_id'] = data?.product_id;
+                    // Subscribe to value changes (to update sizes dynamically).
+                    // bindFieldValueChange = subscribe-once + auto-teardown (prevents the
+                    // duplicate-handler pileup that caused the Product-Info flicker/freeze).
+                    this.bindFieldValueChange(field, 'product', (data: any) => {
+                      // Write to the row's OWN model object, not a captured index.
+                      // formly renumbers row keys when a row is deleted, so a cached
+                      // `currentRowIndex` goes stale and would write product_id to the
+                      // wrong row — leaving the real row without a product_id, which the
+                      // backend then discards (row silently lost on edit).
+                      const row = field.parent?.model;
+                      if (!row) { return; }
+                      row['product_id'] = data?.product_id;
                       this.loadProductVariations(field);
                       this.autoFillProductDetails(field, data); // to fill the remaining fields when product is selected.
                       this.triggerDraftSave(); // Auto-save draft on product change
                     });
 
                     // Product Info Text code
-                    field.formControl.valueChanges.subscribe(async selectedProductId => {
+                    this.bindFieldValueChange(field, 'productInfo', (selectedProductId: any) => {
                       const unit = this.getUnitData(selectedProductId);
-                      const row = this.formConfig.model.sale_order_items[currentRowIndex];
-                      this.displayInformation(row.product, null, null, unit, '', '');
-                      console.log('executed from product info text code');
-                    }); // end of product info text code
+                      const row = field.parent?.model;
+                      this.displayInformation(row?.product, null, null, unit, '', '');
+                    });
                   }
                 }
               },
@@ -7389,13 +7421,16 @@ createChildOrdersForProducts(productDetails, saleOrderDetails, orderAttachments,
                     }
 
                     // Subscribe to value changes (Merged from onInit & onChanges)
-                    field.formControl.valueChanges.subscribe((selectedSize: any) => {
-                      const product = this.formConfig.model.sale_order_items[currentRowIndex]?.product;
+                    this.bindFieldValueChange(field, 'size', (selectedSize: any) => {
+                      // Use the row's live model object (not a stale captured index)
+                      // so a size selection can't land on the wrong row after a delete.
+                      const row = field.parent?.model;
+                      const product = row?.product;
                       if (!product?.product_id) {
-                        console.warn(`Product missing for row ${currentRowIndex}, skipping color fetch.`);
+                        console.warn('Product missing for row, skipping color fetch.');
                         return;
                       }
-                      this.formConfig.model['sale_order_items'][currentRowIndex]['size_id'] = selectedSize?.size_id;
+                      row['size_id'] = selectedSize?.size_id;
 
                       const size_id = selectedSize?.size_id || null;
                       const url = size_id
@@ -7467,13 +7502,16 @@ createChildOrdersForProducts(productDetails, saleOrderDetails, orderAttachments,
                     console.log("color data : ", saleOrderItems?.color)
 
                     // Subscribe to value changes & avoid unnecessary API calls
-                    field.formControl.valueChanges.subscribe((selectedColor: any) => {
-                      if (!row.product?.product_id) {
-                        console.warn(`Product missing for row ${currentRowIndex}, skipping color update.`);
+                    this.bindFieldValueChange(field, 'color', (selectedColor: any) => {
+                      // Prefer the row's live model object over a stale captured index,
+                      // so a color selection can't be written to the wrong row after a delete.
+                      const row = field.parent?.model ?? this.formConfig.model.sale_order_items[currentRowIndex];
+                      if (!row?.product?.product_id) {
+                        console.warn('Product missing for row, skipping color update.');
                         return;
                       }
 
-                      this.formConfig.model['sale_order_items'][currentRowIndex]['color_id'] = selectedColor?.color_id;
+                      row['color_id'] = selectedColor?.color_id;
 
                       const color_id = selectedColor?.color_id || null;
                       console.log('color_id :', color_id)
@@ -7788,6 +7826,13 @@ createChildOrdersForProducts(productDetails, saleOrderDetails, orderAttachments,
 
                       if (!field.form || !field.form.controls) return;
 
+                      // Keep the row's own model in sync with the typed qty (defensive:
+                      // same value formly syncs, but guards against the control→model
+                      // desync seen on rate after a row delete + re-add).
+                      if (field.parent?.model) {
+                        field.parent.model.quantity = quantity;
+                      }
+
                       const rate = Number(field.form.controls.rate?.value || 0);
                       const discount = Number(field.form.controls.discount?.value || 0);
                       const availableQty = Number(field.form.controls.available_qty?.value || 0);
@@ -7898,6 +7943,14 @@ createChildOrdersForProducts(productDetails, saleOrderDetails, orderAttachments,
 
                     // Subscribe to value changes to update amount
                     field.formControl.valueChanges.subscribe(data => {
+                      // Force the row's OWN model to match the typed rate. After a row
+                      // delete + re-add, formly's control→model sync for this cell can
+                      // desync — the input showed the new rate while the model kept a
+                      // stale one, so the total (which reads the model) was wrong.
+                      // Writing to field.parent.model guarantees model == what's shown.
+                      if (field.parent?.model) {
+                        field.parent.model.rate = data;
+                      }
                       if (field.form && field.form.controls && field.form.controls.quantity && data) {
                         const quantity = field.form.controls.quantity.value;
                         const rate = data;

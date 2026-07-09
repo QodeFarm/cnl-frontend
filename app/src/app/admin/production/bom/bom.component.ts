@@ -313,8 +313,9 @@ export class BomComponent {
                         this.formConfig.model['bill_of_material'][currentRowIndex] = {};
                       }
                       
-                      // Set product_id in the model
-                      this.formConfig.model['bill_of_material'][currentRowIndex]['product_id'] = selectedProduct?.product_id;
+                      // Set product_id on the row's own model object (captured currentRowIndex
+                      // goes stale after a formly row delete). Fallback = old behaviour.
+                      (field.parent?.model ?? this.formConfig.model['bill_of_material'][currentRowIndex])['product_id'] = selectedProduct?.product_id;
                       
                       // Auto-populate unit_cost with purchase_rate if available
                       if (selectedProduct?.purchase_rate) {

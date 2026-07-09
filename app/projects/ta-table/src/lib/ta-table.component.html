@@ -118,20 +118,21 @@
             <!-- Quick Period Dropdown (hidden for account-ledger — shown in dedicated panel above) -->
             <div class="filter-group col p-0 mt-2" style="margin-left: 5px;" *ngIf="(isButtonVisible && !isAccountLedgerPage) || isStockForecastPage">
                 <nz-select id="quickPeriod" [(ngModel)]="selectedQuickPeriod" (ngModelChange)="onQuickPeriodChange(); applyFilters()"
-                    [nzPlaceHolder]="isStockForecastPage ? 'Analysis Period' : 'Quick Period'" class="quick-period-select" nzAllowClear>
-                    <nz-option *ngFor="let period of (isStockForecastPage ? stockForecastPeriodOptions : quickPeriodOptions)"
+                    [nzPlaceHolder]="isStockForecastPage ? 'Analysis Period' : 'Quick Period'" class="quick-period-select"
+                    [nzDropdownMatchSelectWidth]="false" nzDropdownClassName="rpt-quick-period-dd" nzAllowClear>
+                    <nz-option *ngFor="let period of (options?.quickPeriodOptions || (isStockForecastPage ? stockForecastPeriodOptions : quickPeriodOptions))"
                         [nzValue]="period.value" [nzLabel]="period.label"></nz-option>
                 </nz-select>
             </div>
 
             <!-- From Date Picker -->
-            <div class="filter-group col p-0 mt-2" style="margin-left: 5px;" *ngIf="isButtonVisible && !isStockForecastPage && !isAccountLedgerPage">
+            <div class="filter-group col p-0 mt-2" style="margin-left: 5px;" *ngIf="isButtonVisible && !isStockForecastPage && !isAccountLedgerPage && !options?.periodOnly">
                 <nz-date-picker id="fromDate" [(ngModel)]="fromDate" nzPlaceHolder="From date" class="date-picker"
                     style="width: 130px;" (ngModelChange)="applyFilters()" nzAllowClear></nz-date-picker>
             </div>
 
             <!-- To Date Picker -->
-            <div class="filter-group col p-0 mt-2" style="margin-left: 5px;" *ngIf="isButtonVisible && !isStockForecastPage && !isAccountLedgerPage">
+            <div class="filter-group col p-0 mt-2" style="margin-left: 5px;" *ngIf="isButtonVisible && !isStockForecastPage && !isAccountLedgerPage && !options?.periodOnly">
                 <nz-date-picker id="toDate" [(ngModel)]="toDate" nzPlaceHolder="To date" class="date-picker"
                     style="width: 130px;" (ngModelChange)="applyFilters()" nzAllowClear></nz-date-picker>
             </div>

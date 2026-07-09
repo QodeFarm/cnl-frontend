@@ -37,6 +37,11 @@ import { FormGroup } from "@angular/forms";
 //     cardWrapper.insertAdjacentElement('afterbegin', productInfoDiv);
 //   };
 
+// Remembers the last banner we rendered, so repeated calls with the same
+// product/size/color don't erase-and-rewrite the shared DOM node. That thrash
+// was the visible "Product Info" flicker when the per-row hooks fired repeatedly.
+let _lastProductInfoKey = '';
+
 export function displayInformation(
   product: any,
   size: any,
@@ -48,8 +53,13 @@ export function displayInformation(
   const cardWrapper = document.querySelector('.ant-card-head-wrapper') as HTMLElement;
   if (!cardWrapper || !product) return;
 
-  console.log('Product data in html:', product);
-  console.log('unitData data in html:', unitData);
+  // Idempotency guard: if the banner already shows this exact product/size/color/
+  // balance, do nothing — no DOM thrash, no flicker.
+  const _infoKey = `${product?.product_id}|${size?.size_id ?? ''}|${color?.color_id ?? ''}|${sizeBalance ?? ''}|${colorBalance ?? ''}|${product?.balance ?? ''}`;
+  if (_infoKey === _lastProductInfoKey && cardWrapper.querySelector('.center-message')) {
+    return;
+  }
+  _lastProductInfoKey = _infoKey;
 
   // ✅ Always-safe unit info
   const stockInfo = `

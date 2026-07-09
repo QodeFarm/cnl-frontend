@@ -259,8 +259,11 @@ editProducts(event: any) {
     if (res) {
       this.formConfig.model = res.data;
 
-      // 🔥 VERY IMPORTANT
-      this.formConfig.formState.viewMode = true;
+      // Edit/Update must stay editable so the Update + Reset action buttons remain
+      // visible. ta-form hides the action buttons whenever viewMode is true (that is
+      // reserved for read-only "View"). Matches the ta-curd edit convention where
+      // edit => viewMode:false and view => viewMode:true.
+      this.formConfig.formState.viewMode = false;
 
       // UI-only placeholder rows
       if (!this.formConfig.model.product_variations || this.formConfig.model.product_variations.length === 0) {
@@ -534,8 +537,22 @@ verifyBalance(): boolean {
 
 preprocessFormData() {
   const products = this.formConfig.model.products;
-  if (products && typeof products.product_mode_id === 'object') {
-    products.product_mode_id = products.product_mode_id.item_master_id;
+  if (products) {
+    // Every dropdown *_id on products can hold the full object (from edit-load or
+    // an onChanges that stored the object). The API expects the UUID string only.
+    // This form submits via submittedFn (no options.url), so ta-form's built-in
+    // extractNestedIds never runs — do the same coercion here for all *_id fields.
+    Object.keys(products).forEach(key => {
+      const value = products[key];
+      if (!key.endsWith('_id') || value === null || typeof value !== 'object' || Array.isArray(value)) {
+        return;
+      }
+      // Prefer a matching inner key (e.g. type_id.type_id), else the first *_id inside.
+      const innerIdKey = value[key] !== undefined ? key : Object.keys(value).find(k => k.endsWith('_id'));
+      if (innerIdKey && value[innerIdKey] !== undefined) {
+        products[key] = value[innerIdKey];
+      }
+    });
   }
 
   const variations = this.formConfig.model.product_variations || [];
