@@ -5,7 +5,11 @@ interface CacheEntry {
   cachedAt: number;
 }
 
-const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+// Short TTL: long enough to make rapid re-opens of the same dropdown instant,
+// short enough that another user's change (e.g. stock/balance) surfaces when you
+// reopen the dropdown — without a browser refresh. Your OWN create/update/delete
+// is reflected instantly regardless, because writes invalidate this cache.
+const CACHE_TTL_MS = 60 * 1000; // 60 seconds
 
 @Injectable({ providedIn: 'root' })
 export class TaTableCacheService {
