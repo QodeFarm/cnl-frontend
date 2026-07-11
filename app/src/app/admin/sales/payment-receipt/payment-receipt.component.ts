@@ -48,7 +48,7 @@ export class PaymentReceiptComponent implements OnInit, OnDestroy {
   // Table configuration for payment receipt data
   tableConfig: TaTableConfig = {
       apiUrl: '', // We'll update this dynamically based on customer selection
-      title: 'Payment Receipt',
+      title: 'Outstanding Invoices',
       pkId: 'voucher_no',
       pageSize: 10,
       globalSearch: { keys: ['invoice_no', 'invoice_date', 'total_amount'] },
@@ -459,7 +459,6 @@ export class PaymentReceiptComponent implements OnInit, OnDestroy {
             defaultValue: this.nowDate(),
             templateOptions: {
               label: 'Date',
-              disabled: true,
               required: true,
             }
           },
@@ -474,7 +473,9 @@ export class PaymentReceiptComponent implements OnInit, OnDestroy {
             },
             hooks: {
               onInit: (field: any) => {
-                if (field.formControl && this.voucherNumber) {
+                // Only stamp the freshly-generated "next" number on a NEW receipt. In edit mode
+                // the record's own saved number is already in the model — overwriting it here made
+                if (!this.SaleOrderEditID && this.voucherNumber && field.formControl) {
                   field.formControl.setValue(this.voucherNumber);
                 }
               }
@@ -674,6 +675,9 @@ editPaymentReceipt(event) {
   console.log('event', event);
 
   this.SaleOrderEditID = event;
+  // Drop any pending create-mode "next" voucher number so the edit form keeps the record's
+  // own saved number (belt-and-suspenders with the field's edit-mode guard above).
+  this.voucherNumber = null;
 
   this.http.get(`sales/payment_transactions/${event}`).subscribe((res: any) => {
     console.log('Payment receipt data:', res);
@@ -698,7 +702,10 @@ editPaymentReceipt(event) {
       this.formConfig.model = {
         ...res.data,
         customer: customerObj,
-        ledger_account_id: accountObj        // <-- FIXED: key MUST match field.key
+        ledger_account_id: accountObj,        // <-- FIXED: key MUST match field.key
+        // Show the receipt's OWN saved date in the (now editable) Date box. res.data carries
+        // 'payment_date'; the Date field's key is 'date', so map it across (date part only).
+        date: res.data.payment_date ? String(res.data.payment_date).slice(0, 10) : this.nowDate()
       };
 
       // Store for payload
