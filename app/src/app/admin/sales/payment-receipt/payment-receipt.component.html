@@ -7,11 +7,12 @@
     </div>
   </div>
   <div *ngIf="!isCustomerPortal && showForm">
-    <div class="payment-receipt-banner">
+    <div class="payment-receipt-banner page-component-header">
       <div class="col-12 px-0" style="display: flex; justify-content: space-between; align-items: center;flex-wrap: wrap;">
-        <div class="d-flex align-items-center" style="gap: 6px;">
-          <button type="button" class="btn p-0" style="color: black;">
-            <span class="custom-heading">Payment Receipt</span>
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <button type="button" class="btn p-0">
+            <span *ngIf="SaleOrderEditID" class="custom-heading">Update Payment Receipt</span>
+            <span *ngIf="!SaleOrderEditID" class="custom-heading">Create Payment Receipt</span>
           </button>
           <app-help-icon topic="sales-payment-receipt"></app-help-icon>
         </div>

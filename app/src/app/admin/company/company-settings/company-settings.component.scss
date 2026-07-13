@@ -1,313 +1,154 @@
-// ── Design tokens (matches rest of project) ──────────────────────────
-$primary:       #142768;
-$primary-hover: #1a3278;
-$primary-light: #eef2fa;
-$border:        #e8e8e8;
-$bg-page:       #f5f6fa;
-$bg-white:      #ffffff;
-$text-dark:     #1a1a2e;
-$text-mid:      #595959;
-$text-light:    #8c8c8c;
-$font:          'Poppins', sans-serif;
+// ── Design tokens (neutrals biased toward the brand navy) ────────────
+$primary:      #142768;
+$primary-2:    #24347a;
+$primary-tint: #eef1fa;
+$canvas:       #f4f6fa;
+$surface:      #ffffff;
+$surface-2:    #fbfcfe;
+$border:       #e4e7ee;
+$border-2:     #eef1f6;
+$ink:          #16192a;
+$ink-2:        #454b60;
+$muted:        #7d8499;
+$danger:       #d0402b;
+$ring:         #9db0e6;
+$font:         'Poppins', sans-serif;
 
-// ── Wrapper ───────────────────────────────────────────────────────────
-.cs-wrapper {
+// ── Shell (compact, centered column) ─────────────────────────────────
+.cs {
   font-family: $font;
-  background: $bg-page;
-  min-height: 100vh;
-  padding: 20px 24px 32px;
+  background: $canvas;
+  min-height: 100%;
+  padding: 20px 24px 32px;   // matches Document Print Settings
 }
-
-// ── Page Header ───────────────────────────────────────────────────────
-.cs-page-header {
-  display: flex;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.cs-header-left {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.cs-header-icon {
-  width: 42px;
-  height: 42px;
-  background-color: $primary;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-size: 18px;
-  flex-shrink: 0;
-}
-
-.cs-page-title {
+.cs__shell {
+  max-width: none;           // full-width page, like Document Print Settings
   margin: 0;
-  font-size: 20px;
-  font-weight: 700;
-  color: $text-dark;
-  line-height: 1.2;
 }
 
-.cs-page-sub {
-  margin: 2px 0 0;
-  font-size: 12px;
-  color: $text-light;
-}
-
-// ── Body layout: left nav + right content ────────────────────────────
-.cs-body {
-  display: flex;
-  gap: 0;
-  background: $bg-white;
-  border: 1px solid $border;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
-  min-height: calc(100vh - 130px);
-}
-
-// ── Left Navigation ───────────────────────────────────────────────────
-.cs-nav {
-  width: 180px;
-  min-width: 180px;
-  background: #f8f9fc;
-  border-right: 1px solid $border;
-  padding: 12px 0;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.cs-nav-item {
+// ── Header ───────────────────────────────────────────────────────────
+.cs-head {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 16px;
-  margin: 0 8px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.15s, color 0.15s;
-  position: relative;
-
-  &:hover:not(.disabled) {
-    background: $primary-light;
-
-    .cs-nav-icon { color: $primary; }
-    .cs-nav-label { color: $primary; }
-  }
-
-  &.active {
-    background: $primary-light;
-    border-left: 3px solid $primary;
-    padding-left: 13px;
-
-    .cs-nav-icon { color: $primary; }
-    .cs-nav-label { color: $primary; font-weight: 600; }
-  }
-
-  &.disabled {
-    cursor: not-allowed;
-    opacity: 0.55;
-  }
-}
-
-.cs-nav-icon {
-  font-size: 16px;
-  color: $text-light;
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
-}
-
-.cs-nav-label {
-  font-size: 13px;
-  color: $text-mid;
-  flex: 1;
-  white-space: nowrap;
-}
-
-.cs-nav-soon {
-  font-size: 9px;
-  font-weight: 600;
-  color: $text-light;
-  background: #f0f0f0;
-  border-radius: 3px;
-  padding: 1px 5px;
-  letter-spacing: 0.3px;
-  text-transform: uppercase;
-}
-
-// ── Right Content ─────────────────────────────────────────────────────
-.cs-content {
-  flex: 1;
-  padding: 24px 28px;
-  overflow-y: auto;
-}
-
-// ── Module Header ─────────────────────────────────────────────────────
-.cs-module-header {
-  display: flex;
-  align-items: flex-start;
   gap: 12px;
-  margin-bottom: 4px;
+  margin-bottom: 16px;
+}
+.cs-head__badge {
+  width: 42px; height: 42px; flex: 0 0 auto;
+  border-radius: 10px;
+  background: $primary;
+  color: #fff; font-size: 18px;
+  display: grid; place-items: center;
+}
+.cs-head__title { margin: 0; font-size: 20px; font-weight: 700; color: $ink; line-height: 1.2; }
+.cs-head__sub   { margin: 3px 0 0; font-size: 12px; color: $muted; }
+
+// ── Top Tabs ─────────────────────────────────────────────────────────
+// Contained white pill-bar — matches Document Print Settings' document-type tabs
+.cs-tabs {
+  display: flex; align-items: center; gap: 2px;
+  background: $surface; border: 1px solid $border; border-radius: 8px;
+  padding: 5px 6px; margin-bottom: 16px;
+  overflow-x: auto; scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}
+.cs-tab {
+  display: inline-flex; align-items: center; gap: 6px;
+  border: 1px solid transparent; background: none; font: inherit; cursor: pointer;
+  padding: 6px 13px; border-radius: 6px;
+  font-size: 12.5px; font-weight: 500; color: $ink-2;
+  white-space: nowrap; transition: all .18s ease;
+
+  span[nz-icon] { font-size: 12px; opacity: .9; }
+
+  &:hover:not(:disabled) { background: $primary-tint; color: $primary; }
+  &:disabled { opacity: .55; cursor: not-allowed; }
+  &.is-active { background: $primary; color: #fff; border-color: $primary; } // solid navy button
+}
+.cs-soon {
+  font-size: 9px; font-weight: 700; letter-spacing: .3px; text-transform: uppercase;
+  color: $muted; background: $border-2; border-radius: 3px; padding: 1px 5px;
 }
 
-.cs-module-icon {
-  width: 36px;
-  height: 36px;
-  background: $primary-light;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  color: $primary;
-  flex-shrink: 0;
-  margin-top: 2px;
+// ── Panel intro ──────────────────────────────────────────────────────
+.cs-panel__intro { margin-bottom: 14px; }
+.cs-panel__intro h2 { margin: 0; font-size: 15px; font-weight: 600; color: $ink; }
+.cs-panel__intro p  { margin: 3px 0 0; font-size: 12px; color: $muted; max-width: 60ch; line-height: 1.5; }
+
+// ── Cards ────────────────────────────────────────────────────────────
+.cs-cards { display: flex; flex-direction: column; gap: 12px; }
+.cs-card {
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: 10px;
+  padding: 14px 16px 16px;
+  box-shadow: 0 1px 2px rgba(16, 25, 64, .04);
+}
+.cs-card__eyebrow {
+  font-size: 10.5px; font-weight: 700; letter-spacing: .7px; text-transform: uppercase;
+  color: $primary; margin-bottom: 12px;
+}
+.cs-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px 18px;
+  @media (max-width: 620px) { grid-template-columns: 1fr; }
 }
 
-.cs-module-title {
-  margin: 0 0 4px;
-  font-size: 16px;
-  font-weight: 600;
-  color: $text-dark;
+// ── Fields ───────────────────────────────────────────────────────────
+.cs-field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.cs-field__label {
+  font-size: 12px; font-weight: 500; color: $ink-2;
+  display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  &--lg { font-size: 13px; font-weight: 600; color: $ink; }
 }
-
-.cs-module-desc {
-  margin: 0;
-  font-size: 12px;
-  color: $text-light;
-  max-width: 560px;
-  line-height: 1.5;
+.cs-req {
+  font-size: 9.5px; font-weight: 700; letter-spacing: .3px; text-transform: uppercase;
+  color: $danger; background: rgba($danger, .1); padding: 1px 5px; border-radius: 4px;
 }
-
-.cs-save-btn {
-  margin-left: auto;
-  min-width: 100px;
-  height: 34px;
-  font-size: 13px;
-  background: $primary !important;
-  border-color: $primary !important;
-  flex-shrink: 0;
-
-  &:hover {
-    background: $primary-hover !important;
-    border-color: $primary-hover !important;
-  }
-}
-
-// ── Field Groups ──────────────────────────────────────────────────────
-.cs-group {
-  margin-bottom: 24px;
-}
-
-.cs-group-label {
-  font-size: 11px;
-  font-weight: 600;
-  color: $text-light;
-  text-transform: uppercase;
-  letter-spacing: 0.6px;
-  margin-bottom: 14px;
-  padding-bottom: 6px;
-  border-bottom: 1px solid $border;
-}
-
-.cs-fields-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px 28px;
-
-  @media (max-width: 860px) {
-    grid-template-columns: 1fr;
-  }
-}
-
-.cs-field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.cs-label {
-  font-size: 12px;
-  font-weight: 500;
-  color: $text-mid;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-
-.cs-info {
-  color: #c0c0c0;
-  font-size: 13px;
+.cs-help {
+  width: 14px; height: 14px; border-radius: 50%; border: 1px solid $border;
+  color: $muted; font-size: 10px; line-height: 1; display: inline-grid; place-items: center;
   cursor: help;
-  line-height: 1;
-  display: flex;
+  &:hover { color: $primary; border-color: $ring; }
+}
+.cs-select { width: 100%; }
 
-  &:hover { color: $primary; }
+// ── Toggle row ───────────────────────────────────────────────────────
+.cs-toggle {
+  display: flex; align-items: center; justify-content: space-between; gap: 28px;
+}
+.cs-toggle__text { min-width: 0; }
+.cs-toggle__hint {
+  margin: 4px 0 0; font-size: 12px; color: $muted; line-height: 1.5; max-width: 56ch;
 }
 
-.cs-tag {
-  font-size: 10px;
-  height: 17px;
-  line-height: 17px;
-  padding: 0 5px;
-  border-radius: 3px;
-}
-
-.cs-select {
-  width: 100%;
-}
-
-// ── Info Note ─────────────────────────────────────────────────────────
+// ── Info note ────────────────────────────────────────────────────────
 .cs-note {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  padding: 10px 14px;
-  background: $primary-light;
-  border: 1px solid #c8d5f0;
-  border-radius: 6px;
-  font-size: 12px;
-  color: $primary;
-  margin-top: 8px;
+  display: flex; align-items: flex-start; gap: 8px;
+  padding: 10px 12px; border-radius: 9px;
+  font-size: 12px; line-height: 1.5; color: $primary-2;
+  background: $primary-tint; border: 1px solid rgba($primary, .18);
 
-  span[nz-icon] {
-    font-size: 14px;
-    margin-top: 1px;
-    flex-shrink: 0;
-  }
+  span[nz-icon] { font-size: 14px; margin-top: 1px; flex-shrink: 0; }
 }
 
-// ── Coming Soon ───────────────────────────────────────────────────────
-.cs-coming-soon {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 80px 20px;
-  text-align: center;
+// ── Coming soon ──────────────────────────────────────────────────────
+.cs-soonwrap {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; padding: 56px 20px;
 
-  h3 {
-    margin: 16px 0 8px;
-    font-size: 16px;
-    font-weight: 600;
-    color: $text-mid;
-  }
-
-  p {
-    margin: 0;
-    font-size: 13px;
-    color: $text-light;
-  }
+  h3 { margin: 14px 0 6px; font-size: 15px; font-weight: 600; color: $ink-2; }
+  p  { margin: 0; font-size: 12.5px; color: $muted; }
 }
+.cs-soon-icon { font-size: 36px; color: #d0d0d0; }
 
-.cs-soon-icon {
-  font-size: 40px;
-  color: #d0d0d0;
+// ── Auto-save status chip (top-right of the header) ──────────────────
+.cs-save-status {
+  margin-left: auto;
+  align-self: center;
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 500; color: $muted;
+
+  span[nz-icon] { font-size: 13px; }
+
+  &.is-saved { color: #1e9e6a; }   // green tick when saved
 }

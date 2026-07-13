@@ -7871,23 +7871,10 @@ export const productsCrudConfig: TaCurdConfig = {
         {
           fieldKey: 'balance',
           name: 'Balance',
-          sort: true,
-          isEdit: true,
-          isEditSumbmit: (row, value, col) => {
-            console.log("isEditSumbmit", row, value, col);
-            // Implement your logic here
-          },
-          autoSave: {
-            apiUrl: row => `products/products/${row.product_id}`,
-            method: 'patch',
-            body: (row: any, value: any, col: any) => {
-              console.log('PATCH value:', value); // Add this log
-              return {
-                [col.fieldKey]: value,
-                product_id: row.product_id
-              };
-            }
-          }
+          sort: true
+          // Inline stock edit removed on purpose: stock/balance must change through
+          // Stock Management / Stock Adjustment so there is an audit trail (who/when/why).
+          // Balance is read-only in this product dropdown.
         },
         // {
         //   fieldKey: 'print_name',

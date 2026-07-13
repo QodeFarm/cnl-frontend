@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Subject } from 'rxjs';
-import { takeUntil, switchMap, catchError } from 'rxjs/operators';
+import { takeUntil, switchMap, catchError, debounceTime } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzSelectModule } from 'ng-zorro-antd/select';
@@ -13,6 +13,7 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 import { NzTagModule } from 'ng-zorro-antd/tag';
 import { NzDividerModule } from 'ng-zorro-antd/divider';
+import { NzSwitchModule } from 'ng-zorro-antd/switch';
 
 export interface SettingsModule {
   key: string;
@@ -38,6 +39,8 @@ export interface FinanceSettings {
   bank_account?: string | null;
   discount_account?: string | null;
   round_off_account?: string | null;
+  // Sales notifications
+  notify_sale_order_whatsapp?: boolean;
 }
 
 @Component({
@@ -53,6 +56,7 @@ export interface FinanceSettings {
     NzToolTipModule,
     NzTagModule,
     NzDividerModule,
+    NzSwitchModule,
   ],
   templateUrl: './company-settings.component.html',
   styleUrls: ['./company-settings.component.scss'],
@@ -65,7 +69,7 @@ export class CompanySettingsComponent implements OnInit, OnDestroy {
   modules: SettingsModule[] = [
     { key: 'finance',   label: 'Finance',   icon: 'fund',          available: true  },
     { key: 'inventory', label: 'Inventory', icon: 'inbox',         available: false },
-    { key: 'sales',     label: 'Sales',     icon: 'shopping-cart', available: false },
+    { key: 'sales',     label: 'Sales',     icon: 'shopping-cart', available: true  },
     { key: 'purchase',  label: 'Purchase',  icon: 'shopping',      available: false },
     { key: 'hrms',      label: 'HRMS',      icon: 'team',          available: false },
   ];
@@ -82,10 +86,18 @@ export class CompanySettingsComponent implements OnInit, OnDestroy {
   bankAccounts: LedgerAccount[]     = [];
 
   settings: FinanceSettings = {};
+  // Auto-save: no Save button. Every change persists after a short debounce.
+  saveStatus: 'idle' | 'saving' | 'saved' = 'idle';
+  private saveTrigger$ = new Subject<void>();
 
   constructor(private http: HttpClient, private message: NzMessageService) {}
 
   ngOnInit(): void {
+    // Debounced auto-save: rapid changes collapse into a single PATCH.
+    this.saveTrigger$
+      .pipe(debounceTime(600), takeUntil(this.destroy$))
+      .subscribe(() => this.persist());
+
     this.http
       .get<{ data: any[] }>('company/companies/')
       .pipe(
@@ -126,12 +138,21 @@ export class CompanySettingsComponent implements OnInit, OnDestroy {
     this.activeModule = key;
   }
 
-  onSave(): void {
+  /** Called on every field change — queues a debounced auto-save. */
+  autoSave(): void {
+    if (this.loading) return; // ignore changes fired while loading the form
+    this.saveStatus = 'saving';
+    this.saveTrigger$.next();
+  }
+
+  /** Persists the current settings. No toast on success — the inline status shows it. */
+  private persist(): void {
     if (!this.companyId) {
       this.message.error('Company not found. Please set up the company profile first.');
+      this.saveStatus = 'idle';
       return;
     }
-    this.saving = true;
+    this.saveStatus = 'saving';
     const payload: Partial<FinanceSettings> = {
       sales_ledger_account:    this.settings.sales_ledger_account    || null,
       purchase_ledger_account: this.settings.purchase_ledger_account || null,
@@ -141,23 +162,24 @@ export class CompanySettingsComponent implements OnInit, OnDestroy {
       bank_account:            this.settings.bank_account            || null,
       discount_account:        this.settings.discount_account        || null,
       round_off_account:       this.settings.round_off_account       || null,
+      // Sales notifications toggle (default OFF until an admin turns it on)
+      notify_sale_order_whatsapp: !!this.settings.notify_sale_order_whatsapp,
     };
 
     this.http
       .patch<any>(`company/company-settings/${this.companyId}/`, payload)
       .pipe(
         catchError((err) => {
-          this.message.error(err?.error?.message || 'Failed to save. Please try again.');
-          this.saving = false;
+          this.message.error(err?.error?.message || 'Could not save. Please try again.');
+          this.saveStatus = 'idle';
           return of(null);
         }),
         takeUntil(this.destroy$)
       )
       .subscribe((res) => {
-        this.saving = false;
         if (res) {
-          this.message.success('Settings saved successfully.');
           if (res.data) this.settings = res.data;
+          this.saveStatus = 'saved';
         }
       });
   }

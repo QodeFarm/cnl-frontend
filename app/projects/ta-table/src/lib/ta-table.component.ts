@@ -1531,13 +1531,27 @@ applyFilters() {
 
   }
   // starting page
+  /**
+   * Drop every cached page/search for this resource so the next load is fresh.
+   * Cache is only ever populated for selection popups (rowSelectionEnabled), so on
+   * regular list pages this is a harmless no-op. Call after any create/update/delete
+   * so the (dropdown) list can't keep showing a record the server already changed.
+   */
+  private invalidateResourceCache(): void {
+    if (this.options?.apiUrl) {
+      this.tableCache.invalidate(this.options.apiUrl);
+    }
+  }
+
   refresh() {
+    this.invalidateResourceCache(); // post-write refresh must not be served a stale cached list
     this.filters = [];
     (this.pageIndex == 1) ? this.loadDataFromServer() : this.pageIndex = 1;
 
     // this.loadDataFromServer(true);
   }
   reload() {
+    this.invalidateResourceCache();
     this.loadDataFromServer(undefined, true);
   }
   globalSearchClear() {
@@ -1586,7 +1600,9 @@ applyFilters() {
   deleteRow(action: any) {
     this.taTableS.deleterow(action.action.apiUrl, action.data, this.options).subscribe((res: any) => {
       this.notification.success(res?.message || 'Record deleted successfully.', '');
-      this.loadDataFromServer();
+      // reload() clears this resource's cache then fetches fresh, so the deleted row
+      // disappears immediately in selection popups (not just on a browser refresh).
+      this.reload();
     });
   }
 
@@ -1672,7 +1688,10 @@ applyFilters() {
   restoreRow(action: any) {
   this.taTableS.restorerow(action.action.apiUrl, action.data, this.options).subscribe((res: any) => {
     this.notification.success(res?.message || 'Record restored successfully.', '');
-    this.loadDataFromServer();
+    // reload() clears this resource's cache then fetches fresh — mirrors deleteRow().
+    // The server re-orders (is_deleted ASC, -created_at), so the restored row returns to
+    // its original position in the dropdown immediately, without a browser refresh.
+    this.reload();
   });
 }
 

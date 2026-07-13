@@ -78,6 +78,11 @@ export class SalesComponent {
   private draftSaveSubject = new Subject<void>();
   // Torn down in ngOnDestroy; every per-row field valueChanges pipes through this.
   private destroy$ = new Subject<void>();
+  // While TRUE, per-row product/size/color valueChanges hooks skip their HTTP + banner.
+  // Set during edit-load population (formly binding the loaded model into each row emits
+  // valueChanges that would otherwise fire one product_variations call per row and freeze
+  // the form). Cleared shortly after the form renders so real user selections work normally.
+  private suppressItemHooks = false;
   // Last-rendered Product-Info banner signature, for the idempotency guard.
   private _lastProductInfoKey = '';
   private draftSaveSubscription: Subscription | null = null;
@@ -1335,6 +1340,9 @@ editSaleOrder(event) {
 
     this.http.get('sales/sale_order/' + event).subscribe((res: any) => {
       if (res && res.data) {
+        // Suppress per-row product/size/color hooks while we populate the edit form,
+        // so formly's model binding doesn't fire a product_variations call per row.
+        this.suppressItemHooks = true;
 
         // ========== FIX: Ensure order_shipments exists ==========
         // Your API already returns order_shipments as an object
@@ -1408,6 +1416,10 @@ editSaleOrder(event) {
 
         // finally show form
         this.showForm = true;
+
+        // Let formly finish binding the loaded rows (which emits the size/color valueChanges),
+        // then re-enable the per-row hooks so real user selections load variations again.
+        setTimeout(() => { this.suppressItemHooks = false; }, 800);
 
         // ========== LOAD WORKFLOW STAGES FOR STEPPER ==========
         this.isLoadingStages = false;
@@ -4290,6 +4302,36 @@ createSaleOrder() {
 
   this.totalAmountCal();
 }
+
+  /**
+   * Clears everything auto-filled from a product when that product is removed from a
+   * row (dropdown 'x'), so no stale print name / unit / stock / rate / size / color or
+   * Product-Info banner is left behind. Scoped to THIS row's form group + model only.
+   * emitEvent:false so clearing size/color doesn't re-fire their variation hooks.
+   */
+  clearProductDetails(field: any) {
+    const controls = field?.form?.controls;
+    if (!controls) { return; }
+    const keysToClear = ['code', 'rate', 'discount', 'unit_options_id', 'stock_unit_id',
+      'print_name', 'mrp', 'available_qty', 'production_qty', 'tax', 'size', 'color'];
+    keysToClear.forEach((key) => controls[key]?.setValue(null, { emitEvent: false }));
+
+    const row = field.parent?.model;
+    if (row) { row['size_id'] = null; row['color_id'] = null; }
+
+    // Reset this row's size/color dropdown options.
+    const parentArray = field.parent;
+    const sizeField = parentArray?.fieldGroup?.find((f: any) => f.key === 'size');
+    const colorField = parentArray?.fieldGroup?.find((f: any) => f.key === 'color');
+    if (sizeField) sizeField.templateOptions.options = [];
+    if (colorField) colorField.templateOptions.options = [];
+
+    // Remove the red Product-Info banner and reset its idempotency key so it can show again.
+    document.querySelector('.ant-card-head-wrapper .center-message')?.remove();
+    this._lastProductInfoKey = '';
+
+    this.totalAmountCal();
+  }
 
 //pramod-change---------------------------
 createWorkOrder() {
@@ -7435,15 +7477,18 @@ createChildOrdersForProducts(productDetails, saleOrderDetails, orderAttachments,
                     const existingProduct = this.dataToPopulate?.sale_order_items?.[currentRowIndex]?.product;
                     // console.log("existingProduct : ", existingProduct);
                     if (existingProduct) {
-                      field.formControl.setValue(existingProduct);
+                      // emitEvent:false + NO eager variation load on edit: we only restore the
+                      // saved product. The per-row product_variations HTTP (and the red
+                      // Product-Info banner) must fire ONLY on a real user selection — not for
+                      // every row on load, which fired one HTTP call per row and froze the form.
+                      field.formControl.setValue(existingProduct, { emitEvent: false });
                     }
-
-                    this.loadProductVariations(field);
 
                     // Subscribe to value changes (to update sizes dynamically).
                     // bindFieldValueChange = subscribe-once + auto-teardown (prevents the
                     // duplicate-handler pileup that caused the Product-Info flicker/freeze).
                     this.bindFieldValueChange(field, 'product', (data: any) => {
+                      if (this.suppressItemHooks) { return; } // skip during edit-load population
                       // Write to the row's OWN model object, not a captured index.
                       // formly renumbers row keys when a row is deleted, so a cached
                       // `currentRowIndex` goes stale and would write product_id to the
@@ -7452,6 +7497,14 @@ createChildOrdersForProducts(productDetails, saleOrderDetails, orderAttachments,
                       const row = field.parent?.model;
                       if (!row) { return; }
                       row['product_id'] = data?.product_id;
+                      if (!data?.product_id) {
+                        // Product cleared (dropdown 'x'): also clear the fields that were
+                        // auto-filled from it (print name, unit, stock, rate…) and the
+                        // Product-Info banner, so no stale related data is left behind.
+                        this.clearProductDetails(field);
+                        this.triggerDraftSave();
+                        return;
+                      }
                       this.loadProductVariations(field);
                       this.autoFillProductDetails(field, data); // to fill the remaining fields when product is selected.
                       this.triggerDraftSave(); // Auto-save draft on product change
@@ -7553,11 +7606,15 @@ createChildOrdersForProducts(productDetails, saleOrderDetails, orderAttachments,
                     // Populate existing size if available
                     const existingSize = saleOrderItems?.size;
                     if (existingSize?.size_id) {
-                      field.formControl.setValue(existingSize);
+                      // Seed just this row's saved option so it displays without any HTTP call;
+                      // the full size list loads only when the user re-picks the product.
+                      field.templateOptions.options = [{ label: existingSize.size_name || '----', value: existingSize }];
+                      field.formControl.setValue(existingSize, { emitEvent: false });
                     }
 
                     // Subscribe to value changes (Merged from onInit & onChanges)
                     this.bindFieldValueChange(field, 'size', (selectedSize: any) => {
+                      if (this.suppressItemHooks) { return; } // skip during edit-load population
                       // Use the row's live model object (not a stale captured index)
                       // so a size selection can't land on the wrong row after a delete.
                       const row = field.parent?.model;
@@ -7632,13 +7689,17 @@ createChildOrdersForProducts(productDetails, saleOrderDetails, orderAttachments,
 
                     // Populate existing color if available
                     if (saleOrderItems?.color) {
-                      field.formControl.setValue(saleOrderItems.color);
+                      // Seed just this row's saved option so it displays without any HTTP call;
+                      // the full color list loads only when the user re-picks the product/size.
+                      field.templateOptions.options = [{ label: saleOrderItems.color.color_name || '----', value: saleOrderItems.color }];
+                      field.formControl.setValue(saleOrderItems.color, { emitEvent: false });
                     }
 
                     console.log("color data : ", saleOrderItems?.color)
 
                     // Subscribe to value changes & avoid unnecessary API calls
                     this.bindFieldValueChange(field, 'color', (selectedColor: any) => {
+                      if (this.suppressItemHooks) { return; } // skip during edit-load population
                       // Prefer the row's live model object over a stale captured index,
                       // so a color selection can't be written to the wrong row after a delete.
                       const row = field.parent?.model ?? this.formConfig.model.sale_order_items[currentRowIndex];
