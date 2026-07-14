@@ -3929,7 +3929,98 @@ createSaleInovice() {
                         }
                       }
                     },
-                    {
+                    // {
+                    //   key: 'shipping_charges',
+                    //   type: 'input',
+                    //   defaultValue: "0",
+                    //   className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                    //   templateOptions: {
+                    //     type: "number",
+                    //     label: 'Shipping Charges',
+                    //     placeholder: 'Enter Shipping Charges',
+                    //   },
+                    //   hooks: {
+                    //     onInit: (field: any) => {
+
+                    //       // Ensure model exists
+                    //       if (!this.formConfig.model.order_shipments) {
+                    //         this.formConfig.model.order_shipments = {};
+                    //       }
+
+                    //       // Edit mode value populate
+                    //       const existingShipping =
+                    //         this.dataToPopulate?.order_shipments?.shipping_charges ?? 0;
+
+                    //       if (field.formControl && existingShipping !== undefined) {
+                    //         field.formControl.setValue(existingShipping, { emitEvent: false });
+                    //         this.formConfig.model.order_shipments.shipping_charges = parseFloat(existingShipping) || 0;
+                    //       }
+
+                    //       // Value change
+                    //       field.formControl.valueChanges.subscribe((value: any) => {
+
+                    //         const numeric = parseFloat(value);
+                    //         const shipping = isNaN(numeric) ? 0 : numeric;
+
+                    //         field.formControl.setValue(shipping, { emitEvent: false });
+
+                    //         // Update model
+                    //         this.formConfig.model.order_shipments.shipping_charges = shipping;
+
+                    //         console.log("Shipping Charges Changed:", shipping);
+
+                    //         // Trigger global calculation
+                    //         this.totalAmountCal();
+                    //       });
+                    //     }
+                    //   }
+                    // },
+                    // {
+                    //   key: 'shipping_gst',
+                    //   type: 'input',
+                    //   defaultValue: "0",
+                    //   className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                    //   templateOptions: {
+                    //     type: "number",
+                    //     label: 'Shipping GST (%)',
+                    //     placeholder: 'Enter Shipping GST',
+                    //   },
+                    //   hooks: {
+                    //     onInit: (field: any) => {
+
+                    //       // Ensure model exists
+                    //       if (!this.formConfig.model.order_shipments) {
+                    //         this.formConfig.model.order_shipments = {};
+                    //       }
+
+                    //       // Edit mode populate
+                    //       const existingGST =
+                    //         this.dataToPopulate?.order_shipments?.shipping_gst ?? 0;
+
+                    //       if (field.formControl && existingGST !== undefined) {
+                    //         field.formControl.setValue(existingGST, { emitEvent: false });
+                    //         this.formConfig.model.order_shipments.shipping_gst = parseFloat(existingGST) || 0;
+                    //       }
+
+                    //       field.formControl.valueChanges.subscribe((value: any) => {
+
+                    //         const numeric = parseFloat(value);
+                    //         const gst = isNaN(numeric) ? 0 : numeric;
+
+                    //         field.formControl.setValue(gst, { emitEvent: false });
+
+                    //         // Update model
+                    //         this.formConfig.model.order_shipments.shipping_gst = gst;
+
+                    //         console.log("Shipping GST Changed:", gst);
+
+                    //         // Trigger global calculation
+                    //         this.totalAmountCal();
+                    //       });
+                    //     }
+                    //   }
+                    // }
+                    					{
                       key: 'shipping_charges',
                       type: 'input',
                       defaultValue: "0",
@@ -3941,35 +4032,29 @@ createSaleInovice() {
                       },
                       hooks: {
                         onInit: (field: any) => {
-
                           // Ensure model exists
                           if (!this.formConfig.model.order_shipments) {
                             this.formConfig.model.order_shipments = {};
                           }
 
-                          // Edit mode value populate
-                          const existingShipping =
-                            this.dataToPopulate?.order_shipments?.shipping_charges ?? 0;
+                          // Edit mode value populate - Use formConfig.model instead of dataToPopulate
+                          const existingShipping = this.formConfig.model.order_shipments?.shipping_charges ?? 0;
 
                           if (field.formControl && existingShipping !== undefined) {
-                            field.formControl.setValue(existingShipping, { emitEvent: false });
+                            console.log("Populating existing shipping charges:", existingShipping);
+                            field.formControl.setValue(parseFloat(existingShipping) || 0, { emitEvent: false });
                             this.formConfig.model.order_shipments.shipping_charges = parseFloat(existingShipping) || 0;
                           }
 
                           // Value change
                           field.formControl.valueChanges.subscribe((value: any) => {
-
                             const numeric = parseFloat(value);
                             const shipping = isNaN(numeric) ? 0 : numeric;
 
                             field.formControl.setValue(shipping, { emitEvent: false });
-
-                            // Update model
                             this.formConfig.model.order_shipments.shipping_charges = shipping;
 
                             console.log("Shipping Charges Changed:", shipping);
-
-                            // Trigger global calculation
                             this.totalAmountCal();
                           });
                         }
@@ -3987,39 +4072,33 @@ createSaleInovice() {
                       },
                       hooks: {
                         onInit: (field: any) => {
-
                           // Ensure model exists
                           if (!this.formConfig.model.order_shipments) {
                             this.formConfig.model.order_shipments = {};
                           }
 
-                          // Edit mode populate
-                          const existingGST =
-                            this.dataToPopulate?.order_shipments?.shipping_gst ?? 0;
+                          // Edit mode populate - Use formConfig.model instead of dataToPopulate
+                          const existingGST = this.formConfig.model.order_shipments?.shipping_gst ?? 0;
 
                           if (field.formControl && existingGST !== undefined) {
-                            field.formControl.setValue(existingGST, { emitEvent: false });
+                            console.log("Populating existing shipping GST:", existingGST);
+                            field.formControl.setValue(parseFloat(existingGST) || 0, { emitEvent: false });
                             this.formConfig.model.order_shipments.shipping_gst = parseFloat(existingGST) || 0;
                           }
 
                           field.formControl.valueChanges.subscribe((value: any) => {
-
                             const numeric = parseFloat(value);
                             const gst = isNaN(numeric) ? 0 : numeric;
 
                             field.formControl.setValue(gst, { emitEvent: false });
-
-                            // Update model
                             this.formConfig.model.order_shipments.shipping_gst = gst;
 
                             console.log("Shipping GST Changed:", gst);
-
-                            // Trigger global calculation
                             this.totalAmountCal();
                           });
                         }
                       }
-                    }
+                    },
                   ]
                 },
               ]

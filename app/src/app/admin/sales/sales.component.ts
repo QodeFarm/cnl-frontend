@@ -1217,7 +1217,123 @@ closeNoQuantityWarning() {
   //   this.hide();
   // }
 
-  editSaleOrder(event) {
+  // editSaleOrder(event) {
+  //   this.showForm = false;
+  //   this.SaleOrderEditID = event;
+  //   console.log("event : ", event);
+
+  //   this.http.get('sales/sale_order/' + event).subscribe((res: any) => {
+  //     if (res && res.data) {
+
+  //       this.formConfig.model = res.data;
+
+  //       // set sale_order default value
+  //       this.formConfig.model['sale_order']['order_type'] = 'sale_order';
+
+  //       // set labels for update
+  //       this.formConfig.pkId = 'sale_order_id';
+  //       this.formConfig.model['flow_status'] = res.data.sale_order.flow_status;
+  //       this.formConfig.model['tax_amount'] = res.data.sale_order.tax_amount;
+  //       this.formConfig.submit.label = 'Update';
+  //       this.formConfig.model['sale_order_id'] = this.SaleOrderEditID;
+
+
+  //       // ========== FIX: Ensure order_shipments exists ==========
+  //       if (!this.formConfig.model.order_shipments) {
+  //         this.formConfig.model.order_shipments = {};
+  //       }
+        
+  //       // If shipping data exists in the response, map it properly
+  //       if (res.data.order_shipments) {
+  //         // If it's an array, take the first item (or handle as needed)
+  //         const shippingData = Array.isArray(res.data.order_shipments) 
+  //           ? res.data.order_shipments[0] 
+  //           : res.data.order_shipments;
+          
+  //         // Merge the shipping data into the model
+  //         Object.assign(this.formConfig.model.order_shipments, shippingData);
+  //       }
+  //       // ========================================================
+
+
+  //       // Show/Hide based on update
+  //       this.formConfig.fields[0].fieldGroup[0].fieldGroup[7].hide = false;
+  //       this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[7].hide = false;
+  //       this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[8].hide = true;
+
+  //       // -------------------------------
+  //       // CUSTOM FIELD VALUES HANDLING
+  //       // -------------------------------
+  //       if (res.data.custom_field_values && Array.isArray(res.data.custom_field_values)) {
+  //         this.formConfig.model['custom_field_values'] =
+  //           res.data.custom_field_values.reduce((acc: any, cf: any) => {
+  //             acc[cf.custom_field_id] = cf.field_value;
+  //             return acc;
+  //           }, {});
+  //       }
+
+  //       // ---------------------------------------------------
+  //       //  ENSURE SALE ORDER ALWAYS HAS 5 ITEM ROWS 
+  //       // ---------------------------------------------------
+  //       let items = res.data.sale_order_items ?? [];
+
+  //       // fill existing rows first, then make sure total is 5
+  //       while (items.length < 5) {
+  //         items.push({
+  //           sale_order_item_id: null,
+  //           product_id: null,
+  //           unit_options_id: null,
+  //           color_id: null,
+  //           quantity: null,
+  //           rate: null,
+  //           amount: null
+  //         });
+  //       }
+
+  //       // assign back to form model
+  //       this.formConfig.model['sale_order_items'] = items;
+
+  //       // finally show form
+  //       this.showForm = true;
+
+  //       // ========== LOAD WORKFLOW STAGES FOR STEPPER ==========
+  //       this.isLoadingStages = false; // Reset in case create-mode load was still in flight
+  //       if (res.data.sale_order?.use_workflow) {
+  //         this.loadWorkflowStages();
+  //       } else {
+  //         this.workflowStages = [];
+  //       }
+  //       // ======================================================
+
+  //       // ========== AUTO-INVOICE TRIGGER ==========
+  //       if (this.shouldAutoInvoice) {
+  //         this.shouldAutoInvoice = false; // Reset flag
+  //         const currentFlowStatus = this.getCurrentFlowStatusName();
+  //         if (this.isReadyForInvoice(currentFlowStatus)) {
+  //           setTimeout(() => {
+  //             this.openSaleInvoiceModal();
+  //           }, 800); // Small delay to ensure form model is ready
+  //         } else {
+  //           const safeStatus = currentFlowStatus || 'Unknown';
+  //           this.notification.warning(
+  //             'Order Not Ready for Invoice',
+  //             `Auto-invoice skipped. Current flow status is "${safeStatus}".`
+  //           );
+  //         }
+  //       }
+  //       // ==========================================
+  //     }
+
+  //     // this.totalAmountCal();
+  //     setTimeout(() => {
+  //     this.totalAmountCal();
+  //   }, 200);
+  //   });
+
+  //   this.hide();
+  // }
+
+editSaleOrder(event) {
     this.showForm = false;
     this.SaleOrderEditID = event;
     console.log("event : ", event);
@@ -1227,6 +1343,21 @@ closeNoQuantityWarning() {
         // Suppress per-row product/size/color hooks while we populate the edit form,
         // so formly's model binding doesn't fire a product_variations call per row.
         this.suppressItemHooks = true;
+
+        // ========== FIX: Ensure order_shipments exists ==========
+        // Your API already returns order_shipments as an object
+        // Just make sure it exists
+        if (!res.data.order_shipments) {
+          res.data.order_shipments = {};
+        }
+        
+        // If for some reason it's an array, convert to object
+        if (Array.isArray(res.data.order_shipments)) {
+          res.data.order_shipments = res.data.order_shipments.length > 0 
+            ? res.data.order_shipments[0] 
+            : {};
+        }
+        // ========================================================
 
         this.formConfig.model = res.data;
 
@@ -1277,6 +1408,12 @@ closeNoQuantityWarning() {
         // assign back to form model
         this.formConfig.model['sale_order_items'] = items;
 
+        // ========== LOG SHIPPING DATA FOR DEBUGGING ==========
+        console.log('Shipping Data:', this.formConfig.model.order_shipments);
+        console.log('Shipping Charges:', this.formConfig.model.order_shipments?.shipping_charges);
+        console.log('Shipping GST:', this.formConfig.model.order_shipments?.shipping_gst);
+        // ======================================================
+
         // finally show form
         this.showForm = true;
 
@@ -1285,7 +1422,7 @@ closeNoQuantityWarning() {
         setTimeout(() => { this.suppressItemHooks = false; }, 800);
 
         // ========== LOAD WORKFLOW STAGES FOR STEPPER ==========
-        this.isLoadingStages = false; // Reset in case create-mode load was still in flight
+        this.isLoadingStages = false;
         if (res.data.sale_order?.use_workflow) {
           this.loadWorkflowStages();
         } else {
@@ -1295,12 +1432,12 @@ closeNoQuantityWarning() {
 
         // ========== AUTO-INVOICE TRIGGER ==========
         if (this.shouldAutoInvoice) {
-          this.shouldAutoInvoice = false; // Reset flag
+          this.shouldAutoInvoice = false;
           const currentFlowStatus = this.getCurrentFlowStatusName();
           if (this.isReadyForInvoice(currentFlowStatus)) {
             setTimeout(() => {
               this.openSaleInvoiceModal();
-            }, 800); // Small delay to ensure form model is ready
+            }, 800);
           } else {
             const safeStatus = currentFlowStatus || 'Unknown';
             this.notification.warning(
@@ -1312,14 +1449,13 @@ closeNoQuantityWarning() {
         // ==========================================
       }
 
-      // this.totalAmountCal();
       setTimeout(() => {
-      this.totalAmountCal();
-    }, 200);
+        this.totalAmountCal();
+      }, 200);
     });
 
     this.hide();
-  }
+}
 
   // ========== WORKFLOW STEPPER HELPERS ==========
   loadWorkflowStages() {
@@ -7903,8 +8039,10 @@ createChildOrdersForProducts(productDetails, saleOrderDetails, orderAttachments,
                       // Existing Amount Logic (KEEP)
                       const productDiscount = rate * qty * discount / 100;
                       if (rate && qty) {
+                        const calculatedAmount = rate * qty - productDiscount;
                         field.form.controls.amount?.setValue(
-                          rate * qty - productDiscount
+                          // rate * qty - productDiscount
+                          Math.round(calculatedAmount * 100) / 100
                         );
                       }
 
@@ -8016,7 +8154,8 @@ createChildOrdersForProducts(productDetails, saleOrderDetails, orderAttachments,
                         const quantity = field.form.controls.quantity.value;
                         const rate = data;
                         if (rate && quantity) {
-                          field.form.controls.amount.setValue(parseFloat(rate) * parseFloat(quantity));
+                          const calculatedAmount = parseFloat(rate) * parseFloat(quantity);
+                          field.form.controls.amount.setValue(Math.round(calculatedAmount * 100) / 100);
                         }
                       }
                       this.totalAmountCal();
@@ -8088,7 +8227,7 @@ createChildOrdersForProducts(productDetails, saleOrderDetails, orderAttachments,
                         const percent = (amount / total) * 100;
 
                         field.form.controls.discount?.setValue(
-                          Number(percent.toFixed(2)),
+                          Math.round(percent * 100) / 100, 
                           { emitEvent: false }
                         );
                       }
@@ -8147,7 +8286,7 @@ createChildOrdersForProducts(productDetails, saleOrderDetails, orderAttachments,
                         const discountAmount = (percent / 100) * total;
 
                         field.form.controls.discount_amount?.setValue(
-                          Number(discountAmount.toFixed(2)),
+                          Math.round(discountAmount * 100) / 100,
                           { emitEvent: false }
                         );
                       }
@@ -9003,35 +9142,29 @@ createChildOrdersForProducts(productDetails, saleOrderDetails, orderAttachments,
                       },
                       hooks: {
                         onInit: (field: any) => {
-
                           // Ensure model exists
                           if (!this.formConfig.model.order_shipments) {
                             this.formConfig.model.order_shipments = {};
                           }
 
-                          // Edit mode value populate
-                          const existingShipping =
-                            this.dataToPopulate?.order_shipments?.shipping_charges ?? 0;
+                          // Edit mode value populate - Use formConfig.model instead of dataToPopulate
+                          const existingShipping = this.formConfig.model.order_shipments?.shipping_charges ?? 0;
 
                           if (field.formControl && existingShipping !== undefined) {
-                            field.formControl.setValue(existingShipping, { emitEvent: false });
+                            console.log("Populating existing shipping charges:", existingShipping);
+                            field.formControl.setValue(parseFloat(existingShipping) || 0, { emitEvent: false });
                             this.formConfig.model.order_shipments.shipping_charges = parseFloat(existingShipping) || 0;
                           }
 
                           // Value change
                           field.formControl.valueChanges.subscribe((value: any) => {
-
                             const numeric = parseFloat(value);
                             const shipping = isNaN(numeric) ? 0 : numeric;
 
                             field.formControl.setValue(shipping, { emitEvent: false });
-
-                            // Update model
                             this.formConfig.model.order_shipments.shipping_charges = shipping;
 
                             console.log("Shipping Charges Changed:", shipping);
-
-                            // Trigger global calculation
                             this.totalAmountCal();
                           });
                         }
@@ -9049,39 +9182,126 @@ createChildOrdersForProducts(productDetails, saleOrderDetails, orderAttachments,
                       },
                       hooks: {
                         onInit: (field: any) => {
-
                           // Ensure model exists
                           if (!this.formConfig.model.order_shipments) {
                             this.formConfig.model.order_shipments = {};
                           }
 
-                          // Edit mode populate
-                          const existingGST =
-                            this.dataToPopulate?.order_shipments?.shipping_gst ?? 0;
+                          // Edit mode populate - Use formConfig.model instead of dataToPopulate
+                          const existingGST = this.formConfig.model.order_shipments?.shipping_gst ?? 0;
 
                           if (field.formControl && existingGST !== undefined) {
-                            field.formControl.setValue(existingGST, { emitEvent: false });
+                            console.log("Populating existing shipping GST:", existingGST);
+                            field.formControl.setValue(parseFloat(existingGST) || 0, { emitEvent: false });
                             this.formConfig.model.order_shipments.shipping_gst = parseFloat(existingGST) || 0;
                           }
 
                           field.formControl.valueChanges.subscribe((value: any) => {
-
                             const numeric = parseFloat(value);
                             const gst = isNaN(numeric) ? 0 : numeric;
 
                             field.formControl.setValue(gst, { emitEvent: false });
-
-                            // Update model
                             this.formConfig.model.order_shipments.shipping_gst = gst;
 
                             console.log("Shipping GST Changed:", gst);
-
-                            // Trigger global calculation
                             this.totalAmountCal();
                           });
                         }
                       }
-                    }
+                    },
+                    // {
+                    //   key: 'shipping_charges',
+                    //   type: 'input',
+                    //   defaultValue: "0",
+                    //   className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                    //   templateOptions: {
+                    //     type: "number",
+                    //     label: 'Shipping Charges',
+                    //     placeholder: 'Enter Shipping Charges',
+                    //   },
+                    //   hooks: {
+                    //     onInit: (field: any) => {
+
+                    //       // Ensure model exists
+                    //       if (!this.formConfig.model.order_shipments) {
+                    //         console.log("Initializing order_shipments model...");
+                    //         this.formConfig.model.order_shipments = {};
+                    //       }
+
+                    //       // Edit mode value populate
+                    //       const existingShipping =
+                    //         this.dataToPopulate?.order_shipments?.shipping_charges ?? 0;
+
+                    //       if (field.formControl && existingShipping !== undefined) {
+                    //         console.log("Populating existing shipping charges:", existingShipping);
+                    //         field.formControl.setValue(existingShipping, { emitEvent: false });
+                    //         this.formConfig.model.order_shipments.shipping_charges = parseFloat(existingShipping) || 0;
+                    //       }
+
+                    //       // Value change
+                    //       field.formControl.valueChanges.subscribe((value: any) => {
+
+                    //         const numeric = parseFloat(value);
+                    //         const shipping = isNaN(numeric) ? 0 : numeric;
+
+                    //         field.formControl.setValue(shipping, { emitEvent: false });
+
+                    //         // Update model
+                    //         this.formConfig.model.order_shipments.shipping_charges = shipping;
+
+                    //         console.log("Shipping Charges Changed:", shipping);
+
+                    //         // Trigger global calculation
+                    //         this.totalAmountCal();
+                    //       });
+                    //     }
+                    //   }
+                    // },
+                    // {
+                    //   key: 'shipping_gst',
+                    //   type: 'input',
+                    //   defaultValue: "0",
+                    //   className: 'col-lg-3 col-md-4 col-sm-6 col-12',
+                    //   templateOptions: {
+                    //     type: "number",
+                    //     label: 'Shipping GST (%)',
+                    //     placeholder: 'Enter Shipping GST',
+                    //   },
+                    //   hooks: {
+                    //     onInit: (field: any) => {
+
+                    //       // Ensure model exists
+                    //       if (!this.formConfig.model.order_shipments) {
+                    //         this.formConfig.model.order_shipments = {};
+                    //       }
+
+                    //       // Edit mode populate
+                    //       const existingGST =
+                    //         this.dataToPopulate?.order_shipments?.shipping_gst ?? 0;
+
+                    //       if (field.formControl && existingGST !== undefined) {
+                    //         field.formControl.setValue(existingGST, { emitEvent: false });
+                    //         this.formConfig.model.order_shipments.shipping_gst = parseFloat(existingGST) || 0;
+                    //       }
+
+                    //       field.formControl.valueChanges.subscribe((value: any) => {
+
+                    //         const numeric = parseFloat(value);
+                    //         const gst = isNaN(numeric) ? 0 : numeric;
+
+                    //         field.formControl.setValue(gst, { emitEvent: false });
+
+                    //         // Update model
+                    //         this.formConfig.model.order_shipments.shipping_gst = gst;
+
+                    //         console.log("Shipping GST Changed:", gst);
+
+                    //         // Trigger global calculation
+                    //         this.totalAmountCal();
+                    //       });
+                    //     }
+                    //   }
+                    // }
                   ]
                 },
               ]
