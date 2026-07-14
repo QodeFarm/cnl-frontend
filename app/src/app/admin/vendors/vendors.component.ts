@@ -12,7 +12,7 @@ import { NzProgressModule } from 'ng-zorro-antd/progress';
 import { NzResultModule } from 'ng-zorro-antd/result';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { BulkEditModalComponent } from '../utils/bulk-edit-modal/bulk-edit-modal.component';
-import { BulkField, BulkOperationsService } from '../utils/bulk-operations.service';
+import { BulkField, BulkOperationsService, BulkSelection } from '../utils/bulk-operations.service';
 import { ledgerAccountsConfig } from '../../utils/master-curd-config';
 import { HelpIconComponent } from '../help/help-icon.component';
 
@@ -68,6 +68,9 @@ export class VendorsComponent {
   // ─── Bulk Edit State ─────────────────────────────────────────
   showBulkEditModal = false;
   bulkEditIds: string[] = [];
+  bulkSelectAll = false;
+  bulkFilterQuery = '';
+  bulkSelectCount = 0;
   isExporting = false;
 
   /** Config: maps each bulk-edit field to its API & display info */
@@ -90,9 +93,12 @@ export class VendorsComponent {
   ];
   // ─────────────────────────────────────────────────────────────
 
-  /** Open the bulk edit modal */
-  openBulkEditModal(ids: string[]) {
-    this.bulkEditIds = ids;
+  /** Open the bulk edit modal for either an explicit selection or all-matching. */
+  openBulkEditModal(selection: BulkSelection) {
+    this.bulkSelectAll = !!selection.selectAll;
+    this.bulkFilterQuery = selection.filterQuery || '';
+    this.bulkEditIds = selection.ids || [];
+    this.bulkSelectCount = selection.count || 0;
     this.showBulkEditModal = true;
   }
 
@@ -108,12 +114,18 @@ export class VendorsComponent {
     this.showBulkEditModal = false;
   }
 
-  /** Export all or selected vendors to Excel */
-  exportVendors(ids: string[]) {
+  /** Export vendors to Excel — all-matching (filter), explicit ids, or all. */
+  exportVendors(selection: BulkSelection) {
     this.isExporting = true;
+    const count = selection.count || 0;
     let url = 'vendors/export-vendors/';
-    if (ids.length > 0) {
-      url += '?ids=' + ids.join(',');
+
+    if (selection.selectAll) {
+      // Export every row matching the current filter (all pages), not just loaded ids.
+      const fq = selection.filterQuery || '';
+      url += fq ? '?' + fq : '';
+    } else if (selection.ids && selection.ids.length > 0) {
+      url += '?ids=' + selection.ids.join(',');
     }
 
     this.http.get(url, { responseType: 'blob' }).subscribe({
@@ -122,14 +134,14 @@ export class VendorsComponent {
         const a = document.createElement('a');
         const objectUrl = window.URL.createObjectURL(blob);
         a.href = objectUrl;
-        a.download = ids.length > 0
-          ? `Vendors_Export_${ids.length}.xlsx`
+        a.download = count > 0
+          ? `Vendors_Export_${count}.xlsx`
           : 'Vendors_Export_All.xlsx';
         a.click();
         window.URL.revokeObjectURL(objectUrl);
         this.notification.success('Export Complete',
-          ids.length > 0
-            ? `${ids.length} vendor(s) exported successfully`
+          count > 0
+            ? `${count} vendor(s) exported successfully`
             : 'All vendors exported successfully'
         );
       },

@@ -207,6 +207,9 @@
 <app-bulk-edit-modal
   [visible]="showBulkEditModal"
   [entityIds]="bulkEditIds"
+  [selectAll]="bulkSelectAll"
+  [filterQuery]="bulkFilterQuery"
+  [totalCount]="bulkSelectCount"
   entityName="Vendor"
   bulkUpdateUrl="vendors/bulk-update/"
   [fields]="VENDOR_BULK_FIELDS"

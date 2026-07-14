@@ -15,7 +15,7 @@ import { NzProgressModule } from 'ng-zorro-antd/progress';
 import { NzResultModule } from 'ng-zorro-antd/result';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { BulkEditModalComponent } from '../utils/bulk-edit-modal/bulk-edit-modal.component';
-import { BulkField, BulkOperationsService } from '../utils/bulk-operations.service';
+import { BulkField, BulkOperationsService, BulkSelection } from '../utils/bulk-operations.service';
 import { HelpIconComponent } from '../help/help-icon.component';
 
 
@@ -61,6 +61,9 @@ export class ProductsComponent implements OnInit, OnDestroy {
   // ─── Bulk Edit State ─────────────────────────────────────────
   showBulkEditModal = false;
   bulkEditIds: string[] = [];
+  bulkSelectAll = false;
+  bulkFilterQuery = '';
+  bulkSelectCount = 0;
   isExporting = false;
 
   /** Config: maps each bulk-edit field to its API & display info */
@@ -70,7 +73,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
     { key: 'category_id',               apiKey: 'category_id',               label: 'Category',               type: 'dropdown', url: 'products/product_categories/',          dataKey: 'category_id',               dataLabel: 'category_name' },
     { key: 'brand_id',                   apiKey: 'brand_id',                   label: 'Brand',                  type: 'dropdown', url: 'masters/product_brands/',              dataKey: 'brand_id',                   dataLabel: 'brand_name' },
     { key: 'stock_unit_id',              apiKey: 'stock_unit_id',              label: 'Stock Unit',             type: 'dropdown', url: 'products/product_stock_units/',         dataKey: 'stock_unit_id',              dataLabel: 'stock_unit_name' },
-    { key: 'gst_classification_id',      apiKey: 'gst_classification_id',      label: 'GST Classification',     type: 'dropdown', url: 'products/product_gst_classifications/', dataKey: 'gst_classification_id',      dataLabel: 'type' },
+    { key: 'gst_id',                     apiKey: 'gst_id',                     label: 'GST Percentage',         type: 'dropdown', url: 'products/gst/',                         dataKey: 'gst_id',                     dataLabel: 'gst_name' },
     { key: 'product_item_type_id',       apiKey: 'product_item_type_id',       label: 'Item Type',              type: 'dropdown', url: 'masters/product_item_type/',           dataKey: 'product_item_type_id',       dataLabel: 'item_name' },
     { key: 'sales_gl_id',               apiKey: 'sales_gl_id',               label: 'Sales GL',               type: 'dropdown', url: 'products/product_sales_gl/',            dataKey: 'sales_gl_id',               dataLabel: 'name' },
     { key: 'purchase_gl_id',            apiKey: 'purchase_gl_id',            label: 'Purchase GL',            type: 'dropdown', url: 'products/product_purchase_gl/',          dataKey: 'purchase_gl_id',            dataLabel: 'name' },
@@ -89,9 +92,12 @@ export class ProductsComponent implements OnInit, OnDestroy {
   ];
   // ─────────────────────────────────────────────────────────────
 
-  /** Open the bulk edit modal */
-  openBulkEditModal(ids: string[]) {
-    this.bulkEditIds = ids;
+  /** Open the bulk edit modal for either an explicit selection or all-matching. */
+  openBulkEditModal(selection: BulkSelection) {
+    this.bulkSelectAll = !!selection.selectAll;
+    this.bulkFilterQuery = selection.filterQuery || '';
+    this.bulkEditIds = selection.ids || [];
+    this.bulkSelectCount = selection.count || 0;
     this.showBulkEditModal = true;
   }
 
@@ -127,12 +133,18 @@ export class ProductsComponent implements OnInit, OnDestroy {
     }, 300);
   }
 
-  /** Export all or selected products to Excel */
-  exportProducts(ids: string[]) {
+  /** Export products to Excel — all-matching (filter), explicit ids, or all. */
+  exportProducts(selection: BulkSelection) {
     this.isExporting = true;
+    const count = selection.count || 0;
     let url = 'products/export-products/';
-    if (ids.length > 0) {
-      url += '?ids=' + ids.join(',');
+
+    if (selection.selectAll) {
+      // Export every row matching the current filter (all pages), not just the loaded ids.
+      const fq = selection.filterQuery || '';
+      url += fq ? '?' + fq : '';
+    } else if (selection.ids && selection.ids.length > 0) {
+      url += '?ids=' + selection.ids.join(',');
     }
 
     this.http.get(url, { responseType: 'blob' }).subscribe({
@@ -141,14 +153,14 @@ export class ProductsComponent implements OnInit, OnDestroy {
         const a = document.createElement('a');
         const objectUrl = window.URL.createObjectURL(blob);
         a.href = objectUrl;
-        a.download = ids.length > 0
-          ? `Products_Export_${ids.length}.xlsx`
+        a.download = count > 0
+          ? `Products_Export_${count}.xlsx`
           : 'Products_Export_All.xlsx';
         a.click();
         window.URL.revokeObjectURL(objectUrl);
         this.notification.success('Export Complete',
-          ids.length > 0
-            ? `${ids.length} product(s) exported successfully`
+          count > 0
+            ? `${count} product(s) exported successfully`
             : 'All products exported successfully'
         );
       },

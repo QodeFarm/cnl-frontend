@@ -874,7 +874,7 @@ export class SalesInvoiceListComponent implements OnInit {
         sort: true
       },
       {
-        fieldKey: 'customer',
+        fieldKey: 'name',
         name: 'Customer',
         displayType: "map",
         mapFn: (currentValue: any, row: any, col: any) => {

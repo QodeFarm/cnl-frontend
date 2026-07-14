@@ -15,6 +15,15 @@ export interface BulkField {
   options?: Array<{ label: string; value: any }>; // static options
 }
 
+/** What the list emits when the user triggers a bulk edit. Either an explicit id
+ *  list, or "all rows matching the current filter" (selectAll + filterQuery). */
+export interface BulkSelection {
+  ids?: string[];        // explicit selection (capped path)
+  selectAll?: boolean;   // true = every row matching the current filter
+  filterQuery?: string;  // filter/search query string (no paging) for selectAll
+  count: number;         // how many records will be affected (for display)
+}
+
 export interface BulkEditConfig {
   entityName: string;          // e.g. "Customer", "Product", "Vendor"
   bulkUpdateUrl: string;       // e.g. "customers/bulk-update/"
@@ -78,9 +87,24 @@ export class BulkOperationsService {
       .map(f => f.label);
   }
 
-  /** Execute bulk update PATCH */
-  bulkUpdate(url: string, ids: string[], updateData: Record<string, any>): Observable<any> {
-    return this.http.patch(url, { ids, update_data: updateData });
+  /** Execute bulk update PATCH.
+   *  selectAll=true sends the filter query instead of an id list, so the server
+   *  updates every matching row (all pages), not just the loaded selection. */
+  bulkUpdate(
+    url: string,
+    ids: string[],
+    updateData: Record<string, any>,
+    selectAll = false,
+    filterQuery = ''
+  ): Observable<any> {
+    const body: Record<string, any> = { update_data: updateData };
+    if (selectAll) {
+      body['select_all'] = true;
+      body['filter_query'] = filterQuery;
+    } else {
+      body['ids'] = ids;
+    }
+    return this.http.patch(url, body);
   }
 
   /** Export to Excel — returns a Blob */
