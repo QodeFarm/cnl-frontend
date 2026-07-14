@@ -203,6 +203,9 @@
 <app-bulk-edit-modal
   [visible]="showBulkEditModal"
   [entityIds]="bulkEditIds"
+  [selectAll]="bulkSelectAll"
+  [filterQuery]="bulkFilterQuery"
+  [totalCount]="bulkSelectCount"
   entityName="Product"
   bulkUpdateUrl="products/bulk-update/"
   [fields]="PRODUCT_BULK_FIELDS"

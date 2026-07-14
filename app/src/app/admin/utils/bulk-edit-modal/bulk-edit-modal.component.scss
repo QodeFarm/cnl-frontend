@@ -1,10 +1,23 @@
 // ─── Bulk Edit Modal Styles (reusable) ──────────────────────
+// Themed to match the app: navy #142768 primary, #1a3278 accent,
+// slate greys for borders/labels. Shared by Products / Customers / Vendors.
+
+$bulk-navy:        #142768;
+$bulk-navy-2:      #1a3278;
+$bulk-border:      #d1d5db;
+$bulk-border-hover:#9aa8c7;
+$bulk-label:       #64748b;
+$bulk-text:        #1f2937;
+$bulk-surface:     #f8fafc;
 
 .bulk-edit-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  z-index: 1060;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(2px);
+  // Sit above the Bootstrap products modal (~1055) but just BELOW the CDK overlay
+  // container (1060, styles.scss) so the nz-select dropdown panel renders on top.
+  z-index: 1059;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -18,13 +31,14 @@
 
 .bulk-edit-modal {
   background: #fff;
-  width: 680px;
+  width: 720px;
   max-width: 95vw;
-  max-height: 85vh;
-  border-radius: 8px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  max-height: 88vh;
+  border-radius: 14px;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.28);
   display: flex;
   flex-direction: column;
+  overflow: hidden;
   animation: slideUp 0.25s ease;
 }
 
@@ -33,43 +47,90 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
+// ── Header ─────────────────────────────────────────────────
 .bulk-edit-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 20px;
-  border-bottom: 1px solid #f0f0f0;
+  padding: 18px 24px;
+  background: linear-gradient(135deg, $bulk-navy 0%, $bulk-navy-2 100%);
 
   h5 {
     font-size: 16px;
     font-weight: 600;
-    color: #1a1a1a;
+    color: #fff;
+    letter-spacing: 0.01em;
+  }
+
+  .btn-close {
+    filter: brightness(0) invert(1);
+    opacity: 0.8;
+    transition: opacity 0.15s;
+    &:hover { opacity: 1; }
   }
 }
 
 .bulk-edit-alert {
-  padding: 8px 20px 0;
+  padding: 12px 24px 0;
 }
 
 .bulk-edit-body {
-  padding: 20px;
+  padding: 22px 24px;
   overflow-y: auto;
   flex: 1;
+
+  // Info hint line at the top of the form
+  > .text-muted:first-child {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #eef4ff;
+    border: 1px solid #dbe4fb;
+    color: #3b4a72 !important;
+    font-size: 12.5px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    margin-bottom: 20px !important;
+  }
 }
 
+// ── Footer ─────────────────────────────────────────────────
 .bulk-edit-footer {
-  padding: 12px 20px;
-  border-top: 1px solid #f0f0f0;
+  padding: 14px 24px;
+  border-top: 1px solid #eef0f5;
+  background: $bulk-surface;
   display: flex;
   justify-content: flex-end;
   gap: 10px;
+
+  .btn {
+    font-size: 13px;
+    font-weight: 500;
+    padding: 7px 18px;
+    border-radius: 8px;
+  }
+
+  .btn-primary {
+    background: $bulk-navy;
+    border-color: $bulk-navy;
+    box-shadow: 0 2px 6px rgba(20, 39, 104, 0.25);
+    &:hover:not(:disabled) { background: $bulk-navy-2; border-color: $bulk-navy-2; }
+    &:disabled { opacity: 0.6; }
+  }
+
+  .btn-outline-secondary {
+    color: #475569;
+    border-color: $bulk-border;
+    background: #fff;
+    &:hover:not(:disabled) { background: #f1f5f9; color: #1f2937; }
+  }
 }
 
-// 2-column responsive grid
+// ── Form grid + fields ─────────────────────────────────────
 .bulk-edit-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  gap: 18px 20px;
 
   @media (max-width: 576px) {
     grid-template-columns: 1fr;
@@ -79,34 +140,109 @@
 .bulk-field {
   label {
     display: block;
-    font-size: 12px;
-    font-weight: 500;
-    color: #555;
-    margin-bottom: 4px;
-  }
-
-  .form-select, .form-control {
-    font-size: 13px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: $bulk-label;
+    margin-bottom: 6px;
   }
 }
 
-// 3-state boolean radio group
+// Style the raw <select>/<input> so they match the app instead of default HTML
+.bulk-edit-modal {
+  .form-select,
+  .form-control {
+    height: 40px;
+    border: 1px solid $bulk-border;
+    border-radius: 8px;
+    font-size: 13px;
+    color: $bulk-text;
+    padding: 8px 12px;
+    background-color: #fff;
+    box-shadow: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+    &::placeholder { color: #9aa3b2; }
+
+    &:hover { border-color: $bulk-border-hover; }
+
+    &:focus {
+      border-color: $bulk-navy;
+      box-shadow: 0 0 0 3px rgba(20, 39, 104, 0.12);
+      outline: none;
+    }
+  }
+
+  // Custom themed chevron for selects (overrides Bootstrap's default arrow)
+  .form-select {
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    padding-right: 34px;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23142768' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 12px;
+
+    // "— No change —" placeholder option reads as muted
+    option:first-child { color: #9aa3b2; }
+  }
+}
+
+// ── nz-select (matches the app's dropdowns; searchable, themed) ─────
+.bulk-nz-select {
+  width: 100%;
+  display: block;
+  font-size: 13px;
+
+  ::ng-deep .ant-select-selector {
+    height: 40px !important;
+    padding: 0 12px !important;
+    border: 1px solid $bulk-border !important;
+    border-radius: 8px !important;
+    box-shadow: none !important;
+    display: flex;
+    align-items: center;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  ::ng-deep .ant-select-selection-item,
+  ::ng-deep .ant-select-selection-placeholder {
+    line-height: 38px !important;
+    font-size: 13px;
+  }
+
+  ::ng-deep .ant-select-selection-placeholder { color: #9aa3b2; }
+
+  ::ng-deep .ant-select-selection-search-input { height: 38px !important; }
+
+  &:hover ::ng-deep .ant-select-selector { border-color: $bulk-border-hover !important; }
+
+  &.ant-select-focused ::ng-deep .ant-select-selector,
+  ::ng-deep .ant-select-focused .ant-select-selector {
+    border-color: $bulk-navy !important;
+    box-shadow: 0 0 0 3px rgba(20, 39, 104, 0.12) !important;
+  }
+}
+
+// ── 3-state boolean radio group ────────────────────────────
 .bool-radio-group {
   display: flex;
   gap: 0;
-  border: 1px solid #d9d9d9;
-  border-radius: 4px;
+  border: 1px solid $bulk-border;
+  border-radius: 8px;
   overflow: hidden;
 
   .bool-option {
     flex: 1;
     text-align: center;
-    padding: 5px 8px;
+    padding: 8px 8px;
     font-size: 12px;
     cursor: pointer;
     margin: 0;
-    border-right: 1px solid #d9d9d9;
-    background: #fafafa;
+    border-right: 1px solid $bulk-border;
+    background: #fff;
     transition: all 0.15s;
 
     &:last-child { border-right: none; }
@@ -124,7 +260,7 @@
     }
 
     input[type="radio"]:focus + span {
-      outline: 2px solid #1890ff;
+      outline: 2px solid $bulk-navy;
       outline-offset: -2px;
       border-radius: 2px;
     }
@@ -136,8 +272,8 @@
     span { pointer-events: none; }
 
     &.active {
-      background: #e6f7ff;
-      color: #1890ff;
+      background: #eef4ff;
+      color: $bulk-navy;
       font-weight: 600;
     }
 
@@ -153,35 +289,44 @@
   }
 }
 
-// Confirmation view
+// ── Confirmation view ──────────────────────────────────────
 .confirm-box {
   background: #fffbe6;
   border: 1px solid #ffe58f;
-  border-radius: 6px;
-  padding: 20px;
+  border-radius: 10px;
+  padding: 20px 22px;
 
   .confirm-title {
     font-size: 16px;
     font-weight: 600;
     margin-bottom: 12px;
+    color: #7c5b00;
   }
 }
 
 .changed-fields-list {
-  margin: 0;
-  padding-left: 20px;
+  margin: 8px 0 0;
+  padding-left: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 
   li {
-    font-size: 13px;
-    padding: 2px 0;
-    color: #333;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 4px 12px;
+    color: $bulk-navy;
+    background: #eef4ff;
+    border: 1px solid #dbe4fb;
+    border-radius: 999px;
   }
 }
 
 // Alert sizing
 .alert-sm {
   font-size: 13px;
-  border-radius: 4px;
+  border-radius: 8px;
 }
 
 .btn-close-sm {

@@ -1465,13 +1465,99 @@ applyFilters() {
     this.loadDataFromServer();
     // this.loadDataFromServer(pageIndex, pageSize, sortField, sortOrder, filter);
   }
+  /**
+   * Current search/filter state as a query string WITHOUT paging (page/limit stripped).
+   * Used by "select all matching" bulk operations so the server can rebuild the exact
+   * same filtered set the user is viewing, across every page — not just the loaded slice.
+   *
+   * The list has TWO filter paths and either can be active, so we merge BOTH here — a
+   * missing filter would let a bulk edit touch rows the user never filtered to, which is
+   * the one outcome we must never allow:
+   *   1) global search (`s=`) + column filters via getParamsQuery
+   *   2) the dropdown/date filters (Type/Group/Category/Warehouse/date/status) that go
+   *      through applyFilters() → generateQueryString (product_group_id=, category_id=, …)
+   * Merging can only ever NARROW the set (extra AND-ed filters), never widen it.
+   */
+  getFilterQuery(): string {
+    const parts: string[] = [];
+
+    // 1) Global search + column filters (drop paging — select-all spans all pages).
+    const cfg: TaParamsConfig = {
+      apiUrl: this.options.apiUrl,
+      pageIndex: this.pageIndex,
+      pageSize: this.pageSize,
+      sort: this.sort,
+      filters: this.filters,
+      globalSearch: this.options.globalSearch,
+      fixedFilters: this.options.fixedFilters
+    };
+    (this.taTableS.getParamsQuery(cfg) || '')
+      .split('&')
+      .filter(p => p && !p.startsWith('page=') && !p.startsWith('limit='))
+      .forEach(p => parts.push(p));
+
+    // 2) Dropdown/date filters — same params the list sends via applyFilters().
+    this.generateQueryString({
+      quickPeriod: this.selectedQuickPeriod,
+      fromDate: this.fromDate,
+      toDate: this.toDate,
+      status: this.selectedStatus,
+      employee: this.selectedEmployee,
+      group: this.selectedGroup,
+      category: this.selectedCategory,
+      type: this.selectedType,
+      warehouse: this.selectedWarehouse,
+      ledgerAccount: this.selectedLedgerAccount,
+      city: this.selectedCity
+    })
+      .split('&')
+      .filter(p => p)
+      .forEach(p => parts.push(p));
+
+    return parts.join('&');
+  }
+
+  /**
+   * "Select all matching" mode: the logical selection is EVERY row matching the current
+   * filter across all pages — not a per-id list. While active, every row checkbox (on any
+   * page) and the header render as checked, and bulk operations use getFilterQuery() rather
+   * than the id list. Any manual checkbox change exits the mode (see handlers below).
+   */
+  selectAllMatching = false;
+
+  /** True when a row's checkbox should render ticked (honours select-all-matching). */
+  isRowChecked(row: any): boolean {
+    return this.selectAllMatching || this.setOfCheckedId.has(row[this.options.pkId]);
+  }
+
+  /** Turn on select-all-matching (every row on every page shows checked). */
+  enableSelectAllMatching(): void {
+    this.selectAllMatching = true;
+    this.refreshCheckedStatus();
+  }
+
+  /** Clear everything: exit select-all-matching and drop all ticked ids. */
+  clearAllSelections(): void {
+    this.selectAllMatching = false;
+    this.setOfCheckedId.clear();
+    this.refreshCheckedStatus();
+  }
+
   refreshCheckedStatus(): void {
     const listOfEnabledData = this.rows.filter(({ disabled }) => !disabled);
-    this.checked = listOfEnabledData.every((row) => this.setOfCheckedId.has(row[this.options.pkId]));
+    // In select-all-matching the header is always fully checked; otherwise derive it.
+    this.checked = this.selectAllMatching
+      || (listOfEnabledData.length > 0 && listOfEnabledData.every((row) => this.setOfCheckedId.has(row[this.options.pkId])));
     this.options.checkedRows = Array.from(this.setOfCheckedId) || [];
-    this.indeterminate = listOfEnabledData.some((row) => this.setOfCheckedId.has(row[this.options.pkId])) && !this.checked;
+    this.indeterminate = !this.selectAllMatching
+      && listOfEnabledData.some((row) => this.setOfCheckedId.has(row[this.options.pkId])) && !this.checked;
   }
   onAllChecked(checked: boolean): void {
+    // Header shows checked while in select-all-matching; unticking it clears everything.
+    if (this.selectAllMatching) {
+      this.clearAllSelections();
+      return;
+    }
     this.rows
       .filter(({ disabled }) => !disabled)
       .forEach((row) => this.updateCheckedSet(row[this.options.pkId], checked));
@@ -1485,6 +1571,15 @@ applyFilters() {
     }
   }
   onItemChecked(id: number, checked: boolean): void {
+    // Leaving select-all-matching by touching a row: materialise the visible page as an
+    // explicit selection first, so the page reflects reality (all-but-this-one checked).
+    if (this.selectAllMatching) {
+      this.selectAllMatching = false;
+      this.setOfCheckedId.clear();
+      this.rows
+        .filter(({ disabled }) => !disabled)
+        .forEach((row) => this.setOfCheckedId.add(row[this.options.pkId]));
+    }
     this.updateCheckedSet(id, checked);
     this.refreshCheckedStatus();
   }

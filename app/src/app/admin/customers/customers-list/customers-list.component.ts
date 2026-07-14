@@ -7,6 +7,7 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component';
 import { DoubleClickNavigationService } from 'src/app/services/double-click-navigation.service';
+import { BulkSelection } from 'src/app/admin/utils/bulk-operations.service';
 
 @Component({
   selector: 'app-customers-list',
@@ -18,39 +19,89 @@ import { DoubleClickNavigationService } from 'src/app/services/double-click-navi
 export class CustomersListComponent {
 
   @Output('edit') edit = new EventEmitter<any>();
-  @Output('bulkEdit') bulkEdit = new EventEmitter<string[]>();
-  @Output('exportCustomers') exportCustomers = new EventEmitter<string[]>();
+  @Output('bulkEdit') bulkEdit = new EventEmitter<BulkSelection>();
+  @Output('exportCustomers') exportCustomers = new EventEmitter<BulkSelection>();
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
   constructor(private http: HttpClient, private router: Router, private message: NzMessageService, private dblClickNav: DoubleClickNavigationService) { }
+
+  /** Single source of truth for select-all-matching lives in ta-table (checkboxes + banner stay in sync). */
+  get selectAllMatching(): boolean {
+    return !!this.taTableComponent?.selectAllMatching;
+  }
 
   /** Selected customer IDs — read directly from ta-table's checkedRows */
   get selectedIds(): string[] {
     return (this.tableConfig.checkedRows as string[]) || [];
   }
 
+  /** Total records matching the current filter (across all pages). */
+  get totalRecords(): number {
+    return this.taTableComponent?.total || 0;
+  }
+
+  /** The header checkbox is on = every enabled row on the current page is ticked. */
+  get pageFullySelected(): boolean {
+    return !!this.taTableComponent?.checked;
+  }
+
+  /** Offer "select all matching" only when the page is full-selected and more rows exist. */
+  get canSelectAllMatching(): boolean {
+    return !this.selectAllMatching && this.pageFullySelected && this.totalRecords > this.selectedIds.length;
+  }
+
+  /** "All N matching" banner is active (state owned by ta-table). */
+  get selectAllMatchingActive(): boolean {
+    return this.selectAllMatching;
+  }
+
+  enableSelectAllMatching() {
+    this.taTableComponent?.enableSelectAllMatching();
+  }
+
+  /** Count shown on the Export button (all-matching total, else explicit selection). */
+  get exportCount(): number {
+    return this.selectAllMatching ? this.totalRecords : this.selectedIds.length;
+  }
+
   get isOverLimit(): boolean {
-    return this.selectedIds.length > 100;
+    // The 100 cap only applies to explicit selection; select-all-matching bypasses it.
+    return !this.selectAllMatching && this.selectedIds.length > 100;
   }
 
   refreshTable() {
     this.taTableComponent?.refresh();
   }
 
-  /** Clear all checkbox selections */
+  /** Clear all checkbox selections (and exit select-all-matching). */
   clearSelections() {
-    this.taTableComponent?.setOfCheckedId?.clear();
+    this.taTableComponent?.clearAllSelections();
     this.tableConfig.checkedRows = [];
-    this.taTableComponent?.refreshCheckedStatus();
   }
 
-  /** Emit selected IDs to parent for bulk edit */
+  /** Emit the selection (explicit ids, or all-matching + filter) to parent for bulk edit */
   onBulkEditClick() {
-    this.bulkEdit.emit([...this.selectedIds]);
+    if (this.selectAllMatching) {
+      this.bulkEdit.emit({
+        selectAll: true,
+        filterQuery: this.taTableComponent?.getFilterQuery() || '',
+        count: this.totalRecords
+      });
+    } else {
+      this.bulkEdit.emit({ ids: [...this.selectedIds], count: this.selectedIds.length });
+    }
   }
 
-  /** Emit selected IDs (empty array if none selected) to parent for export */
+  /** Emit the selection to parent for export (all-matching, explicit ids, or none=all) */
   onExportClick() {
-    this.exportCustomers.emit([...this.selectedIds]);
+    if (this.selectAllMatching) {
+      this.exportCustomers.emit({
+        selectAll: true,
+        filterQuery: this.taTableComponent?.getFilterQuery() || '',
+        count: this.totalRecords
+      });
+    } else {
+      this.exportCustomers.emit({ ids: [...this.selectedIds], count: this.selectedIds.length });
+    }
   }
 
   tableConfig: TaTableConfig = {
