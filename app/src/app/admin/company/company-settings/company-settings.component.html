@@ -122,6 +122,18 @@
                   <nz-option *ngFor="let a of generalAccounts" [nzValue]="a.ledger_account_id" [nzLabel]="a.name"></nz-option>
                 </nz-select>
               </label>
+              <label class="cs-field">
+                <span class="cs-field__label">Opening Balance Equity Account</span>
+                <nz-select class="cs-select" nzShowSearch nzAllowClear nzPlaceHolder="Select opening balance equity account"
+                  [(ngModel)]="settings.opening_balance_equity_account" (ngModelChange)="autoSave()">
+                  <nz-option *ngFor="let a of generalAccounts" [nzValue]="a.ledger_account_id" [nzLabel]="a.name"></nz-option>
+                </nz-select>
+              </label>
+              <label class="cs-field">
+                <span class="cs-field__label">Books Beginning Date</span>
+                <input class="cs-select" type="date"
+                  [(ngModel)]="settings.books_beginning_date" (ngModelChange)="autoSave()" />
+              </label>
             </div>
           </div>
 

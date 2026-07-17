@@ -25,6 +25,7 @@ import { GstDetailsComponent } from './gst-details/gst-details.component';
 import { AccountLedgerComponent } from './account-ledger/account-ledger.component';
 import { AccountLedgerModule } from './account-ledger/account-ledger.module';
 import { LedgerAccountsComponent } from '../customers/ledger-accounts/ledger-accounts.component';
+import { OpeningBalanceComponent } from './opening-balance/opening-balance.component';
 
 
 @NgModule({
@@ -55,8 +56,9 @@ import { LedgerAccountsComponent } from '../customers/ledger-accounts/ledger-acc
     AccountLedgerComponent,
     GstDetailsComponent,
     AccountLedgerModule,
-    LedgerAccountsComponent
-    
+    LedgerAccountsComponent,
+    OpeningBalanceComponent
+
   ]
 })
 export class FinanceModule { }
