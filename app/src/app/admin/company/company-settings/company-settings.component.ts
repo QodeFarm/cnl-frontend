@@ -39,6 +39,8 @@ export interface FinanceSettings {
   bank_account?: string | null;
   discount_account?: string | null;
   round_off_account?: string | null;
+  opening_balance_equity_account?: string | null;
+  books_beginning_date?: string | null;
   // Sales notifications
   notify_sale_order_whatsapp?: boolean;
 }
@@ -162,6 +164,8 @@ export class CompanySettingsComponent implements OnInit, OnDestroy {
       bank_account:            this.settings.bank_account            || null,
       discount_account:        this.settings.discount_account        || null,
       round_off_account:       this.settings.round_off_account       || null,
+      opening_balance_equity_account: this.settings.opening_balance_equity_account || null,
+      books_beginning_date:    this.settings.books_beginning_date    || null,
       // Sales notifications toggle (default OFF until an admin turns it on)
       notify_sale_order_whatsapp: !!this.settings.notify_sale_order_whatsapp,
     };

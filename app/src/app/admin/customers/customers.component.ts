@@ -83,6 +83,7 @@ export class CustomersComponent {
 
   /** Config: maps each bulk-edit field to its API & display info */
   readonly BULK_FIELDS: BulkField[] = [
+    { key: 'ledger_account_id', apiKey: 'ledger_account_id', label: 'Under Ledger', type: 'dropdown', url: 'customers/ledger_accounts/?group_purpose=AccountsReceivable', dataKey: 'ledger_account_id', dataLabel: 'name' },
     { key: 'customer_category_id', apiKey: 'customer_category_id', label: 'Customer Category', type: 'dropdown', url: 'masters/customer_categories/', dataKey: 'customer_category_id', dataLabel: 'name' },
     { key: 'territory_id', apiKey: 'territory_id', label: 'Territory', type: 'dropdown', url: 'masters/territory/', dataKey: 'territory_id', dataLabel: 'name' },
     { key: 'firm_status_id', apiKey: 'firm_status_id', label: 'Firm Status', type: 'dropdown', url: 'masters/firm_statuses/', dataKey: 'firm_status_id', dataLabel: 'name' },

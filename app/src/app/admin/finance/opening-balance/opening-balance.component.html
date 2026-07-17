@@ -1,0 +1,48 @@
+<div class="container-fluid p-3">
+    <div class="bank-account-banner">
+        <div class="col-12 px-0" style="display: flex; justify-content: space-between; align-items: center;flex-wrap: wrap;">
+            <div class="d-flex align-items-center" style="gap: 6px;">
+              <button (click)="OpeningBalanceEditID = null" type="button" class="btn p-0" style="color: black;">
+                <span *ngIf="OpeningBalanceEditID" class="custom-heading">Update Opening Balance</span>
+                <span *ngIf="!OpeningBalanceEditID" class="custom-heading">Opening Balance</span>
+              </button>
+            </div>
+            <div class="d-flex justify-content-end align-items-center gap-4" style="font-size: 14px; font-weight: 600;">
+              <div class="text-primary">
+                Total Debit: <span class="text-success">₹{{ totalDebit }}</span>
+              </div>
+              <div class="text-primary">
+                Total Credit: <span class="text-danger">₹{{ totalCredit }}</span>
+              </div>
+              <button (click)="showOpeningBalanceListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#openingBalanceModal">
+                  Opening Balance List
+              </button>
+            </div>
+        </div>
+    </div>
+    <div class="row custom-form">
+        <div *ngIf="OpeningBalanceEditID && !showForm" class="col-12 p-3">
+          <nz-skeleton [nzActive]="true" [nzParagraph]="{ rows: 8 }"></nz-skeleton>
+        </div>
+        <div class="col-12 px-1" *ngIf="showForm">
+            <ta-form [options]="formConfig"></ta-form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade custom-modal" id="openingBalanceModal" tabindex="-1" aria-labelledby="openingBalanceModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl ">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="openingBalanceModalLabel">Opening Balance List</h5>
+                <button type="button" id="modalClose" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" *ngIf="showOpeningBalanceList">
+                <app-opening-balance-list (edit)="editOpeningBalance($event)" (cancel)="cancelOpeningBalance($event)" class="custom-list"></app-opening-balance-list>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
