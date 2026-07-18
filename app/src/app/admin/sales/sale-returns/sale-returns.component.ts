@@ -824,6 +824,8 @@ updateReturnNoControl() {
             return_no: this.formConfig.model.sale_return_order.return_no,
             ref_no: invoiceData.ref_no,
             ref_date: invoiceData.ref_date,
+            against_bill: invoiceData.invoice_no,
+            against_bill_date: invoiceData.invoice_date,
             tax: invoiceData.tax,
             remarks: invoiceData.remarks,
             item_value: invoiceData.item_value,
@@ -871,6 +873,8 @@ updateReturnNoControl() {
             return_no: this.formConfig.model.sale_return_order.return_no,
             ref_no: invoiceData.ref_no,
             ref_date: invoiceData.ref_date,
+            against_bill: invoiceData.invoice_no,
+            against_bill_date: invoiceData.invoice_date,
             tax: invoiceData.tax,
             remarks: invoiceData.remarks,
             item_value: invoiceData.item_value,
@@ -927,11 +931,140 @@ updateReturnNoControl() {
     this.hideModal(); // Use the hideModal method to remove the modal elements
   }
 
-  handleProductsPulled(products: any[]) {
+  // handleProductsPulled(products: any[], invoiceData?: any) {
+  //   let existingProducts = this.formConfig.model['sale_return_items'] || [];
+
+  //   existingProducts = existingProducts.filter((product: any) => product?.code && product.code.trim() !== "");
+  //   console.log("Products received for pulling:", products);
+
+  //   // Update against_bill if invoiceData is provided
+  //   if (invoiceData) {
+  //       this.formConfig.model.sale_return_order = {
+  //           ...this.formConfig.model.sale_return_order,
+  //           against_bill: invoiceData.invoice_no,
+  //           against_bill_date: invoiceData.invoice_date
+  //       };
+  //   }
+
+  //   if (existingProducts.length === 0) {
+  //     this.formConfig.model['sale_return_items'] = products.map(product => ({
+  //       product: {
+  //         product_id: product.product_id || null,
+  //         name: product.name || '',
+  //         code: product.code || '',
+  //       },
+  //       product_id: product.product_id || null,
+  //       code: product.code || '',
+  //       total_boxes: product.total_boxes || 0,
+  //       unit_options_id: product.unit_options_id,
+  //       quantity: product.quantity || 1,
+  //       rate: product.rate || 0,
+  //       discount: product.discount || 0,
+  //       print_name: product.print_name || product.name || '',
+  //       amount: product.amount || 0,
+  //       tax: product.tax || 0,
+  //       cgst: product.cgst || 0,
+  //       sgst: product.sgst || 0,
+  //       igst: product.igst || 0,
+  //       remarks: product.remarks || null
+  //     }));
+  //   } else {
+  //     products.forEach(newProduct => {
+  //       const existingProductIndex = existingProducts.findIndex((product: any) => product?.code === newProduct?.code);
+
+  //       if (existingProductIndex === -1) {
+  //         existingProducts.push({
+  //           product: {
+  //             product_id: newProduct.product_id || null,
+  //             name: newProduct.name || '',
+  //             code: newProduct.code || '',
+  //           },
+  //           product_id: newProduct.product_id || null,
+  //           code: newProduct.code || '',
+  //           total_boxes: newProduct.total_boxes || 0,
+  //           unit_options_id: newProduct.unit_options_id,
+  //           quantity: newProduct.quantity || 1,
+  //           rate: newProduct.rate || 0,
+  //           discount: newProduct.discount || 0,
+  //           print_name: newProduct.print_name || newProduct.name || '',
+  //           amount: newProduct.amount || 0,
+  //           tax: newProduct.tax || 0,
+  //           cgst: newProduct.cgst || 0,
+  //           sgst: newProduct.sgst || 0,
+  //           igst: newProduct.igst || 0,
+  //           remarks: newProduct.remarks || null
+  //         });
+  //       } else {
+  //         existingProducts[existingProductIndex] = {
+  //           ...existingProducts[existingProductIndex],
+  //           ...newProduct,
+  //           remarks:
+  //             newProduct.remarks !== undefined
+  //               ? newProduct.remarks
+  //               : existingProducts[existingProductIndex].remarks ?? null,
+  //           product: {
+  //             product_id: newProduct.product_id || existingProducts[existingProductIndex].product.product_id,
+  //             name: newProduct.name || existingProducts[existingProductIndex].product.name,
+  //             code: newProduct.code || existingProducts[existingProductIndex].product.code,
+  //           }
+  //         };
+  //       }
+  //     });
+
+  //     this.formConfig.model['sale_return_items'] = [...existingProducts];
+  //   }
+
+  //   this.formConfig.model = { ...this.formConfig.model };
+
+  //   this.cdRef.detectChanges();
+
+  //   console.log("Final Products List:", this.formConfig.model['sale_return_items']);
+  //   this.hideModal();
+  // }
+
+handleProductsPulled(event: any) {
+    const products = event.products;
+    const saleInvoiceId = event.sale_invoice_id;
+    
+    console.log("Products received for pulling:", products);
+    console.log("Sale Invoice ID:", saleInvoiceId);
+
+    // Fetch sale invoice details using the saleInvoiceId
+    if (saleInvoiceId) {
+        this.http.get(`sales/sale_invoice_order/${saleInvoiceId}`).subscribe((res: any) => {
+            if (res && res.data) {
+                const invoiceData = res.data.sale_invoice_order;
+                console.log("Invoice data fetched:", invoiceData);
+                
+                // Update against_bill and against_bill_date with fetched invoice data
+                this.formConfig.model.sale_return_order = {
+                    ...this.formConfig.model.sale_return_order,
+                    against_bill: invoiceData.invoice_no,
+                    against_bill_date: invoiceData.invoice_date
+                };
+                
+                console.log("Updated against_bill:", invoiceData.invoice_no);
+                console.log("Updated against_bill_date:", invoiceData.invoice_date);
+                
+                // Now process the products
+                this.processProducts(products);
+            }
+        }, (error) => {
+            console.error('Error fetching invoice details:', error);
+            // Still process products even if invoice fetch fails
+            this.processProducts(products);
+        });
+    } else {
+        console.warn("No sale_invoice_id provided, skipping invoice fetch");
+        this.processProducts(products);
+    }
+}
+
+// Extract product processing logic to a separate method
+private processProducts(products: any[]) {
     let existingProducts = this.formConfig.model['sale_return_items'] || [];
 
     existingProducts = existingProducts.filter((product: any) => product?.code && product.code.trim() !== "");
-    console.log("Products received for pulling:", products);
 
     if (existingProducts.length === 0) {
       this.formConfig.model['sale_return_items'] = products.map(product => ({
@@ -1006,8 +1139,10 @@ updateReturnNoControl() {
     this.cdRef.detectChanges();
 
     console.log("Final Products List:", this.formConfig.model['sale_return_items']);
+    console.log("Final Against Bill:", this.formConfig.model.sale_return_order.against_bill);
+    console.log("Final Against Bill Date:", this.formConfig.model.sale_return_order.against_bill_date);
     this.hideModal();
-  }
+}
 
 
 
