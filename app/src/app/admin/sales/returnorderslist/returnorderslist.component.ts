@@ -12,15 +12,15 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
   styleUrls: ['./returnorderslist.component.scss']
 })
 export class ReturnorderslistComponent {
-@Input() customerOrders: any[] = [];
+  @Input() customerOrders: any[] = [];
   @Output() orderSelected = new EventEmitter<any>();
-  @Output() productsPulled = new EventEmitter<any[]>();
+  @Output() productsPulled = new EventEmitter<{products: any[], sale_invoice_id: string}>();
   @Input() noOrdersMessage: string = '';
   @Output() modalClosed = new EventEmitter<void>();
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
 
   refreshTable() {
-   this.taTableComponent?.refresh();
+    this.taTableComponent?.refresh();
   };
   
   selectedOrder: any = null;
@@ -51,43 +51,50 @@ export class ReturnorderslistComponent {
   hideModal() {
     this.modalClosed.emit();
   }
+
   pullSelectedProducts() {
+    const saleInvoiceId = this.selectedOrder?.sale_invoice_id;
+    
     if (this.selectedProducts.length > 0) {
-      this.productsPulled.emit(this.selectedProducts.map(product => ({
-        product_id: product.product_id || null,
-        name: product.product_name || '',
-        code: product.code || '',
-        total_boxes: product.total_boxes,
-        unit_options_id: product.unit_options_id,
-        discount: product.discount || 0,
-        quantity: product.quantity || 0,
-        rate: product.rate || 0,
-        amount: product.amount || 0,
-        tax: product.tax || 0,
-        cgst: product.cgst || 0,
-        sgst: product.sgst || 0,
-        igst: product.igst || 0,
-        remarks: product.remarks || '',
-        // Add other required fields
-      })));
+      this.productsPulled.emit({
+        products: this.selectedProducts.map(product => ({
+          product_id: product.product_id || null,
+          name: product.product_name || '',
+          code: product.code || '',
+          total_boxes: product.total_boxes,
+          unit_options_id: product.unit_options_id,
+          discount: product.discount || 0,
+          quantity: product.quantity || 0,
+          rate: product.rate || 0,
+          amount: product.amount || 0,
+          tax: product.tax || 0,
+          cgst: product.cgst || 0,
+          sgst: product.sgst || 0,
+          igst: product.igst || 0,
+          remarks: product.remarks || '',
+        })),
+        sale_invoice_id: saleInvoiceId
+      });
     } else if (this.selectedOrder) {
-      this.productsPulled.emit(this.selectedOrder.productsList.map(product => ({
-        product_id: product.product_id || null,
-        name: product.product_name || '',
-        code: product.code || '',
-        total_boxes: product.total_boxes,
-        unit_options_id: product.unit_options_id,
-        discount: product.discount || 0,
-        quantity: product.quantity || 0,
-        rate: product.rate || 0,
-        amount: product.amount || 0,
-        tax: product.tax || 0,
-        cgst: product.cgst || 0,
-        sgst: product.sgst || 0,
-        igst: product.igst || 0,
-        remarks: product.remarks || '',
-        // Add other required fields
-      })));
+      this.productsPulled.emit({
+        products: this.selectedOrder.productsList.map(product => ({
+          product_id: product.product_id || null,
+          name: product.product_name || '',
+          code: product.code || '',
+          total_boxes: product.total_boxes,
+          unit_options_id: product.unit_options_id,
+          discount: product.discount || 0,
+          quantity: product.quantity || 0,
+          rate: product.rate || 0,
+          amount: product.amount || 0,
+          tax: product.tax || 0,
+          cgst: product.cgst || 0,
+          sgst: product.sgst || 0,
+          igst: product.igst || 0,
+          remarks: product.remarks || '',
+        })),
+        sale_invoice_id: saleInvoiceId
+      });
     }
   }
 }
