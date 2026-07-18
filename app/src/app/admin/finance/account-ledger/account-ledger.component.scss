@@ -211,6 +211,25 @@ $color-cr:   #16a34a;
       color: #333333;
       white-space: nowrap;
     }
+
+    // Counter-account heading inside the Description cell (Tally / AlignBooks style):
+    // the "other side" account, highlighted on its own line, with the narration below.
+    .ledger-acct-head {
+      display: inline-block;
+      font-weight: 700;
+      color: $primary;
+      background: rgba(20, 39, 104, 0.08);
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-bottom: 4px;
+      line-height: 1.3;
+    }
+    .ledger-acct-desc {
+      display: block;
+      color: #4a5268;
+      font-size: 13px;
+      line-height: 1.45;
+    }
   }
 }
 

@@ -15,7 +15,7 @@ import { NzProgressModule } from 'ng-zorro-antd/progress';
 import { NzResultModule } from 'ng-zorro-antd/result';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { BulkEditModalComponent } from '../utils/bulk-edit-modal/bulk-edit-modal.component';
-import { BulkField } from '../utils/bulk-operations.service';
+import { BulkField, BulkSelection } from '../utils/bulk-operations.service';
 import { LocalStorageService } from 'projects/ta-core/src/lib/services/local-storage.service';
 import { ledgerAccountsConfig } from '../../utils/master-curd-config';
 import { HelpIconComponent } from '../help/help-icon.component';
@@ -77,9 +77,13 @@ export class CustomersComponent {
   // ─── Bulk Edit State ─────────────────────────────────────────
   showBulkEditModal = false;
   bulkEditIds: string[] = [];
+  bulkSelectAll = false;
+  bulkFilterQuery = '';
+  bulkSelectCount = 0;
 
   /** Config: maps each bulk-edit field to its API & display info */
   readonly BULK_FIELDS: BulkField[] = [
+    { key: 'ledger_account_id', apiKey: 'ledger_account_id', label: 'Under Ledger', type: 'dropdown', url: 'customers/ledger_accounts/?group_purpose=AccountsReceivable', dataKey: 'ledger_account_id', dataLabel: 'name' },
     { key: 'customer_category_id', apiKey: 'customer_category_id', label: 'Customer Category', type: 'dropdown', url: 'masters/customer_categories/', dataKey: 'customer_category_id', dataLabel: 'name' },
     { key: 'territory_id', apiKey: 'territory_id', label: 'Territory', type: 'dropdown', url: 'masters/territory/', dataKey: 'territory_id', dataLabel: 'name' },
     { key: 'firm_status_id', apiKey: 'firm_status_id', label: 'Firm Status', type: 'dropdown', url: 'masters/firm_statuses/', dataKey: 'firm_status_id', dataLabel: 'name' },
@@ -2415,9 +2419,12 @@ sendCredentialsToCustomer() {
 
   // ─── Bulk Edit Methods ───────────────────────────────────────
 
-  /** Open the bulk edit modal */
-  openBulkEditModal(ids: string[]) {
-    this.bulkEditIds = ids;
+  /** Open the bulk edit modal for either an explicit selection or all-matching. */
+  openBulkEditModal(selection: BulkSelection) {
+    this.bulkSelectAll = !!selection.selectAll;
+    this.bulkFilterQuery = selection.filterQuery || '';
+    this.bulkEditIds = selection.ids || [];
+    this.bulkSelectCount = selection.count || 0;
     this.showBulkEditModal = true;
   }
 
@@ -2435,12 +2442,18 @@ sendCredentialsToCustomer() {
 
   // ─── Export Customers ────────────────────────────────────────
 
-  /** Export all or selected customers to Excel */
-  exportCustomers(ids: string[]) {
+  /** Export customers to Excel — all-matching (filter), explicit ids, or all. */
+  exportCustomers(selection: BulkSelection) {
     this.isExporting = true;
+    const count = selection.count || 0;
     let url = 'customers/export-customers/';
-    if (ids.length > 0) {
-      url += '?ids=' + ids.join(',');
+
+    if (selection.selectAll) {
+      // Export every row matching the current filter (all pages), not just loaded ids.
+      const fq = selection.filterQuery || '';
+      url += fq ? '?' + fq : '';
+    } else if (selection.ids && selection.ids.length > 0) {
+      url += '?ids=' + selection.ids.join(',');
     }
 
     this.http.get(url, { responseType: 'blob' }).subscribe({
@@ -2449,14 +2462,14 @@ sendCredentialsToCustomer() {
         const a = document.createElement('a');
         const objectUrl = window.URL.createObjectURL(blob);
         a.href = objectUrl;
-        a.download = ids.length > 0
-          ? `Customers_Export_${ids.length}.xlsx`
+        a.download = count > 0
+          ? `Customers_Export_${count}.xlsx`
           : 'Customers_Export_All.xlsx';
         a.click();
         window.URL.revokeObjectURL(objectUrl);
         this.notification.success('Export Complete',
-          ids.length > 0
-            ? `${ids.length} customer(s) exported successfully`
+          count > 0
+            ? `${count} customer(s) exported successfully`
             : 'All customers exported successfully'
         );
       },

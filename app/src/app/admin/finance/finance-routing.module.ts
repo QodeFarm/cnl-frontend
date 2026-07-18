@@ -14,6 +14,7 @@ import { JournalVoucherComponent } from './journal-voucher/journal-voucher.compo
 import { GstDetailsComponent } from './gst-details/gst-details.component';
 import { AccountLedgerComponent } from './account-ledger/account-ledger.component';
 import { LedgerAccountsComponent } from '../customers/ledger-accounts/ledger-accounts.component';
+import { OpeningBalanceComponent } from './opening-balance/opening-balance.component';
 
 const routes: Routes = [
   {
@@ -71,6 +72,11 @@ const routes: Routes = [
   {
     path: 'ledger-accounts',
     component: LedgerAccountsComponent,
+  },
+
+  {
+    path: 'opening-balance',
+    component: OpeningBalanceComponent,
   }
 ];
 

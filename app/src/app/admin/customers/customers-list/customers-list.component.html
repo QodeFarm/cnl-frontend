@@ -2,27 +2,47 @@
 <div class="bulk-edit-bar" [class.has-selection]="selectedIds.length > 0">
   <!-- Left: selection info + bulk edit -->
   <div class="bar-left" *ngIf="selectedIds.length > 0">
-    <span class="selected-count">{{ selectedIds.length }} selected</span>
+    <span class="selected-count">
+      {{ selectAllMatchingActive ? ('All ' + totalRecords + ' matching selected') : (selectedIds.length + ' selected') }}
+    </span>
+
+    <!-- Offer to extend the selection to every matching row (all pages) -->
     <button
-      class="btn btn-primary btn-sm bulk-edit-btn"
+      *ngIf="canSelectAllMatching"
+      class="btn btn-link btn-sm p-0 ms-2 select-all-matching-link"
+      title="Select every customer matching the current filter, across all pages"
+      (click)="enableSelectAllMatching()">
+      Select all {{ totalRecords }} matching
+    </button>
+    <!-- Undo the all-matching selection -->
+    <button
+      *ngIf="selectAllMatchingActive"
+      class="btn btn-link btn-sm p-0 ms-2 select-all-matching-link"
+      title="Clear the all-matching selection"
+      (click)="clearSelections()">
+      Clear selection
+    </button>
+
+    <button
+      class="btn btn-primary btn-sm bulk-edit-btn ms-2"
       [disabled]="isOverLimit"
-      [title]="isOverLimit ? 'Select up to 100 customers' : 'Bulk edit selected customers'"
+      [title]="isOverLimit ? 'Select up to 100 customers (or use Select all matching)' : 'Bulk edit selected customers'"
       (click)="onBulkEditClick()">
       <i class="fa fa-pencil-alt me-1"></i>
-      Bulk Edit ({{ selectedIds.length }})
+      Bulk Edit ({{ selectAllMatchingActive ? totalRecords : selectedIds.length }})
     </button>
     <span class="text-danger ms-2" *ngIf="isOverLimit">
-      <small>Max 100 allowed</small>
+      <small>Max 100 &mdash; use "Select all matching" for more</small>
     </span>
   </div>
   <!-- Right: Export button (always visible) -->
   <div class="bar-right">
     <button
       class="btn btn-outline-success btn-sm"
-      title="{{ selectedIds.length > 0 ? 'Export ' + selectedIds.length + ' selected customers' : 'Export all customers' }}"
+      title="{{ exportCount > 0 ? 'Export ' + exportCount + ' selected customers' : 'Export all customers' }}"
       (click)="onExportClick()">
       <i class="fa fa-file-excel me-1"></i>
-      {{ selectedIds.length > 0 ? 'Export Selected (' + selectedIds.length + ')' : 'Export All' }}
+      {{ exportCount > 0 ? 'Export Selected (' + exportCount + ')' : 'Export All' }}
     </button>
   </div>
 </div>

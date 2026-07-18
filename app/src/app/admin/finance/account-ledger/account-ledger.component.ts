@@ -194,6 +194,7 @@ export class AccountLedgerComponent implements OnInit, AfterViewInit, OnDestroy 
               bill_payment:      '/admin/purchase/bill-payments',
               journal_entry:     '/admin/finance/journal-entry',
               journal_voucher:   '/admin/finance/journal-voucher',
+              opening_balance:   '/admin/finance/opening-balance',
             };
             const srcType: string = row?.source_type;
             const srcId: string   = row?.source_id;
@@ -234,16 +235,27 @@ export class AccountLedgerComponent implements OnInit, AfterViewInit, OnDestroy 
           displayType: 'date'
         },
         {
+          // Description cell = the counter-account ("Particulars") as a highlighted heading,
+          // with the transaction narration below it (Tally / AlignBooks style). counter_account
+          // is computed per row by the backend = the account on the other side of the entry.
           fieldKey: 'description',
           name: 'Description',
-          width: '340px',
+          width: '420px',
           sort: false,
           displayType: 'map',
-          mapFn: (value: any) => {
-            if (!value) return '';
-            const lines = value.split('\n');
-            lines[0] = `<strong>${lines[0]}</strong>`;
-            return lines.join('<br/>');
+          mapFn: (value: any, row: any) => {
+            // Escape before building HTML - counter_account and description carry account/
+            // customer/vendor names, which are user-controlled and would otherwise allow
+            // stored XSS when injected as innerHTML by the table.
+            const esc = (s: any) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) =>
+              ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] as string));
+            const acct = (row?.counter_account && row.counter_account !== '-')
+              ? `<span class="ledger-acct-head">${esc(row.counter_account)}</span>`
+              : '';
+            const desc = value
+              ? `<span class="ledger-acct-desc">${esc(value).split('\n').join('<br/>')}</span>`
+              : '';
+            return acct + desc;
           }
         },
         {

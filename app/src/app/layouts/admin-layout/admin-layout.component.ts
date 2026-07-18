@@ -871,6 +871,7 @@ export class AdminLayoutComponent {
 
       'firm status': '/admin/master/firm-statuses',
       'ledgeraccounts': '/admin/master/ledger-accounts',
+      'opening balance': '/admin/finance/opening-balance',
       'ledger groups': '/admin/master/ledger-groups',
       'customer payment-terms': '/admin/master/customer-payment-terms',
       'vendor agent': '/admin/master/vendor-agent',

@@ -6,6 +6,7 @@ import { TaTableConfig } from '@ta/ta-table';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component'
 import { DoubleClickNavigationService } from 'src/app/services/double-click-navigation.service';
+import { BulkSelection } from 'src/app/admin/utils/bulk-operations.service';
 
 @Component({
   selector: 'app-products-list',
@@ -17,39 +18,90 @@ import { DoubleClickNavigationService } from 'src/app/services/double-click-navi
 export class ProductsListComponent {
 
   @Output('edit') edit = new EventEmitter<any>();
-  @Output('bulkEdit') bulkEdit = new EventEmitter<string[]>();
-  @Output('exportProducts') exportProducts = new EventEmitter<string[]>();
+  @Output('bulkEdit') bulkEdit = new EventEmitter<BulkSelection>();
+  @Output('exportProducts') exportProducts = new EventEmitter<BulkSelection>();
   @Output('mergeProducts') mergeProducts = new EventEmitter<void>();
   @ViewChild(TaTableComponent) taTableComponent!: TaTableComponent;
+
+  /** Single source of truth for select-all-matching lives in ta-table so the toolbar
+   *  banner and the row/header checkboxes can never disagree. */
+  get selectAllMatching(): boolean {
+    return !!this.taTableComponent?.selectAllMatching;
+  }
 
   /** Selected product IDs from ta-table's checkedRows */
   get selectedIds(): string[] {
     return (this.tableConfig.checkedRows as string[]) || [];
   }
 
+  /** Total records matching the current filter (across all pages). */
+  get totalRecords(): number {
+    return this.taTableComponent?.total || 0;
+  }
+
+  /** The header checkbox is on = every enabled row on the current page is ticked. */
+  get pageFullySelected(): boolean {
+    return !!this.taTableComponent?.checked;
+  }
+
+  /** Offer "select all matching" only when the page is full-selected and more rows exist. */
+  get canSelectAllMatching(): boolean {
+    return !this.selectAllMatching && this.pageFullySelected && this.totalRecords > this.selectedIds.length;
+  }
+
+  /** "All N matching" banner is active (state owned by ta-table). */
+  get selectAllMatchingActive(): boolean {
+    return this.selectAllMatching;
+  }
+
+  enableSelectAllMatching() {
+    this.taTableComponent?.enableSelectAllMatching();
+  }
+
   get isOverLimit(): boolean {
-    return this.selectedIds.length > 100;
+    // The 100 cap only applies to explicit selection; select-all-matching bypasses it.
+    return !this.selectAllMatching && this.selectedIds.length > 100;
   }
 
   refreshTable() {
     this.taTableComponent?.refresh();
   };
 
-  /** Clear all checkbox selections */
+  /** Clear all checkbox selections (and exit select-all-matching). */
   clearSelections() {
-    this.taTableComponent?.setOfCheckedId?.clear();
+    this.taTableComponent?.clearAllSelections();
     this.tableConfig.checkedRows = [];
-    this.taTableComponent?.refreshCheckedStatus();
   }
 
-  /** Emit selected IDs to parent for bulk edit */
+  /** Emit the selection (explicit ids, or all-matching + filter) to parent for bulk edit */
   onBulkEditClick() {
-    this.bulkEdit.emit([...this.selectedIds]);
+    if (this.selectAllMatching) {
+      this.bulkEdit.emit({
+        selectAll: true,
+        filterQuery: this.taTableComponent?.getFilterQuery() || '',
+        count: this.totalRecords
+      });
+    } else {
+      this.bulkEdit.emit({ ids: [...this.selectedIds], count: this.selectedIds.length });
+    }
   }
 
-  /** Emit selected IDs (empty array if none selected) to parent for export */
+  /** Emit the selection to parent for export (all-matching, explicit ids, or none=all) */
   onExportClick() {
-    this.exportProducts.emit([...this.selectedIds]);
+    if (this.selectAllMatching) {
+      this.exportProducts.emit({
+        selectAll: true,
+        filterQuery: this.taTableComponent?.getFilterQuery() || '',
+        count: this.totalRecords
+      });
+    } else {
+      this.exportProducts.emit({ ids: [...this.selectedIds], count: this.selectedIds.length });
+    }
+  }
+
+  /** Count shown on the Export button (all-matching total, else explicit selection). */
+  get exportCount(): number {
+    return this.selectAllMatching ? this.totalRecords : this.selectedIds.length;
   }
 
   /** Emit merge event to parent (parent closes modal then navigates) */

@@ -7,7 +7,7 @@
 
     <!-- Header -->
     <div class="bulk-edit-header">
-      <h5 class="mb-0">Bulk Edit &mdash; {{ entityIds.length }} {{ (entityName || 'Record') }}{{ entityIds.length > 1 ? 's' : '' }} Selected</h5>
+      <h5 class="mb-0">Bulk Edit &mdash; {{ affectedCount }} {{ (entityName || 'Record') }}{{ affectedCount > 1 ? 's' : '' }} {{ selectAll ? 'Matching' : 'Selected' }}</h5>
       <button class="btn-close" (click)="close()" [disabled]="loading" aria-label="Close"></button>
     </div>
 
@@ -32,23 +32,23 @@
           <!-- FK Dropdown -->
           <div class="bulk-field" *ngIf="field.type === 'dropdown'">
             <label [attr.for]="'bulk-' + field.key">{{ field.label }}</label>
-            <select [id]="'bulk-' + field.key" class="form-select form-select-sm" [(ngModel)]="bulkEditForm[field.key]">
-              <option [ngValue]="null">&mdash; No change &mdash;</option>
-              <option *ngFor="let opt of dropdownOptions[field.key]" [ngValue]="opt[field.dataKey]">
-                {{ opt[field.dataLabel] }}
-              </option>
-            </select>
+            <nz-select class="bulk-nz-select" nzShowSearch nzAllowClear
+                       nzPlaceHolder="&mdash; No change &mdash;"
+                       [(ngModel)]="bulkEditForm[field.key]">
+              <nz-option *ngFor="let opt of dropdownOptions[field.key]"
+                         [nzValue]="opt[field.dataKey]" [nzLabel]="opt[field.dataLabel]"></nz-option>
+            </nz-select>
           </div>
 
           <!-- Static Dropdown -->
           <div class="bulk-field" *ngIf="field.type === 'static-dropdown'">
             <label [attr.for]="'bulk-' + field.key">{{ field.label }}</label>
-            <select [id]="'bulk-' + field.key" class="form-select form-select-sm" [(ngModel)]="bulkEditForm[field.key]">
-              <option [ngValue]="null">&mdash; No change &mdash;</option>
-              <option *ngFor="let opt of field.options" [ngValue]="opt.value">
-                {{ opt.label }}
-              </option>
-            </select>
+            <nz-select class="bulk-nz-select" nzShowSearch nzAllowClear
+                       nzPlaceHolder="&mdash; No change &mdash;"
+                       [(ngModel)]="bulkEditForm[field.key]">
+              <nz-option *ngFor="let opt of field.options"
+                         [nzValue]="opt.value" [nzLabel]="opt.label"></nz-option>
+            </nz-select>
           </div>
 
           <!-- Number Input -->
@@ -106,7 +106,7 @@
     <div class="bulk-edit-body" *ngIf="confirmVisible">
       <div class="confirm-box">
         <p class="confirm-title">&#9888;&#65039; Confirm Bulk Update</p>
-        <p>You are about to update <strong>{{ entityIds.length }}</strong> {{ (entityName || 'record').toLowerCase() }}{{ entityIds.length > 1 ? 's' : '' }}.</p>
+        <p>You are about to update <strong>{{ affectedCount }}</strong> {{ (entityName || 'record').toLowerCase() }}{{ affectedCount > 1 ? 's' : '' }}{{ selectAll ? ' matching the current filter' : '' }}.</p>
         <p class="mb-2">Fields being changed:</p>
         <ul class="changed-fields-list">
           <li *ngFor="let label of changedFieldLabels">{{ label }}</li>

@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, NgZone, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TaFormConfig } from '@ta/ta-form';
 import { CommonModule } from '@angular/common';
@@ -20,7 +20,7 @@ export class LedgerAccountsComponent {
   LedgerAccountsListComponent: any;
   @ViewChild(LedgerAccountListComponent) LedgerAccountListComponent!: LedgerAccountListComponent;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private zone: NgZone) {}
 
   ngOnInit() {
     this.showLedgerAccountsList = false;
@@ -52,7 +52,16 @@ export class LedgerAccountsComponent {
 
 showLedgerAccountsListFn() {
   this.showLedgerAccountsList = true;
-  this.LedgerAccountListComponent?.refreshTable();
+  // The list table is inside a Bootstrap modal that starts hidden, so ng-zorro measures it
+  // as zero-size and paints empty until a reflow (clicking/closing "fixed" it). Refresh once
+  // the modal has finished opening and nudge a resize so the table paints immediately.
+  const modalEl = document.getElementById('ledgerAccountsModal');
+  if (modalEl) {
+    modalEl.addEventListener('shown.bs.modal', () => {
+      this.zone.run(() => this.LedgerAccountListComponent?.refreshTable());
+      window.dispatchEvent(new Event('resize'));
+    }, { once: true });
+  }
 }
 
   setFormConfig() {

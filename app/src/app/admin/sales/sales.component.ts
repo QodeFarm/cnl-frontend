@@ -982,13 +982,25 @@ invoiceCreationHandler() {
       response => {
         console.log('Sale invoice created successfully', response);
 
+        // Mark the items we actually invoiced. Use `!== 'YES'` not `=== 'NO'`: the invoiced
+        // flag can arrive blank from the dispatch payload, and the old strict `=== 'NO'`
+        // skipped those - so a genuine full invoice was sometimes mis-flagged "partial".
+        // Skipping only already-'YES' items keeps re-invoicing safe.
+        //
+        // NOTE: an `invoiceableQty > 0` guard was tried here to keep production-only items
+        // 'NO', but SaleOrderItems.production_qty is never decremented once goods are made
+        // (no production-completion flow exists yet), which would strand those items and
+        // leave the order permanently 'Partially Delivered'. Reverted until that feature is
+        // built - see the production-completion follow-up.
         itemsToInvoice.forEach(item => {
-          if (item.invoiced === 'NO') {
+          if (item.invoiced !== 'YES') {
             item.invoiced = 'YES';
             this.updateInvoicedStatusDirectly(item.sale_order_item_id, 'YES');
           }
         });
         const saleOrderId = this.invoiceData.sale_invoice_order.sale_order_id;
+        // Full = every line of the order is now invoiced (nothing left pending in production).
+        // Partial = some lines still need invoicing later (e.g. items still in production).
         const allInvoiced = this.invoiceData.sale_invoice_items.every(item => item.invoiced === 'YES');
         if (allInvoiced) {
           // Full invoice: set flow_status to 'Delivery In progress' explicitly
@@ -1041,40 +1053,60 @@ invoiceCreationHandler() {
             }
           );
         } else {
-          // Partial invoice: update flow_status to 'Partially Delivered'
-          // Stay on this page so user can invoice the remaining items
+          // Partial invoice: update flow_status to 'Partially Delivered'.
+          // Stay on this page (reload in place) so the user can invoice the remaining
+          // items - but the success message AND the reload must still fire, exactly like
+          // the full-invoice branch above, or the screen looks stuck after Confirm.
+          const reloadAfterPartial = () => {
+            this.notification.success(
+              'Invoice Created',
+              'Invoice created for the selected items. Order moved to Partially Delivered.',
+              { nzDuration: 5000, nzPlacement: 'topRight' }
+            );
+            this.editSaleOrder(saleOrderId);
+          };
           this.http.get('masters/flow_status/?flow_status_name=Partially Delivered').subscribe(
             (res: any) => {
-              console.log("We are in the method ... fetch");
               const status = res?.data?.[0];
               if (status && status.flow_status_id) {
                 const patchUrl = `sales/sale_order/${saleOrderId}/`;
                 const payload = { flow_status_id: status.flow_status_id };
-
                 this.http.patch(patchUrl, payload).subscribe(
-                  (patchRes: any) => {
-                    console.log('Sale order flow status updated to Partially Delivered:', patchRes);
-                  },
+                  () => reloadAfterPartial(),
                   (patchErr: any) => {
                     console.error('Error updating sale order flow status:', patchErr);
+                    reloadAfterPartial(); // invoice was created - still refresh + notify
                   }
                 );
               } else {
                 console.warn('Partially Delivered status not found in response:', res);
+                reloadAfterPartial();
               }
             },
             (err: any) => {
               console.error('Error fetching flow status:', err);
+              reloadAfterPartial();
             }
           );
         }
       },
       error => {
         console.error('Error creating sale invoice', error);
+        // Never fail silently - the user clicked Confirm and must be told it didn't work.
+        this.notification.error(
+          'Invoice Not Created',
+          error?.error?.message || 'Something went wrong creating the sale invoice. Please try again.',
+          { nzDuration: 6000, nzPlacement: 'topRight' }
+        );
       }
     );
   } else {
     console.warn('No items selected for invoicing');
+    this.notification.warning(
+      'Nothing to Invoice',
+      'No items were available to invoice for this order.',
+      { nzDuration: 5000, nzPlacement: 'topRight' }
+    );
   }
 }
 
