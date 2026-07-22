@@ -1646,107 +1646,138 @@ private processProducts(products: any[]) {
                 //   },
                 // },
                 {
-  key: 'cgst',
-  type: 'text',
-  className: 'col-12',
-  templateOptions: {
-    label: 'Output CGST',
-    required: false,
-    readonly: true,
-    disabled: true,
-    className: 'text-center'
-  },
-  defaultValue: '0.00',
-  expressionProperties: {
-    'model.cgst': (model) => {
-      const address = model.billing_address || model.shipping_address || '';
+                  key: 'cgst',
+                  type: 'text',
+                  className: 'col-12',
+                  templateOptions: {
+                    label: 'Output CGST',
+                    required: false,
+                    readonly: true,
+                    disabled: true,
+                    className: 'text-center'
+                  },
+                  defaultValue: '0.00',
+                  expressionProperties: {
+                    'model.cgst': (model) => {
+                      const address = model.billing_address || model.shipping_address || '';
 
-      // Default to intra-state when address is empty
-      const isIntraState = !address || address.toLowerCase().includes('andhra pradesh');
+                      // Remove phone numbers, emails, and extra data
+                      const cleanAddress = address
+                        .replace(/(Phone|Ph|Mobile|Tel|Fax)[\s:]*[0-9,\s]+/gi, '')
+                        .replace(/Email[\s:]*[^\s,]+/gi, '')
+                        .replace(/[0-9,\s]+/g, '')
+                        .trim();
+                      
+                      const isIntraState = !cleanAddress || cleanAddress.toLowerCase().includes('andhra pradesh');
 
-      const taxAmount = parseFloat(model.tax_amount || 0);
+                      const taxAmount = parseFloat(model.tax_amount || 0);
 
-      return isIntraState
-        ? (taxAmount / 2).toFixed(2)
-        : '0.00';
-    }
-  },
-  hideExpression: (model) => {
-    const address = model.billing_address || model.shipping_address || '';
-    // Default to intra-state when address is empty
-    const isIntraState = !address || address.toLowerCase().includes('andhra pradesh');
+                      return isIntraState
+                        ? (taxAmount / 2).toFixed(2)
+                        : '0.00';
+                    }
+                  },
+                  hideExpression: (model) => {
+                    const address = model.billing_address || model.shipping_address || '';
+                    const cleanAddress = address
+                      .replace(/(Phone|Ph|Mobile|Tel|Fax)[\s:]*[0-9,\s]+/gi, '')
+                      .replace(/Email[\s:]*[^\s,]+/gi, '')
+                      .replace(/[0-9,\s]+/g, '')
+                      .trim();
+                    
+                    const isIntraState = !cleanAddress || cleanAddress.toLowerCase().includes('andhra pradesh');
 
-    return !isIntraState;
-  }
-},
-{
-  key: 'sgst',
-  type: 'text',
-  className: 'col-12',
-  templateOptions: {
-    label: 'Output SGST',
-    required: false,
-    readonly: true,
-    disabled: true,
-    className: 'text-center'
-  },
-  defaultValue: '0.00',
-  expressionProperties: {
-    'model.sgst': (model) => {
-      const address = model.billing_address || model.shipping_address || '';
+                    return !isIntraState;
+                  }
+                },
+                {
+                  key: 'sgst',
+                  type: 'text',
+                  className: 'col-12',
+                  templateOptions: {
+                    label: 'Output SGST',
+                    required: false,
+                    readonly: true,
+                    disabled: true,
+                    className: 'text-center'
+                  },
+                  defaultValue: '0.00',
+                  expressionProperties: {
+                    'model.sgst': (model) => {
+                      const address = model.billing_address || model.shipping_address || '';
 
-      // Default to intra-state when address is empty
-      const isIntraState = !address || address.toLowerCase().includes('andhra pradesh');
+                      const cleanAddress = address
+                        .replace(/(Phone|Ph|Mobile|Tel|Fax)[\s:]*[0-9,\s]+/gi, '')
+                        .replace(/Email[\s:]*[^\s,]+/gi, '')
+                        .replace(/[0-9,\s]+/g, '')
+                        .trim();
+                      
+                      const isIntraState = !cleanAddress || cleanAddress.toLowerCase().includes('andhra pradesh');
 
-      const taxAmount = parseFloat(model.tax_amount || 0);
+                      const taxAmount = parseFloat(model.tax_amount || 0);
 
-      return isIntraState
-        ? (taxAmount / 2).toFixed(2)
-        : '0.00';
-    }
-  },
-  hideExpression: (model) => {
-    const address = model.billing_address || model.shipping_address || '';
-    // Default to intra-state when address is empty
-    const isIntraState = !address || address.toLowerCase().includes('andhra pradesh');
+                      return isIntraState
+                        ? (taxAmount / 2).toFixed(2)
+                        : '0.00';
+                    }
+                  },
+                  hideExpression: (model) => {
+                    const address = model.billing_address || model.shipping_address || '';
+                    const cleanAddress = address
+                      .replace(/(Phone|Ph|Mobile|Tel|Fax)[\s:]*[0-9,\s]+/gi, '')
+                      .replace(/Email[\s:]*[^\s,]+/gi, '')
+                      .replace(/[0-9,\s]+/g, '')
+                      .trim();
+                    
+                    const isIntraState = !cleanAddress || cleanAddress.toLowerCase().includes('andhra pradesh');
 
-    return !isIntraState;
-  }
-},
-{
-  key: 'igst',
-  type: 'text',
-  className: 'col-12',
-  templateOptions: {
-    label: 'Output IGST',
-    required: false,
-    readonly: true,
-    disabled: true,
-    className: 'text-center'
-  },
-  defaultValue: '0.00',
-  expressionProperties: {
-    'model.igst': (model) => {
-      const address = model.billing_address || model.shipping_address || '';
+                    return !isIntraState;
+                  }
+                },
+                {
+                  key: 'igst',
+                  type: 'text',
+                  className: 'col-12',
+                  templateOptions: {
+                    label: 'Output IGST',
+                    required: false,
+                    readonly: true,
+                    disabled: true,
+                    className: 'text-center'
+                  },
+                  defaultValue: '0.00',
+                  expressionProperties: {
+                    'model.igst': (model) => {
+                      const address = model.billing_address || model.shipping_address || '';
 
-      // Default to intra-state when address is empty
-      const isIntraState = !address || address.toLowerCase().includes('andhra pradesh');
+                      const cleanAddress = address
+                        .replace(/(Phone|Ph|Mobile|Tel|Fax)[\s:]*[0-9,\s]+/gi, '')
+                        .replace(/Email[\s:]*[^\s,]+/gi, '')
+                        .replace(/[0-9,\s]+/g, '')
+                        .trim();
+                      
+                      const isIntraState = !cleanAddress || cleanAddress.toLowerCase().includes('andhra pradesh');
 
-      const taxAmount = parseFloat(model.tax_amount || 0);
+                      const taxAmount = parseFloat(model.tax_amount || 0);
 
-      return !isIntraState
-        ? taxAmount.toFixed(2)
-        : '0.00';
-    }
-  },
-  hideExpression: (model) => {
-    const address = model.billing_address || model.shipping_address || '';
-    // Default to intra-state when address is empty
-    const isIntraState = !address || address.toLowerCase().includes('andhra pradesh');
+                      return !isIntraState
+                        ? taxAmount.toFixed(2)
+                        : '0.00';
+                    }
+                  },
+                  hideExpression: (model) => {
+                    const address = model.billing_address || model.shipping_address || '';
+                    const cleanAddress = address
+                      .replace(/(Phone|Ph|Mobile|Tel|Fax)[\s:]*[0-9,\s]+/gi, '')
+                      .replace(/Email[\s:]*[^\s,]+/gi, '')
+                      .replace(/[0-9,\s]+/g, '')
+                      .trim();
+                    
+                    const isIntraState = !cleanAddress || cleanAddress.toLowerCase().includes('andhra pradesh');
 
-    return isIntraState;
-  }
-},
+                    return isIntraState;
+                  }
+                },
                 {
                   key: 'total_amount',
                   type: 'text',
