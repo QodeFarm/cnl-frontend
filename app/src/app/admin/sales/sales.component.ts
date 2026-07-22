@@ -1197,7 +1197,13 @@ closeNoQuantityWarning() {
   formConfig: TaFormConfig = {};
 
   hide() {
-    document.getElementById('modalClose').click();
+    // editSaleOrder() calls this on EVERY path, but the #modalClose button only exists
+    // when the edit was opened from a modal. On the auto-invoice (post-dispatch) and
+    // route-refresh paths there is no modal, so the old unguarded `.click()` threw
+    // "Cannot read properties of null" and aborted the whole flow mid-way - which is why
+    // the invoice/status update intermittently didn't complete. Close the modal if it's
+    // there; otherwise do nothing.
+    document.getElementById('modalClose')?.click();
   }
 
   // // Function to create a sale invoice

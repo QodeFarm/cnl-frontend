@@ -367,7 +367,7 @@ export class VendorsComponent {
   formConfig: TaFormConfig = {};
 
   hide() {
-    document.getElementById('modalClose').click();
+    document.getElementById('modalClose')?.click();
   }
 
   // editVendor(event) {

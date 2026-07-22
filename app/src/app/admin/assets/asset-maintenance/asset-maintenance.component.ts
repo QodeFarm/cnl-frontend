@@ -38,7 +38,7 @@ export class AssetMaintenanceComponent {
   formConfig: TaFormConfig = {};
 
   hide() {
-    document.getElementById('modalClose').click();
+    document.getElementById('modalClose')?.click();
   };
 
   editAssetMaintenance(event) {

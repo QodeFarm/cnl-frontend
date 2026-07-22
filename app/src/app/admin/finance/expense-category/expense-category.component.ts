@@ -34,7 +34,7 @@ export class ExpenseCategoryComponent {
   formConfig: TaFormConfig = {};
 
   hide() {
-    document.getElementById('modalClose').click();
+    document.getElementById('modalClose')?.click();
   };
 
   editExpenseCategory(event) {

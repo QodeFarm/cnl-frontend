@@ -36,7 +36,7 @@ export class EmployeeSalaryComponent {
   formConfig: TaFormConfig = {};
 
   hide() {
-    document.getElementById('modalClose').click();
+    document.getElementById('modalClose')?.click();
   };
 
   editEmployeeSalary(event) {

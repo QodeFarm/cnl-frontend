@@ -49,7 +49,7 @@ export class LeadsComponent {
   formConfig: TaFormConfig = {};
 
   hide() {
-    document.getElementById('modalClose').click();
+    document.getElementById('modalClose')?.click();
   }
 
   editLeads(event) {

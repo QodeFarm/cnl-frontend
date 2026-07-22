@@ -449,7 +449,7 @@ checkAndPopulateData() {
   formConfig: TaFormConfig = {};
 
   hide() {
-    document.getElementById('modalClose').click();
+    document.getElementById('modalClose')?.click();
   }
 
   editPurchaseInvoice(event) {

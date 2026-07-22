@@ -34,7 +34,7 @@ export class WarehousesComponent {
   formConfig: TaFormConfig = {};
 
   hide() {
-    document.getElementById('modalClose').click();
+    document.getElementById('modalClose')?.click();
   };
 
   editWarehouses(event) {
