@@ -36,7 +36,7 @@ export class SwipesComponent {
   formConfig: TaFormConfig = {};
 
   hide() {
-    document.getElementById('modalClose').click();
+    document.getElementById('modalClose')?.click();
   };
 
   editSwipes(event) {

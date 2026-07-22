@@ -34,7 +34,7 @@ export class ExpenseItemComponent {
   formConfig: TaFormConfig = {};
 
   hide() {
-    document.getElementById('modalClose').click();
+    document.getElementById('modalClose')?.click();
   };
 
   editExpenseItem(event) {

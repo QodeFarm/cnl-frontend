@@ -34,7 +34,7 @@ export class TaxConfigurationComponent {
   formConfig: TaFormConfig = {};
 
   hide() {
-    document.getElementById('modalClose').click();
+    document.getElementById('modalClose')?.click();
   };
 
   editTaxConfiguration(event) {

@@ -36,7 +36,7 @@ export class AssetsComponent{
   formConfig: TaFormConfig = {};
 
     hide() {
-    document.getElementById('modalClose').click();
+    document.getElementById('modalClose')?.click();
   }
 
   editAssets(event) {

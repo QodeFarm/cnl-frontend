@@ -36,7 +36,7 @@ export class RemindersComponent {
   formConfig: TaFormConfig = {};
 
   hide() {
-    document.getElementById('modalClose').click();
+    document.getElementById('modalClose')?.click();
   };
 
   editReminders(event) {

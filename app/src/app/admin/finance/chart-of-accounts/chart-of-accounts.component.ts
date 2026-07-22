@@ -34,7 +34,7 @@ export class ChartOfAccountsComponent {
   formConfig: TaFormConfig = {};
 
   hide() {
-    document.getElementById('modalClose').click();
+    document.getElementById('modalClose')?.click();
   };
 
   editChartOfAccounts(event) {

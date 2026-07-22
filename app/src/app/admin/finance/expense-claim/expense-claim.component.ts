@@ -34,7 +34,7 @@ export class ExpenseClaimComponent {
   formConfig: TaFormConfig = {};
 
   hide() {
-    document.getElementById('modalClose').click();
+    document.getElementById('modalClose')?.click();
   };
 
   editExpenseClaim(event) {

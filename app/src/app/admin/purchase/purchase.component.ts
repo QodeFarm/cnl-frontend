@@ -446,7 +446,7 @@ export class PurchaseComponent {
   formConfig: TaFormConfig = {};
 
   hide() {
-    document.getElementById('modalClose').click();
+    document.getElementById('modalClose')?.click();
   }
 
   editPurchaseOrder(event) {
