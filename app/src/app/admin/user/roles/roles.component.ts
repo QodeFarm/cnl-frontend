@@ -291,7 +291,7 @@ export class RolesComponent {
         }, 3000);
         
         // close modal
-        document.getElementById('modalClose').click();
+        document.getElementById('modalClose')?.click();
       },
       (error) => {
         console.error('Error saving permissions:', error);

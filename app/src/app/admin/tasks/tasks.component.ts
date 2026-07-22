@@ -71,7 +71,7 @@ export class TasksComponent implements OnInit {
   }
 
   hide() {
-    document.getElementById('modalClose').click();
+    document.getElementById('modalClose')?.click();
   }
 
   editTasks(event) {

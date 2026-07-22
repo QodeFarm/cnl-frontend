@@ -35,7 +35,7 @@ export class BankAccountComponent {
   formConfig: TaFormConfig = {};
 
   hide() {
-    document.getElementById('modalClose').click();
+    document.getElementById('modalClose')?.click();
   };
 
   editBankAccount(event) {

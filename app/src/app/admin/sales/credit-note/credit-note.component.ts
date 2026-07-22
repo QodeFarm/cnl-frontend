@@ -139,7 +139,9 @@ ngOnInit() {
   formConfig: TaFormConfig = {};
 
   hide() {
-    document.getElementById('modalClose').click();
+    // Guard: #modalClose only exists when opened from a modal. Unguarded .click() on
+    // null throws and aborts the flow. Close if present, otherwise no-op.
+    document.getElementById('modalClose')?.click();
   }
 
   updateSaleCreditNote() {

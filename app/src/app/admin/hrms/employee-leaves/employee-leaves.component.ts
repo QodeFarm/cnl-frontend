@@ -107,7 +107,7 @@ export class EmployeeLeavesComponent implements OnInit {
   formConfig: TaFormConfig = {};
 
   hide() {
-    document.getElementById('modalClose').click();
+    document.getElementById('modalClose')?.click();
   }
 
   editEmployeeLeaves(event) {

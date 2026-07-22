@@ -999,16 +999,22 @@ export class AdminLayoutComponent {
 
   refreshCurrentTab(): void {
     if (this.isRefreshing) return;
-    const activeTab = this.tabs[this.selectedTabIndex];
+    if (!this.tabs?.length) return;
+
+    // selectedTabIndex is nz-tabset's two-way-bound index = the visible tab. Clamp it
+    // defensively so a momentarily out-of-range value can never make Refresh a no-op -
+    // reading tabs[out-of-range] used to return undefined and silently do nothing.
+    const index = Math.min(Math.max(this.selectedTabIndex, 0), this.tabs.length - 1);
+    const activeTab = this.tabs[index];
     if (!activeTab?.component) return;
 
     this.isRefreshing = true;
     const comp = activeTab.component;
-    activeTab.component = null;
+    activeTab.component = null;      // unmount → destroy this screen's component instance
     this.cd.detectChanges();
 
     setTimeout(() => {
-      activeTab.component = comp;
+      activeTab.component = comp;    // remount → fresh instance = full reload of this tab
       this.cd.detectChanges();
       this.isRefreshing = false;
     }, 120);
@@ -1056,7 +1062,11 @@ export class AdminLayoutComponent {
       if (!tab.name) { tab.name = 'Untitle-' + this.tabs.length + 1 }
 
       this.tabs.push(tab);
-      this.selectedTabIndex = this.tabs.length;
+      // Point at the tab just pushed. Was `this.tabs.length` (off by one) → out of
+      // range, which left selectedTabIndex pointing past the array. Everything keyed
+      // off it (nz-tabset selection, Refresh, context Help) then read undefined, so
+      // Refresh silently did nothing right after opening a new tab.
+      this.selectedTabIndex = this.tabs.length - 1;
     } else {
       // if the tab exists, activate it
       const tabToActivate = this.tabs.find(t => t.key == tab.key);

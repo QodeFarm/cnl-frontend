@@ -90,7 +90,7 @@ export class JournalEntryComponent implements OnInit, OnDestroy {
   formConfig: TaFormConfig = {};
 
   hide() {
-    document.getElementById('modalClose').click();
+    document.getElementById('modalClose')?.click();
   }
 
   nowDate = () => {
