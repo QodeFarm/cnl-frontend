@@ -1572,6 +1572,7 @@ private processProducts(products: any[]) {
                   templateOptions: {
                     label: 'Items Total',
                     disabled: true,
+                    readonly: true,
                   },
                   defaultValue: '0.00'
                 },
@@ -1581,7 +1582,8 @@ private processProducts(products: any[]) {
                   className: 'col-12',
                   templateOptions: {
                     label: 'Discount Amount',
-                    required: false
+                    required: false,
+                    readonly: true,
                   },
                   defaultValue: '0.00',
                 },
@@ -1591,7 +1593,8 @@ private processProducts(products: any[]) {
                   className: 'col-12',
                   templateOptions: {
                     label: 'Cess Amount',
-                    required: false
+                    required: false,
+                    readonly: true,
                   },
                   defaultValue: '0.00',
                 },
@@ -1601,7 +1604,8 @@ private processProducts(products: any[]) {
                   className: 'col-12',
                   templateOptions: {
                     label: 'Discount Amount',
-                    required: false
+                    required: false,
+                    readonly: true,
                   },
                   defaultValue: '0.00'
 
@@ -1613,7 +1617,8 @@ private processProducts(products: any[]) {
                   templateOptions: {
                     label: 'Shipping Charges',
                     required: false,
-                    disabled: true
+                    disabled: true,
+                    readonly: true,
                   },
                   defaultValue: '0.00',
                 },
@@ -1849,7 +1854,8 @@ private processProducts(products: any[]) {
                   className: 'col-12',
                   templateOptions: {
                     label: 'Round Off',
-                    required: false
+                    required: false,
+                    readonly: true,
                   },
                   defaultValue: '0.00'
                 },
@@ -1862,6 +1868,7 @@ private processProducts(products: any[]) {
                     required: false,
                     placeholder: 'Total Amount',
                     disabled: true,
+                    readonly: true,
                   },
                   defaultValue: '0.00'
                 },
