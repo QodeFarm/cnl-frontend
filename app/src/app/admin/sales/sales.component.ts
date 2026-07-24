@@ -7224,6 +7224,7 @@ createChildOrdersForProducts(productDetails, saleOrderDetails, orderAttachments,
                   templateOptions: {
                     label: 'Items Total',
                     disabled: true,
+                    readonly: true,
                   },
                   defaultValue: '0.00'
                 },
@@ -7233,7 +7234,8 @@ createChildOrdersForProducts(productDetails, saleOrderDetails, orderAttachments,
                   className: 'col-12',
                   templateOptions: {
                     label: 'Product disocunt',
-                    required: false
+                    required: false,
+                    readonly: true,
                   },
                   defaultValue: '0.00'
                 },
@@ -7243,7 +7245,8 @@ createChildOrdersForProducts(productDetails, saleOrderDetails, orderAttachments,
                   className: 'col-12',
                   templateOptions: {
                     label: 'Cess Amount',
-                    required: false
+                    required: false,
+                    readonly: true,
                   },
                   defaultValue: '0.00',
                 },
@@ -7253,7 +7256,8 @@ createChildOrdersForProducts(productDetails, saleOrderDetails, orderAttachments,
                   className: 'col-12',
                   templateOptions: {
                     label: 'Discount Amount',
-                    required: false
+                    required: false,
+                    readonly: true,
                   },
                   defaultValue: '0.00'
 
@@ -7265,7 +7269,8 @@ createChildOrdersForProducts(productDetails, saleOrderDetails, orderAttachments,
                   templateOptions: {
                     label: 'Shipping Charges',
                     required: false,
-                    disabled: true
+                    disabled: true,
+                    readonly: true,
                   },
                   defaultValue: '0.00',
                 },
@@ -7275,7 +7280,8 @@ createChildOrdersForProducts(productDetails, saleOrderDetails, orderAttachments,
                   className: 'col-12',
                   templateOptions: {
                     label: 'Output CGST',
-                    required: false
+                    required: false,
+                    readonly: true,
                   },
                   defaultValue: '0.00',
                   expressionProperties: {
@@ -7306,7 +7312,8 @@ createChildOrdersForProducts(productDetails, saleOrderDetails, orderAttachments,
                   className: 'col-12',
                   templateOptions: {
                     label: 'Output SGST',
-                    required: false
+                    required: false,
+                    readonly: true,
                   },
                   defaultValue: '0.00',
                   expressionProperties: {
@@ -7337,7 +7344,8 @@ createChildOrdersForProducts(productDetails, saleOrderDetails, orderAttachments,
                   className: 'col-12',
                   templateOptions: {
                     label: 'Output IGST',
-                    required: false
+                    required: false,
+                    readonly: true,
                   },
                   defaultValue: '0.00',
                   expressionProperties: {
@@ -7368,7 +7376,8 @@ createChildOrdersForProducts(productDetails, saleOrderDetails, orderAttachments,
                   className: 'col-12',
                   templateOptions: {
                     label: 'Advance Amount',
-                    required: false
+                    required: false,
+                    readonly: true,
                   },
                   defaultValue: '0.00'
                 },
@@ -7378,7 +7387,8 @@ createChildOrdersForProducts(productDetails, saleOrderDetails, orderAttachments,
                   className: 'col-12',
                   templateOptions: {
                     label: 'Round Off',
-                    required: false
+                    required: false,
+                    readonly: true,
                   },
                   defaultValue: '0.00'
                 },
@@ -7391,6 +7401,7 @@ createChildOrdersForProducts(productDetails, saleOrderDetails, orderAttachments,
                     required: false,
                     placeholder: 'Total Amount',
                     disabled: true,
+                    readonly: true,
                   },
                   defaultValue: '0.00'
                 },
