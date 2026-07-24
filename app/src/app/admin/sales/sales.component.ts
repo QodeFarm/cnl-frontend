@@ -7373,6 +7373,16 @@ createChildOrdersForProducts(productDetails, saleOrderDetails, orderAttachments,
                   defaultValue: '0.00'
                 },
                 {
+                  key: 'round_off',
+                  type: 'text',
+                  className: 'col-12',
+                  templateOptions: {
+                    label: 'Round Off',
+                    required: false
+                  },
+                  defaultValue: '0.00'
+                },
+                {
                   key: 'total_amount',
                   type: 'text',
                   className: 'col-12 product-total',
@@ -8986,6 +8996,164 @@ createChildOrdersForProducts(productDetails, saleOrderDetails, orderAttachments,
 
                               }
                             },
+                            // {
+                            //   key: 'round_off',
+                            //   type: 'input',
+                            //   defaultValue: "0",
+                            //   className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                            //   templateOptions: {
+                            //     type: 'number',
+                            //     label: 'Round Off',
+                            //     placeholder: 'Enter Round Off amount',
+                            //     description: 'Manually enter round off amount (positive or negative)'
+                            //   },
+                            //   hooks: {
+                            //     onInit: (field: any) => {
+                            //       // Set the initial value from dataToPopulate if available
+                            //       if (this.dataToPopulate && 
+                            //           this.dataToPopulate.sale_order && 
+                            //           this.dataToPopulate.sale_order.round_off !== undefined && 
+                            //           this.dataToPopulate.sale_order.round_off !== null && 
+                            //           field.formControl) {
+                            //         field.formControl.setValue(this.dataToPopulate.sale_order.round_off);
+                            //       }
+
+                            //       // Subscribe to value changes
+                            //       field.formControl.valueChanges.subscribe(data => {
+                            //         // Coerce empty, null, or invalid to 0
+                            //         const numeric = parseFloat(data);
+                            //         const roundedValue = isNaN(numeric) ? 0 : numeric;
+                                    
+                            //         // Update the form control with proper numeric value
+                            //         field.formControl.setValue(roundedValue, { emitEvent: false });
+                                    
+                            //         // Recalculate total if you have a method for it
+                            //         if (this.totalAmountCal) {
+                            //           this.totalAmountCal();
+                            //         }
+                            //       });
+                            //     }
+                            //   }
+                            // },
+                              {
+                                key: 'round_off',
+                                type: 'input',
+                                defaultValue: "0",
+                                className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                                templateOptions: {
+                                  type: 'number',
+                                  label: 'Round Off',
+                                  placeholder: 'Enter Round Off amount',
+                                  description: 'Use + for rounding up, - for rounding down (e.g., +0.50 or -0.50)',
+                                },
+                                hooks: {
+                                  onInit: (field: any) => {
+                                    // Set the initial value from dataToPopulate if available
+                                    if (this.dataToPopulate && 
+                                        this.dataToPopulate.sale_order && 
+                                        this.dataToPopulate.sale_order.round_off !== undefined && 
+                                        this.dataToPopulate.sale_order.round_off !== null && 
+                                        field.formControl) {
+                                      field.formControl.setValue(this.dataToPopulate.sale_order.round_off);
+                                    }
+
+                                    // Subscribe to value changes
+                                    field.formControl.valueChanges.subscribe(data => {
+                                      // Handle empty/null/undefined
+                                      if (data === null || data === undefined || data === '') {
+                                        field.formControl.setValue(0, { emitEvent: false });
+                                        if (this.totalAmountCal) {
+                                          this.totalAmountCal();
+                                        }
+                                        return;
+                                      }
+
+                                      let value = data;
+                                      let numericValue = 0;
+                                      let isNegative = false;
+
+                                      // Check if it's a string and has + or - prefix
+                                      if (typeof value === 'string') {
+                                        const trimmed = value.trim();
+                                        
+                                        // Check for negative sign
+                                        if (trimmed.startsWith('-')) {
+                                          isNegative = true;
+                                          const numPart = trimmed.substring(1).trim();
+                                          // If it's just '-' or '- ' or '-0' 
+                                          if (numPart === '' || numPart === '0' || numPart === '0.00') {
+                                            // Allow user to type negative but keep it as -0 display
+                                            field.formControl.setValue('-0', { emitEvent: false });
+                                            if (this.totalAmountCal) {
+                                              this.totalAmountCal();
+                                            }
+                                            return;
+                                          }
+                                          numericValue = parseFloat(numPart);
+                                        } 
+                                        // Check for positive sign
+                                        else if (trimmed.startsWith('+')) {
+                                          const numPart = trimmed.substring(1).trim();
+                                          if (numPart === '' || numPart === '0' || numPart === '0.00') {
+                                            field.formControl.setValue(0, { emitEvent: false });
+                                            if (this.totalAmountCal) {
+                                              this.totalAmountCal();
+                                            }
+                                            return;
+                                          }
+                                          numericValue = parseFloat(numPart);
+                                        } 
+                                        // Regular number
+                                        else {
+                                          numericValue = parseFloat(trimmed);
+                                        }
+                                      } else {
+                                        numericValue = parseFloat(value);
+                                      }
+
+                                      // Check if it's a valid number
+                                      if (isNaN(numericValue)) {
+                                        field.formControl.setValue(0, { emitEvent: false });
+                                        if (this.totalAmountCal) {
+                                          this.totalAmountCal();
+                                        }
+                                        return;
+                                      }
+
+                                      // Apply negative sign if needed
+                                      let finalValue = numericValue;
+                                      if (isNegative) {
+                                        finalValue = -Math.abs(numericValue);
+                                      } else {
+                                        // If the value is -0 (negative zero), it should be 0
+                                        if (Object.is(finalValue, -0)) {
+                                          finalValue = 0;
+                                        } else {
+                                          finalValue = Math.abs(numericValue);
+                                        }
+                                      }
+
+                                      // Round to 2 decimal places
+                                      finalValue = parseFloat(finalValue.toFixed(2));
+
+                                      // If finalValue is -0, convert to 0
+                                      if (Object.is(finalValue, -0)) {
+                                        finalValue = 0;
+                                      }
+
+                                      // Update the form control
+                                      field.formControl.setValue(finalValue, { emitEvent: false });
+                                      
+                                      console.log('Round off value set to:', finalValue);
+                                      
+                                      // Recalculate total
+                                      if (this.totalAmountCal) {
+                                        this.totalAmountCal();
+                                      }
+                                    });
+                                  }
+                                }
+                              },
                             {
                               key: 'total_amount',
                               type: 'input',
