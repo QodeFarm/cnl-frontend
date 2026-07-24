@@ -588,7 +588,59 @@ async autoFillProductDetails(field, data) {
   }
 
   // Modify your edit method to set up the form for editing
-  editSaleReturnOrder(event) {
+  // editSaleReturnOrder(event) {
+  //   this.showForm = false;
+  //   this.SaleReturnOrderEditID = event;
+  //   this.http.get('sales/sale_return_order/' + event).subscribe((res: any) => {
+  //     if (res && res.data) {
+  //       this.formConfig.model = res.data;
+  //       console.log("Editing starting here", res.data);
+  //       this.formConfig.model['sale_return_order']['order_type'] = 'sale_return';
+  //       this.formConfig.pkId = 'sale_return_id';
+  //       this.formConfig.submit.label = 'Update';
+  //       this.formConfig.model['sale_return_id'] = this.SaleReturnOrderEditID;
+  //       this.showForm = true; // Show form for editing
+  //       // Show necessary fields for editing
+  //       this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[5].hide = false;
+  //       this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[6].hide = true;
+
+  //       this.totalAmountCal() //calling calculation in edit mode.
+  //       // Ensure custom_field_values are correctly populated in the model
+  //       if (res.data.custom_field_values) {
+  //         this.formConfig.model['custom_field_values'] = res.data.custom_field_values.reduce((acc: any, fieldValue: any) => {
+  //           acc[fieldValue.custom_field_id] = fieldValue.field_value; // Map custom_field_id to the corresponding value
+  //           return acc;
+  //         }, {});
+  //       }
+
+  //       // ---------------------------------------------------
+  //       //  ENSURE SALE RETURN ORDER ALWAYS HAS 5 ITEM ROWS 
+  //       // ---------------------------------------------------
+  //       let items = res.data.sale_return_items ?? [];
+
+  //       // fill existing rows first, then make sure total is 5
+  //       while (items.length < 5) {
+  //         items.push({
+  //           sale_order_item_id: null,
+  //           product_id: null,
+  //           unit_options_id: null,
+  //           quantity: null,
+  //           rate: null,
+  //           amount: null
+  //         });
+  //       }
+
+  //       // assign back to form model
+  //       this.formConfig.model['sale_return_items'] = items;
+
+  //       // finally show form
+  //       this.showForm = true;
+  //     }
+  //   });
+  //   this.hide();
+  // }
+
+editSaleReturnOrder(event) {
     this.showForm = false;
     this.SaleReturnOrderEditID = event;
     this.http.get('sales/sale_return_order/' + event).subscribe((res: any) => {
@@ -599,12 +651,23 @@ async autoFillProductDetails(field, data) {
         this.formConfig.pkId = 'sale_return_id';
         this.formConfig.submit.label = 'Update';
         this.formConfig.model['sale_return_id'] = this.SaleReturnOrderEditID;
+        
+        // Ensure order_shipments exists and has shipping_charges
+        if (!this.formConfig.model.order_shipments) {
+          this.formConfig.model.order_shipments = {};
+        }
+        // Ensure shipping_charges is set
+        if (this.formConfig.model.order_shipments.shipping_charges === undefined) {
+          this.formConfig.model.order_shipments.shipping_charges = 0;
+        }
+        
         this.showForm = true; // Show form for editing
         // Show necessary fields for editing
         this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[5].hide = false;
         this.formConfig.fields[2].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[0].fieldGroup[6].hide = true;
 
-        this.totalAmountCal() //calling calculation in edit mode.
+        this.totalAmountCal(); //calling calculation in edit mode.
+        
         // Ensure custom_field_values are correctly populated in the model
         if (res.data.custom_field_values) {
           this.formConfig.model['custom_field_values'] = res.data.custom_field_values.reduce((acc: any, fieldValue: any) => {
@@ -638,7 +701,7 @@ async autoFillProductDetails(field, data) {
       }
     });
     this.hide();
-  }
+}
 
   // Example for how the form submission might trigger the update
   onSubmit() {
@@ -748,7 +811,7 @@ updateReturnNoControl() {
               order.productsList = orderDetails.data.sale_invoice_items.map(item => ({
                 product_id: item.product?.product_id,
                 product_name: item.product?.name ?? 'Unknown Product',
-                quantity: item.quantity,
+                quantity: Number(item.quantity),
                 code: item.product?.code,
                 total_boxes: item.total_boxes,
                 unit_options_id: item.unit_options_id,
@@ -799,7 +862,137 @@ updateReturnNoControl() {
     this.handleInvoiceOrderSelected(order); // Handle order selection
   }
 
-  handleInvoiceOrderSelected(order: any) {
+  // handleInvoiceOrderSelected(order: any) {
+  //   const saleInvoiceId = order.sale_invoice_id;  // Extract sale_invoice_id from the emitted order
+  //   if (!saleInvoiceId) {
+  //     console.error('Invalid sale_invoice_id:', saleInvoiceId);
+  //     return;
+  //   }
+
+  //   console.log('Selected Sale Invoice ID:', saleInvoiceId);
+
+  //   // Fetch sale invoice details using the saleInvoiceId
+  //   this.http.get(`sales/sale_invoice_order/${saleInvoiceId}`).subscribe((res: any) => {
+  //     if (res && res.data) {
+  //       const invoiceData = res.data.sale_invoice_order;
+  //       console.log("Inovice data : ", invoiceData);
+  //       const invoiceItems = res.data.sale_invoice_items;
+  //       console.log("Inovice Items : ", invoiceItems);
+  //       // const invoiceShipments = res.data.order_shipments;
+
+  //       // Map sale_invoice_order fields to sale_return_order fields
+  //       this.formConfig.model = {
+  //         sale_return_order: {
+  //           bill_type: invoiceData.bill_type,
+  //           order_type: this.formConfig.model.sale_return_order.order_type || 'sale_return',
+  //           return_date: this.nowDate(),
+  //           return_no: this.formConfig.model.sale_return_order.return_no,
+  //           ref_no: invoiceData.ref_no,
+  //           ref_date: invoiceData.ref_date,
+  //           against_bill: invoiceData.invoice_no,
+  //           against_bill_date: invoiceData.invoice_date,
+  //           tax: invoiceData.tax,
+  //           remarks: invoiceData.remarks,
+  //           item_value: invoiceData.item_value,
+  //           discount: invoiceData.discount,
+  //           dis_amt: invoiceData.dis_amt,
+  //           taxable: invoiceData.taxable,
+  //           tax_amount: invoiceData.tax_amount,
+  //           cess_amount: invoiceData.cess_amount,
+  //           transport_charges: invoiceData.transport_charges,
+  //           round_off: invoiceData.round_off,
+  //           total_amount: invoiceData.total_amount,
+  //           vehicle_name: invoiceData.vehicle_name,
+  //           total_boxes: invoiceData.total_boxes,
+  //           gst_type: {
+  //             gst_type_id: invoiceData.gst_type?.gst_type_id,
+  //             name: invoiceData.gst_type?.name
+  //           },
+  //           payment_term: {
+  //             payment_term_id: invoiceData.payment_term?.payment_term_id,
+  //             name: invoiceData.payment_term?.name,
+  //             code: invoiceData.payment_term?.code,
+  //           },
+  //           customer: {
+  //             customer_id: invoiceData.customer?.customer_id,
+  //             name: invoiceData.customer?.name
+  //           },
+  //           email: invoiceData.email,
+  //           billing_address: invoiceData.billing_address,
+  //           shipping_address: invoiceData.shipping_address,
+  //         },
+  //         customer_id: invoiceData.customer_id,
+  //         gst_type_id: invoiceData.gst_type_id,
+  //         payment_term_id: invoiceData.payment_term_id,
+  //         sale_return_items: invoiceItems,
+  //         order_attachments: res.data.order_attachments,
+  //         order_shipments: res.data.order_shipments
+  //       };
+  //       // Map sale_invoice_order fields to sale_return_order fields
+  //       this.formConfig.model = {
+  //         sale_return_order: {
+  //           sale_invoice_id: invoiceData.sale_invoice_id,
+  //           bill_type: invoiceData.bill_type,
+  //           order_type: this.formConfig.model.sale_return_order.order_type || 'sale_return',
+  //           return_date: this.nowDate(),
+  //           return_no: this.formConfig.model.sale_return_order.return_no,
+  //           ref_no: invoiceData.ref_no,
+  //           ref_date: invoiceData.ref_date,
+  //           against_bill: invoiceData.invoice_no,
+  //           against_bill_date: invoiceData.invoice_date,
+  //           tax: invoiceData.tax,
+  //           remarks: invoiceData.remarks,
+  //           item_value: invoiceData.item_value,
+  //           discount: invoiceData.discount,
+  //           dis_amt: invoiceData.dis_amt,
+  //           taxable: invoiceData.taxable,
+  //           tax_amount: invoiceData.tax_amount,
+  //           cess_amount: invoiceData.cess_amount,
+  //           transport_charges: invoiceData.transport_charges,
+  //           round_off: invoiceData.round_off,
+  //           total_amount: invoiceData.total_amount,
+  //           vehicle_name: invoiceData.vehicle_name,
+  //           total_boxes: invoiceData.total_boxes,
+  //           gst_type: {
+  //             gst_type_id: invoiceData.gst_type?.gst_type_id,
+  //             name: invoiceData.gst_type?.name
+  //           },
+  //           payment_term: {
+  //             payment_term_id: invoiceData.payment_term?.payment_term_id,
+  //             name: invoiceData.payment_term?.name,
+  //             code: invoiceData.payment_term?.code,
+  //           },
+  //           customer: {
+  //             customer_id: invoiceData.customer?.customer_id,
+  //             name: invoiceData.customer?.name
+  //           },
+  //           customer_id: invoiceData.customer_id,
+  //           gst_type_id: invoiceData.gst_type_id,
+  //           payment_term_id: invoiceData.payment_term_id,
+  //           email: invoiceData.email,
+  //           billing_address: invoiceData.billing_address,
+  //           shipping_address: invoiceData.shipping_address,
+  //         },
+  //         sale_return_items: invoiceItems,
+  //         order_attachments: res.data.order_attachments,
+  //         order_shipments: res.data.order_shipments
+  //       };
+
+  //       // Display the form
+  //       this.showForm = true;
+
+  //       // Trigger change detection to update the form
+  //       this.cdRef.detectChanges();
+  //     }
+  //   }, (error) => {
+  //     console.error('Error fetching order details:', error);
+  //   });
+
+  //   // Hide the modal
+  //   this.hideModal();
+  // }
+
+handleInvoiceOrderSelected(order: any) {
     const saleInvoiceId = order.sale_invoice_id;  // Extract sale_invoice_id from the emitted order
     if (!saleInvoiceId) {
       console.error('Invalid sale_invoice_id:', saleInvoiceId);
@@ -812,59 +1005,20 @@ updateReturnNoControl() {
     this.http.get(`sales/sale_invoice_order/${saleInvoiceId}`).subscribe((res: any) => {
       if (res && res.data) {
         const invoiceData = res.data.sale_invoice_order;
-        console.log("Inovice data : ", invoiceData);
+        console.log("Invoice data : ", invoiceData);
         const invoiceItems = res.data.sale_invoice_items;
-        console.log("Inovice Items : ", invoiceItems);
-        // const invoiceShipments = res.data.order_shipments;
+        console.log("Invoice Items : ", invoiceItems);
 
-        // Map sale_invoice_order fields to sale_return_order fields
-        this.formConfig.model = {
-          sale_return_order: {
-            bill_type: invoiceData.bill_type,
-            order_type: this.formConfig.model.sale_return_order.order_type || 'sale_return',
-            return_date: this.nowDate(),
-            return_no: this.formConfig.model.sale_return_order.return_no,
-            ref_no: invoiceData.ref_no,
-            ref_date: invoiceData.ref_date,
-            against_bill: invoiceData.invoice_no,
-            against_bill_date: invoiceData.invoice_date,
-            tax: invoiceData.tax,
-            remarks: invoiceData.remarks,
-            item_value: invoiceData.item_value,
-            discount: invoiceData.discount,
-            dis_amt: invoiceData.dis_amt,
-            taxable: invoiceData.taxable,
-            tax_amount: invoiceData.tax_amount,
-            cess_amount: invoiceData.cess_amount,
-            transport_charges: invoiceData.transport_charges,
-            round_off: invoiceData.round_off,
-            total_amount: invoiceData.total_amount,
-            vehicle_name: invoiceData.vehicle_name,
-            total_boxes: invoiceData.total_boxes,
-            gst_type: {
-              gst_type_id: invoiceData.gst_type?.gst_type_id,
-              name: invoiceData.gst_type?.name
-            },
-            payment_term: {
-              payment_term_id: invoiceData.payment_term?.payment_term_id,
-              name: invoiceData.payment_term?.name,
-              code: invoiceData.payment_term?.code,
-            },
-            customer: {
-              customer_id: invoiceData.customer?.customer_id,
-              name: invoiceData.customer?.name
-            },
-            email: invoiceData.email,
-            billing_address: invoiceData.billing_address,
-            shipping_address: invoiceData.shipping_address,
-          },
-          customer_id: invoiceData.customer_id,
-          gst_type_id: invoiceData.gst_type_id,
-          payment_term_id: invoiceData.payment_term_id,
-          sale_return_items: invoiceItems,
-          order_attachments: res.data.order_attachments,
-          order_shipments: res.data.order_shipments
-        };
+        // Transform invoiceItems to ensure quantity is integer
+        const transformedItems = invoiceItems.map((item: any) => ({
+          ...item,
+          quantity: Math.floor(Number(item.quantity) || 0), // Ensure integer
+          // If you have other numeric fields that should be integers, add them here
+          // For example:
+          // rate: Number(item.rate) || 0,
+          // amount: Number(item.amount) || 0,
+        }));
+
         // Map sale_invoice_order fields to sale_return_order fields
         this.formConfig.model = {
           sale_return_order: {
@@ -910,7 +1064,7 @@ updateReturnNoControl() {
             billing_address: invoiceData.billing_address,
             shipping_address: invoiceData.shipping_address,
           },
-          sale_return_items: invoiceItems,
+          sale_return_items: transformedItems, // Use transformed items with integer quantities
           order_attachments: res.data.order_attachments,
           order_shipments: res.data.order_shipments
         };
@@ -932,97 +1086,6 @@ updateReturnNoControl() {
   closeModal() {
     this.hideModal(); // Use the hideModal method to remove the modal elements
   }
-
-  // handleProductsPulled(products: any[], invoiceData?: any) {
-  //   let existingProducts = this.formConfig.model['sale_return_items'] || [];
-
-  //   existingProducts = existingProducts.filter((product: any) => product?.code && product.code.trim() !== "");
-  //   console.log("Products received for pulling:", products);
-
-  //   // Update against_bill if invoiceData is provided
-  //   if (invoiceData) {
-  //       this.formConfig.model.sale_return_order = {
-  //           ...this.formConfig.model.sale_return_order,
-  //           against_bill: invoiceData.invoice_no,
-  //           against_bill_date: invoiceData.invoice_date
-  //       };
-  //   }
-
-  //   if (existingProducts.length === 0) {
-  //     this.formConfig.model['sale_return_items'] = products.map(product => ({
-  //       product: {
-  //         product_id: product.product_id || null,
-  //         name: product.name || '',
-  //         code: product.code || '',
-  //       },
-  //       product_id: product.product_id || null,
-  //       code: product.code || '',
-  //       total_boxes: product.total_boxes || 0,
-  //       unit_options_id: product.unit_options_id,
-  //       quantity: product.quantity || 1,
-  //       rate: product.rate || 0,
-  //       discount: product.discount || 0,
-  //       print_name: product.print_name || product.name || '',
-  //       amount: product.amount || 0,
-  //       tax: product.tax || 0,
-  //       cgst: product.cgst || 0,
-  //       sgst: product.sgst || 0,
-  //       igst: product.igst || 0,
-  //       remarks: product.remarks || null
-  //     }));
-  //   } else {
-  //     products.forEach(newProduct => {
-  //       const existingProductIndex = existingProducts.findIndex((product: any) => product?.code === newProduct?.code);
-
-  //       if (existingProductIndex === -1) {
-  //         existingProducts.push({
-  //           product: {
-  //             product_id: newProduct.product_id || null,
-  //             name: newProduct.name || '',
-  //             code: newProduct.code || '',
-  //           },
-  //           product_id: newProduct.product_id || null,
-  //           code: newProduct.code || '',
-  //           total_boxes: newProduct.total_boxes || 0,
-  //           unit_options_id: newProduct.unit_options_id,
-  //           quantity: newProduct.quantity || 1,
-  //           rate: newProduct.rate || 0,
-  //           discount: newProduct.discount || 0,
-  //           print_name: newProduct.print_name || newProduct.name || '',
-  //           amount: newProduct.amount || 0,
-  //           tax: newProduct.tax || 0,
-  //           cgst: newProduct.cgst || 0,
-  //           sgst: newProduct.sgst || 0,
-  //           igst: newProduct.igst || 0,
-  //           remarks: newProduct.remarks || null
-  //         });
-  //       } else {
-  //         existingProducts[existingProductIndex] = {
-  //           ...existingProducts[existingProductIndex],
-  //           ...newProduct,
-  //           remarks:
-  //             newProduct.remarks !== undefined
-  //               ? newProduct.remarks
-  //               : existingProducts[existingProductIndex].remarks ?? null,
-  //           product: {
-  //             product_id: newProduct.product_id || existingProducts[existingProductIndex].product.product_id,
-  //             name: newProduct.name || existingProducts[existingProductIndex].product.name,
-  //             code: newProduct.code || existingProducts[existingProductIndex].product.code,
-  //           }
-  //         };
-  //       }
-  //     });
-
-  //     this.formConfig.model['sale_return_items'] = [...existingProducts];
-  //   }
-
-  //   this.formConfig.model = { ...this.formConfig.model };
-
-  //   this.cdRef.detectChanges();
-
-  //   console.log("Final Products List:", this.formConfig.model['sale_return_items']);
-  //   this.hideModal();
-  // }
 
 handleProductsPulled(event: any) {
     const products = event.products;
@@ -1079,7 +1142,7 @@ private processProducts(products: any[]) {
         code: product.code || '',
         total_boxes: product.total_boxes || 0,
         unit_options_id: product.unit_options_id,
-        quantity: product.quantity || 1,
+        quantity: (Number(product.quantity) || 0) || 1,
         rate: product.rate || 0,
         discount: product.discount || 0,
         print_name: product.print_name || product.name || '',
@@ -1105,7 +1168,7 @@ private processProducts(products: any[]) {
             code: newProduct.code || '',
             total_boxes: newProduct.total_boxes || 0,
             unit_options_id: newProduct.unit_options_id,
-            quantity: newProduct.quantity || 1,
+            quantity: (Number(newProduct.quantity) || 0) || 1,
             rate: newProduct.rate || 0,
             discount: newProduct.discount || 0,
             print_name: newProduct.print_name || newProduct.name || '',
@@ -2156,6 +2219,53 @@ private processProducts(products: any[]) {
                   }
                 }
               },             
+              // {
+              //   type: 'input',
+              //   key: 'quantity',
+              //   // defaultValue: 1,
+              //   templateOptions: {
+              //     type: 'number',
+              //     label: 'Qty',
+              //     placeholder: 'Qty',
+              //     min: 1,
+              //     hideLabel: true,
+              //     required: false,
+              //   },
+              //   hooks: {
+              //     onInit: (field: any) => {
+              //       const parentArray = field.parent;
+
+              //       // Check if parentArray exists and proceed
+              //       if (parentArray) {
+              //         const currentRowIndex = +parentArray.key; // Simplified number conversion
+
+              //         // Check if there is a product already selected in this row (when data is copied)
+              //         if (this.dataToPopulate && this.dataToPopulate.sale_return_items.length > currentRowIndex) {
+              //           const existingQuan = this.dataToPopulate.sale_return_items[currentRowIndex].quantity;
+
+              //           // Set the full product object instead of just the product_id
+              //           if (existingQuan) {
+              //             field.formControl.setValue(existingQuan); // Set full product object (not just product_id)
+              //           }
+              //         }
+              //       }
+
+              //       // Subscribe to value changes
+              //       field.formControl.valueChanges.subscribe(data => {
+              //         if (field.form && field.form.controls && field.form.controls.rate && data) {
+              //           const rate = field.form.controls.rate.value;
+              //           const quantity = data;
+              //           if (rate && quantity) {
+              //             field.form.controls.amount.setValue(parseInt(rate) * parseInt(quantity));
+              //           }
+              //         }
+              //       });
+              //     },
+              //     onChanges: (field: any) => {
+              //       // You can handle any changes here if needed
+              //     }
+              //   }
+              // },
               {
                 type: 'input',
                 key: 'quantity',
@@ -2167,6 +2277,8 @@ private processProducts(products: any[]) {
                   min: 1,
                   hideLabel: true,
                   required: false,
+                  step: 1,  // Add this to enforce integer values
+                  pattern: /^\d+$/, // Optional: Add pattern validation
                 },
                 hooks: {
                   onInit: (field: any) => {
@@ -2182,7 +2294,8 @@ private processProducts(products: any[]) {
 
                         // Set the full product object instead of just the product_id
                         if (existingQuan) {
-                          field.formControl.setValue(existingQuan); // Set full product object (not just product_id)
+                          // Ensure the value is an integer
+                          field.formControl.setValue(Math.floor(existingQuan)); // Set full product object (not just product_id)
                         }
                       }
                     }
@@ -2191,15 +2304,22 @@ private processProducts(products: any[]) {
                     field.formControl.valueChanges.subscribe(data => {
                       if (field.form && field.form.controls && field.form.controls.rate && data) {
                         const rate = field.form.controls.rate.value;
-                        const quantity = data;
+                        // Ensure quantity is an integer
+                        const quantity = parseInt(data);
                         if (rate && quantity) {
-                          field.form.controls.amount.setValue(parseInt(rate) * parseInt(quantity));
+                          field.form.controls.amount.setValue(parseInt(rate) * quantity);
                         }
                       }
                     });
                   },
                   onChanges: (field: any) => {
-                    // You can handle any changes here if needed
+                    // Handle changes and ensure integer value
+                    if (field.formControl && field.formControl.value) {
+                      const intValue = Math.floor(Number(field.formControl.value));
+                      if (field.formControl.value !== intValue) {
+                        field.formControl.setValue(intValue);
+                      }
+                    }
                   }
                 }
               },
@@ -3179,7 +3299,7 @@ private processProducts(products: any[]) {
                     //     }
                     //   }
                     // }
-                    					{
+                    {
                       key: 'shipping_charges',
                       type: 'input',
                       defaultValue: "0",
@@ -3196,14 +3316,23 @@ private processProducts(products: any[]) {
                             this.formConfig.model.order_shipments = {};
                           }
 
-                          // Edit mode value populate - Use formConfig.model instead of dataToPopulate
-                          const existingShipping = this.formConfig.model.order_shipments?.shipping_charges ?? 0;
-
-                          if (field.formControl && existingShipping !== undefined) {
-                            console.log("Populating existing shipping charges:", existingShipping);
-                            field.formControl.setValue(parseFloat(existingShipping) || 0, { emitEvent: false });
-                            this.formConfig.model.order_shipments.shipping_charges = parseFloat(existingShipping) || 0;
-                          }
+                          // Use setTimeout to ensure the model is fully loaded
+                          setTimeout(() => {
+                            // Edit mode value populate
+                            const existingShipping = this.formConfig.model.order_shipments?.shipping_charges ?? 0;
+                            
+                            console.log("Existing shipping charges from model:", existingShipping);
+                            
+                            if (field.formControl && existingShipping !== undefined) {
+                              console.log("Populating existing shipping charges:", existingShipping);
+                              const shippingValue = parseFloat(existingShipping) || 0;
+                              field.formControl.setValue(shippingValue, { emitEvent: false });
+                              this.formConfig.model.order_shipments.shipping_charges = shippingValue;
+                              
+                              // Update the billing summary
+                              this.totalAmountCal();
+                            }
+                          }, 50);
 
                           // Value change
                           field.formControl.valueChanges.subscribe((value: any) => {
