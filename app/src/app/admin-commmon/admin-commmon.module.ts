@@ -16,6 +16,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TaTableModule } from '@ta/ta-table';
 import { TaCurdModule } from '@ta/ta-curd';
 import { TaFormComponent, TaFormModule } from '@ta/ta-form';
+import { MoneyPipe } from '@ta/ta-core';
 import { RouterModule } from '@angular/router';
 import { HasPermissionDirective } from './permision.directive';
 import { FomrlyMasterAdvSelectFieldsModule } from './fomrly-master-adv-select-fields.module';
@@ -37,6 +38,7 @@ const module = [NzListModule,
   TaTableModule,
   TaFormComponent,
   TaCurdModule,
+  MoneyPipe,
   FomrlyMasterAdvSelectFieldsModule
 ];
 

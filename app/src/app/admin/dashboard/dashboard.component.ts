@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, AfterViewInit, ViewChild, ElementRef, PLA
 import { CommonModule } from '@angular/common';
 import { Chart, ChartTypeRegistry, Colors, registerables } from 'chart.js';
 import { HttpClient } from '@angular/common/http'; // Import HttpClient
-import { SiteConfigService } from '@ta/ta-core'; // Import SiteConfigService
+import { SiteConfigService, formatMoney } from '@ta/ta-core'; // Import SiteConfigService + money formatter
 import { REPORT_CONFIGS  } from '../utils/reports.config'; // Import report configurations
 import { DashboardTilesService } from './dashboard-tiles.service';
 import { Router } from '@angular/router';
@@ -2034,7 +2034,7 @@ loadCurrentYearFinancialData() {
               label: (context) => {
                 const label = context.label || '';
                 const value = context.raw || 0;
-                return `${label}: ₹${value.toLocaleString()}`;
+                return `${label}: ${formatMoney(value, { symbol: true })}`;
               }
             }
           },

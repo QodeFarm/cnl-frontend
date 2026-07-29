@@ -267,7 +267,8 @@ export class DeliveryChallanListComponent implements OnInit {
       {
         fieldKey: 'total_amount',
         name: 'Total Amount',
-        sort: true
+        sort: true,
+        displayType: 'inr'
       },
       {
         fieldKey: 'is_converted',

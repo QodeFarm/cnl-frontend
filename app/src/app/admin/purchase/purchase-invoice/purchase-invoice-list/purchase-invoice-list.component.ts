@@ -150,19 +150,22 @@ export class PurchaseInvoiceListComponent {
       {
         fieldKey: 'total_amount',
         name: 'Total amount',
-        sort: true
+        sort: true,
+        displayType: 'inr'
       },
       {
         fieldKey: 'tax_amount',
         name: 'Tax amount',
         sort: true,
-        hidden: true
+        hidden: true,
+        displayType: 'inr'
       },
       {
         fieldKey: 'advance_amount',
         name: 'Advance Amount',
         sort: true,
-        hidden: true
+        hidden: true,
+        displayType: 'inr'
       },
       {
         fieldKey: 'status_name',

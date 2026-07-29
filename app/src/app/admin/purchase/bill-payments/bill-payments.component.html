@@ -15,7 +15,7 @@
 
     <div class="row custom-form">
         <div class="col-12 px-1">
-            <ta-form #billpaymentreceiptForm [options]="formConfig"></ta-form>
+            <ta-form *ngIf="showForm" #billpaymentreceiptForm [options]="formConfig"></ta-form>
         </div>
     </div>
 

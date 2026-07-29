@@ -46,9 +46,10 @@ export class AssetsListComponent {
         sort: true
       },
       {
-          fieldKey: 'price', 
+          fieldKey: 'price',
           name: 'Price',
-          sort: true
+          sort: true,
+          displayType: 'inr'
       },
       {
         fieldKey: 'asset_category_id',

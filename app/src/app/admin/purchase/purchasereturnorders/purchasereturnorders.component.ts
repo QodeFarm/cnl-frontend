@@ -1086,7 +1086,7 @@ showSuccessToast = false;
                 // },
                 {
                   key: 'total_amount',
-                  type: 'text',
+                  type: 'inrDisplay',
                   className: 'col-12 product-total',
                   templateOptions: {
                     label: ' ',

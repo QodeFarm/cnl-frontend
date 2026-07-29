@@ -868,12 +868,14 @@ export class SaleReturnsListComponent implements OnInit {
       {
         fieldKey: 'tax_amount',
         name: 'Tax Amount',
-        sort: true
+        sort: true,
+        displayType: 'inr'
       },
       {
         fieldKey: 'total_amount',
         name: 'Total Amount',
-        sort: true
+        sort: true,
+        displayType: 'inr'
       },
       {
         fieldKey: 'return_reason',

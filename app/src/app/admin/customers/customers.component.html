@@ -144,7 +144,7 @@
             <div class="card-icon"><i class="fas fa-credit-card"></i></div>
             <div class="card-content">
               <span class="card-label">Credit Limit</span>
-              <span class="card-value">{{ customerProfile.customer_data?.credit_limit | currency:'INR' }}</span>
+              <span class="card-value">{{ customerProfile.customer_data?.credit_limit | inr:true }}</span>
             </div>
           </div>
           <div class="info-card">

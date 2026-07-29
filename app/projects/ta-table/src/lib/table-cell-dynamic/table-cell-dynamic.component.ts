@@ -1,7 +1,7 @@
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, Input, OnInit, Output } from '@angular/core';
-import { evalFn } from '@ta/ta-core';
+import { evalFn, formatMoney } from '@ta/ta-core';
 
 @Component({
   selector: 'ta-table-cell-dynamic',
@@ -45,8 +45,11 @@ export class TableCellDynamicComponent implements OnInit {
       case 'time':
         this.html = this.datepipe.transform(this.value, this.col.dateFormat || 'h:mm a');
         break;
+      case 'inr':
       case 'currency':
-        this.html = this.currency.transform(this.value, 'INR');
+        // Indian grouping (48,42,000.00). Underlying row value stays numeric,
+        // so sort/search/export are unaffected. Set col.currencySymbol for a ₹ prefix.
+        this.html = formatMoney(this.value, { symbol: !!this.col.currencySymbol });
         break;
 
       default:

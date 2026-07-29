@@ -49,7 +49,8 @@ export class OpeningBalanceListComponent {
         {
           fieldKey: 'amount',
           name: 'Amount',
-          sort: true
+          sort: true,
+          displayType: 'inr'
         },
         {
           fieldKey: 'entry_type',

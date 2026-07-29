@@ -13,6 +13,7 @@ import { FieldCommonModule } from './fields/field-common/field-common.module';
 import { FieldAccordionModule } from './fields/field-accordion/field-accordion.module';
 import { FieldTabsModule } from './fields/field-tabs/field-tabs.module';
 import { FieldAdvSelectModule } from './fields/field-adv-select/field-adv-select.module';
+import { FieldInrDisplayModule } from './fields/field-inr-display/field-inr-display.module';
 
 
 
@@ -21,6 +22,7 @@ import { FieldAdvSelectModule } from './fields/field-adv-select/field-adv-select
   imports: [
     TaFormFieldModule,
     TaFieldInputModule,
+    FieldInrDisplayModule,
     FormlyTaTextAreaModule,
     FormlyTaRadioModule,
     FormlyTaCheckboxModule,
