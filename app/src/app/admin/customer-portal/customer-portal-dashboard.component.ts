@@ -2,11 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
+import { MoneyPipe } from '@ta/ta-core';
 
 @Component({
   selector: 'app-customer-portal-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, MoneyPipe],
   template: `
     <div class="dashboard">
       <!-- Welcome Banner -->
@@ -120,15 +121,15 @@ import { RouterModule } from '@angular/router';
         <div class="summary-cards">
           <div class="summary-card">
             <div class="summary-label">Credit Limit</div>
-            <div class="summary-value">{{ accountSummary.creditLimit | currency:'INR' }}</div>
+            <div class="summary-value">{{ accountSummary.creditLimit | inr:true }}</div>
           </div>
           <div class="summary-card">
             <div class="summary-label">Outstanding</div>
-            <div class="summary-value">{{ accountSummary.outstanding | currency:'INR' }}</div>
+            <div class="summary-value">{{ accountSummary.outstanding | inr:true }}</div>
           </div>
           <div class="summary-card">
             <div class="summary-label">Available Credit</div>
-            <div class="summary-value">{{ accountSummary.availableCredit | currency:'INR' }}</div>
+            <div class="summary-value">{{ accountSummary.availableCredit | inr:true }}</div>
           </div>
           <div class="summary-card">
             <div class="summary-label">Last Login</div>

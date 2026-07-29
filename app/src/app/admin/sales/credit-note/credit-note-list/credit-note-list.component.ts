@@ -264,7 +264,8 @@ export class CreditNoteListComponent implements OnInit {
       {
         fieldKey: 'total_amount',
         name: 'Total Amount',
-        sort: true
+        sort: true,
+        displayType: 'inr'
       },
       {
         fieldKey: 'status_name',

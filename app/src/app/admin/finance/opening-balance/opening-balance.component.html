@@ -9,10 +9,10 @@
             </div>
             <div class="d-flex justify-content-end align-items-center gap-4" style="font-size: 14px; font-weight: 600;">
               <div class="text-primary">
-                Total Debit: <span class="text-success">₹{{ totalDebit }}</span>
+                Total Debit: <span class="text-success">₹{{ totalDebit | inr }}</span>
               </div>
               <div class="text-primary">
-                Total Credit: <span class="text-danger">₹{{ totalCredit }}</span>
+                Total Credit: <span class="text-danger">₹{{ totalCredit | inr }}</span>
               </div>
               <button (click)="showOpeningBalanceListFn()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#openingBalanceModal">
                   Opening Balance List

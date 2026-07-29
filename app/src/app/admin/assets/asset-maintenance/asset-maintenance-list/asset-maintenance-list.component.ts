@@ -50,9 +50,10 @@ export class AssetMaintenanceListComponent {
         },
       },
       {
-        fieldKey: 'cost', 
+        fieldKey: 'cost',
         name: 'Cost',
-        sort: true
+        sort: true,
+        displayType: 'inr'
       },
       {
         fieldKey: 'maintenance_date',

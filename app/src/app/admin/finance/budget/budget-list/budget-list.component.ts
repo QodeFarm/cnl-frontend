@@ -51,14 +51,16 @@ export class BudgetListComponent {
         sort: true
       },
       {
-        fieldKey: 'allocated_amount', 
+        fieldKey: 'allocated_amount',
         name: 'Allocated Amount',
-        sort: true
+        sort: true,
+        displayType: 'inr'
       },
       {
-        fieldKey: 'spent_amount', 
+        fieldKey: 'spent_amount',
         name: 'Spent Amount',
-        sort: true
+        sort: true,
+        displayType: 'inr'
       },
       {
         fieldKey: "code",

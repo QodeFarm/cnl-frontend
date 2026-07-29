@@ -574,7 +574,7 @@ export class DeliveryChallanComponent implements OnInit, OnDestroy {
                 },
                 {
                   key: 'total_amount',
-                  type: 'text',
+                  type: 'inrDisplay',
                   className: 'col-12 product-total',
                   templateOptions: { label: ' ', placeholder: 'Total Amount', disabled: true },
                   defaultValue: '0.00'

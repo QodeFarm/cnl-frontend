@@ -415,6 +415,7 @@ export class SalesListComponent implements OnInit {
         fieldKey: 'total_amount',
         name: 'Total Amount',
         sort: true,
+        displayType: 'inr',
         isEdit: true,
         isEditSumbmit(row, value, col) {
         },
@@ -438,7 +439,8 @@ export class SalesListComponent implements OnInit {
         fieldKey: 'advance_amount',
         name: 'Advance Amt',
         sort: true,
-        hidden: true
+        hidden: true,
+        displayType: 'inr'
       },
       {
         fieldKey: 'order_status',

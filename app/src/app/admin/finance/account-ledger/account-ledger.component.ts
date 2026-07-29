@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, ViewChild, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
 import { TaCurdConfig } from '@ta/ta-curd';
+import { formatMoney } from '@ta/ta-core';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { HttpClient } from '@angular/common/http';
 import { DoubleClickNavigationService } from 'src/app/services/double-click-navigation.service';
@@ -267,7 +268,7 @@ export class AccountLedgerComponent implements OnInit, AfterViewInit, OnDestroy 
           mapFn: (_: any, row: any) => {
             const v = parseFloat(row.debit) || 0;
             if (v === 0) return '<span class="ledger-muted">—</span>';
-            return `<span class="ledger-dr">₹${v.toFixed(2)}</span>`;
+            return `<span class="ledger-dr">${formatMoney(v, { symbol: true })}</span>`;
           }
         },
         {
@@ -279,7 +280,7 @@ export class AccountLedgerComponent implements OnInit, AfterViewInit, OnDestroy 
           mapFn: (_: any, row: any) => {
             const v = parseFloat(row.credit) || 0;
             if (v === 0) return '<span class="ledger-muted">—</span>';
-            return `<span class="ledger-cr">₹${v.toFixed(2)}</span>`;
+            return `<span class="ledger-cr">${formatMoney(v, { symbol: true })}</span>`;
           }
         },
         {
@@ -290,7 +291,7 @@ export class AccountLedgerComponent implements OnInit, AfterViewInit, OnDestroy 
           displayType: 'map',
           mapFn: (_: any, row: any) => {
             const v   = parseFloat(row.running_balance || row.balance) || 0;
-            const abs = `₹${Math.abs(v).toFixed(2)}`;
+            const abs = formatMoney(Math.abs(v), { symbol: true });
             if (v > 0) return `<span class="ledger-dr ledger-bal">${abs} <em class="bal-tag">Dr</em></span>`;
             if (v < 0) return `<span class="ledger-cr ledger-bal">${abs} <em class="bal-tag">Cr</em></span>`;
             return '<span class="ledger-muted">₹0.00</span>';

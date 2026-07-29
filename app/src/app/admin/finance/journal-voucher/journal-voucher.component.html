@@ -42,14 +42,14 @@
         <div class="col-12">
             <div class="d-flex justify-content-end align-items-center gap-4" style="font-size: 14px; font-weight: 600;">
                 <div class="text-primary">
-                    Total Debit: <span class="text-success">₹{{ totalDebit.toFixed(2) }}</span>
+                    Total Debit: <span class="text-success">₹{{ totalDebit | inr }}</span>
                 </div>
                 <div class="text-primary">
-                    Total Credit: <span class="text-danger">₹{{ totalCredit.toFixed(2) }}</span>
+                    Total Credit: <span class="text-danger">₹{{ totalCredit | inr }}</span>
                 </div>
                 <div [ngClass]="{'text-success': totalDebit === totalCredit && totalDebit > 0, 'text-danger': totalDebit !== totalCredit}">
                     <span *ngIf="totalDebit === totalCredit && totalDebit > 0">✓ Balanced</span>
-                    <span *ngIf="totalDebit !== totalCredit">⚠ Unbalanced (Diff: ₹{{ (totalDebit - totalCredit).toFixed(2) }})</span>
+                    <span *ngIf="totalDebit !== totalCredit">⚠ Unbalanced (Diff: ₹{{ (totalDebit - totalCredit) | inr }})</span>
                 </div>
             </div>
         </div>

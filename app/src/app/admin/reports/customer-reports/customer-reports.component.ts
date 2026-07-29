@@ -206,12 +206,16 @@ export class CustomerReportsComponent {
           {
             fieldKey: 'credit_limit',
             name: 'Credit Limit',
-            sort: true
+            sort: true,
+            displayType: 'inr',
+            currencySymbol: true
           },
           {
             fieldKey: 'credit_usage',
             name: 'Credit Usage',
             sort: true,
+            displayType: 'inr',
+            currencySymbol: true
           },
           // {
           //   fieldKey: 'total_paid',

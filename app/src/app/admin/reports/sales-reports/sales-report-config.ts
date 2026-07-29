@@ -1,6 +1,7 @@
 // ─────────────────────────────────────────────────────────────
 // Sales Report Config — single source of truth for all 19 reports
 // ─────────────────────────────────────────────────────────────
+import { formatMoney } from '@ta/ta-core';
 
 export type ReportCategory =
   | 'Sale Register'
@@ -63,8 +64,7 @@ export interface SalesReportDef {
 }
 
 // ─── Column value helpers (shared across report modules — single source) ──────
-export const cur = (v: any) =>
-  v != null ? `₹${Number(v).toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '—';
+export const cur = (v: any) => formatMoney(v, { symbol: true });
 
 export const dt = (v: any) =>
   v ? new Date(v).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';

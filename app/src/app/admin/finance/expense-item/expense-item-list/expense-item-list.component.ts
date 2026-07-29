@@ -50,9 +50,10 @@ export class ExpenseItemListComponent {
       //   },
       // },
       {
-        fieldKey: 'amount', 
+        fieldKey: 'amount',
         name: 'Amount',
-        sort: true
+        sort: true,
+        displayType: 'inr'
       },
       {
         fieldKey: 'description',

@@ -159,23 +159,23 @@
           </tr>
           <tr>
             <td>Sales Invoices</td>
-            <td class="text-right">₹{{ salesInvoices | number:'1.0-2' }}</td>
+            <td class="text-right">₹{{ salesInvoices | inr }}</td>
             <td>Billed to customers</td>
           </tr>
           <tr>
             <td>Sales Credit Notes</td>
-            <td class="text-right text-red-500">-₹{{ salesCreditNotes | number:'1.0-2' }}</td>
+            <td class="text-right text-red-500">-₹{{ salesCreditNotes | inr }}</td>
             <td>Refunds/returns issued</td>
           </tr>
           <tr>
             <td>Sales Debit Notes</td>
-            <td class="text-right">₹{{ salesDebitNotes | number:'1.0-2' }}</td>
+            <td class="text-right">₹{{ salesDebitNotes | inr }}</td>
             <td>Extra charges (late fees, interest, etc.)</td>
           </tr>
           <tr class="font-bold text-black">
             <td>Total Sales</td>
-            <td class="text-right">₹{{ totalSales | number:'1.0-2' }}</td>
-            <td>= {{ salesInvoices | number:'1.0-2' }} − {{ salesCreditNotes | number:'1.0-2' }} + {{ salesDebitNotes | number:'1.0-2' }}</td>
+            <td class="text-right">₹{{ totalSales | inr }}</td>
+            <td>= {{ salesInvoices | inr }} − {{ salesCreditNotes | inr }} + {{ salesDebitNotes | inr }}</td>
           </tr>
           <tr><td colspan="3"><hr></td></tr>
 
@@ -185,31 +185,31 @@
           </tr>
           <tr>
             <td>Purchase Invoices</td>
-            <td class="text-right">₹{{ purchaseInvoices | number:'1.0-2' }}</td>
+            <td class="text-right">₹{{ purchaseInvoices | inr }}</td>
             <td>Materials, stock, etc.</td>
           </tr>
           <tr>
             <td>General Expenses</td>
-            <td class="text-right">₹{{ generalExpenses | number:'1.0-2' }}</td>
+            <td class="text-right">₹{{ generalExpenses | inr }}</td>
             <td>Rent, utilities, maintenance</td>
           </tr>
           <tr>
             <td>Salaries</td> 
-            <td class="text-right">₹{{ salaries | number:'1.0-2' }}</td>
+            <td class="text-right">₹{{ salaries | inr }}</td>
             <td>Payroll paid to staff</td>
           </tr>
           <tr class="font-bold text-black">
             <td>Total Expenses</td>
-            <td class="text-right">₹{{ totalExpenses | number:'1.0-2' }}</td>
-            <td>= {{ purchaseInvoices | number:'1.0-2' }} + ₹{{ generalExpenses | number:'1.0-2' }} + ₹{{ salaries | number:'1.0-2' }}</td>
+            <td class="text-right">₹{{ totalExpenses | inr }}</td>
+            <td>= {{ purchaseInvoices | inr }} + ₹{{ generalExpenses | inr }} + ₹{{ salaries | inr }}</td>
           </tr>
           <tr><td colspan="3"><hr></td></tr>
 
           <!-- Net Profit -->
           <tr class="font-bold text-black">
             <td>Net Profit</td>
-            <td class="text-right text-red-600">₹{{ netProfit | number:'1.0-2' }}</td>
-            <td>= {{ totalSales | number:'1.0-2' }} − {{ totalExpenses | number:'1.0-2' }}</td>
+            <td class="text-right text-red-600">₹{{ netProfit | inr }}</td>
+            <td>= {{ totalSales | inr }} − {{ totalExpenses | inr }}</td>
           </tr>
         </tbody>
       </table>

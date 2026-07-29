@@ -2,7 +2,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { LocalStorageService } from '@ta/ta-core';
+import { LocalStorageService, formatMoney } from '@ta/ta-core';
 import { TaTableComponent, TaTableConfig } from '@ta/ta-table';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { NzSelectModule } from 'ng-zorro-antd/select';
@@ -125,7 +125,7 @@ export class SalesRepotsComponent {
           sort: true,
           displayType: 'map',
           mapFn: (currentValue: any) => {
-            return currentValue ? `₹${currentValue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '₹0.00';
+            return formatMoney(currentValue, { symbol: true });
           }
         },
         {
@@ -134,7 +134,7 @@ export class SalesRepotsComponent {
           sort: true,
           displayType: 'map',
           mapFn: (currentValue: any) => {
-            return currentValue ? `₹${currentValue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '₹0.00';
+            return formatMoney(currentValue, { symbol: true });
           }
         },
         {
@@ -143,7 +143,7 @@ export class SalesRepotsComponent {
           sort: true,
           displayType: 'map',
           mapFn: (currentValue: any) => {
-            return currentValue ? `₹${currentValue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '₹0.00';
+            return formatMoney(currentValue, { symbol: true });
           }
         },
         {
@@ -152,7 +152,7 @@ export class SalesRepotsComponent {
           sort: true,
           displayType: 'map',
           mapFn: (currentValue: any) => {
-            return currentValue ? `₹${currentValue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '₹0.00';
+            return formatMoney(currentValue, { symbol: true });
           }
         },
         {
@@ -161,7 +161,7 @@ export class SalesRepotsComponent {
           sort: true,
           displayType: 'map',
           mapFn: (currentValue: any) => {
-            return currentValue ? `₹${currentValue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '₹0.00';
+            return formatMoney(currentValue, { symbol: true });
           }
         },
         {
@@ -224,7 +224,7 @@ export class SalesRepotsComponent {
           sort: true,
           displayType: 'map',
           mapFn: (currentValue: any) => {
-            return currentValue ? `₹${currentValue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '₹0.00';
+            return formatMoney(currentValue, { symbol: true });
           }
         },
         {
@@ -233,7 +233,7 @@ export class SalesRepotsComponent {
           sort: true,
           displayType: 'map',
           mapFn: (currentValue: any) => {
-            return currentValue ? `₹${currentValue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '₹0.00';
+            return formatMoney(currentValue, { symbol: true });
           }
         },
         {
@@ -242,7 +242,7 @@ export class SalesRepotsComponent {
           sort: true,
           displayType: 'map',
           mapFn: (currentValue: any) => {
-            return currentValue ? `₹${currentValue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '₹0.00';
+            return formatMoney(currentValue, { symbol: true });
           }
         }
       ]
@@ -295,7 +295,7 @@ export class SalesRepotsComponent {
           sort: true,
           displayType: 'map',
           mapFn: (currentValue: any) => {
-            return currentValue ? `₹${currentValue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '₹0.00';
+            return formatMoney(currentValue, { symbol: true });
           }
         },
         {
@@ -342,7 +342,7 @@ export class SalesRepotsComponent {
           sort: true,
           displayType: 'map',
           mapFn: (currentValue: any) => {
-            return currentValue ? `₹${currentValue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '₹0.00';
+            return formatMoney(currentValue, { symbol: true });
           }
         }
       ]
@@ -384,7 +384,7 @@ export class SalesRepotsComponent {
           sort: true,
           displayType: 'map',
           mapFn: (currentValue: any) => {
-            return currentValue ? `₹${currentValue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '₹0.00';
+            return formatMoney(currentValue, { symbol: true });
           }
         }
       ]
@@ -426,7 +426,7 @@ export class SalesRepotsComponent {
           sort: true,
           displayType: 'map',
           mapFn: (currentValue: any) => {
-            return currentValue ? `₹${currentValue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '₹0.00';
+            return formatMoney(currentValue, { symbol: true });
           }
         }
       ]
@@ -468,7 +468,7 @@ export class SalesRepotsComponent {
           sort: true,
           displayType: 'map',
           mapFn: (currentValue: any) => {
-            return currentValue ? `₹${currentValue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '₹0.00';
+            return formatMoney(currentValue, { symbol: true });
           }
         }
       ]
@@ -506,7 +506,7 @@ export class SalesRepotsComponent {
           sort: true,
           displayType: 'map',
           mapFn: (currentValue: any) => {
-            return currentValue ? `₹${currentValue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '₹0.00';
+            return formatMoney(currentValue, { symbol: true });
           }
         },
         {
@@ -515,7 +515,7 @@ export class SalesRepotsComponent {
           sort: true,
           displayType: 'map',
           mapFn: (currentValue: any) => {
-            return currentValue ? `₹${currentValue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '₹0.00';
+            return formatMoney(currentValue, { symbol: true });
           }
         },
         {
@@ -524,7 +524,7 @@ export class SalesRepotsComponent {
           sort: true,
           displayType: 'map',
           mapFn: (currentValue: any) => {
-            return currentValue ? `₹${currentValue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '₹0.00';
+            return formatMoney(currentValue, { symbol: true });
           }
         },
         {
@@ -533,7 +533,7 @@ export class SalesRepotsComponent {
           sort: true,
           displayType: 'map',
           mapFn: (currentValue: any) => {
-            return currentValue ? `₹${currentValue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '₹0.00';
+            return formatMoney(currentValue, { symbol: true });
           }
         }
       ]
@@ -570,7 +570,7 @@ export class SalesRepotsComponent {
           sort: true,
           displayType: 'map',
           mapFn: (currentValue: any) => {
-            return currentValue ? `₹${currentValue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '₹0.00';
+            return formatMoney(currentValue, { symbol: true });
           }
         },
         {
@@ -579,7 +579,7 @@ export class SalesRepotsComponent {
           sort: true,
           displayType: 'map',
           mapFn: (currentValue: any) => {
-            return currentValue ? `₹${currentValue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '₹0.00';
+            return formatMoney(currentValue, { symbol: true });
           }
         },
         {
@@ -588,7 +588,7 @@ export class SalesRepotsComponent {
           sort: true,
           displayType: 'map',
           mapFn: (currentValue: any) => {
-            return currentValue ? `₹${currentValue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '₹0.00';
+            return formatMoney(currentValue, { symbol: true });
           }
         },
         {
@@ -597,7 +597,7 @@ export class SalesRepotsComponent {
           sort: true,
           displayType: 'map',
           mapFn: (currentValue: any) => {
-            return currentValue ? `₹${currentValue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '₹0.00';
+            return formatMoney(currentValue, { symbol: true });
           }
         }
       ]

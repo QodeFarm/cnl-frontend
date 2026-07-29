@@ -7,6 +7,7 @@ import { FormsModule } from '@angular/forms';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzPopoverModule } from 'ng-zorro-antd/popover';
 import { TaTableConfig } from '@ta/ta-table';
+import { formatMoney } from '@ta/ta-core';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import {
   SalesReportDef, SummaryField,
@@ -200,10 +201,7 @@ export class ReportDetailComponent implements OnInit, OnChanges {
     const raw = this.summaryData[field.key];
     if (raw == null || raw === '') return '—';
     if (field.currency) {
-      return `₹${Number(raw).toLocaleString('en-IN', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      })}`;
+      return formatMoney(raw, { symbol: true });
     }
     const num = Number(raw);
     return isNaN(num) ? String(raw) : num.toLocaleString('en-IN');

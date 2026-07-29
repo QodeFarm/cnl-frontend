@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, ElementRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TaTableConfig } from '@ta/ta-table';
+import { formatMoney } from '@ta/ta-core';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 
 @Component({
@@ -566,7 +567,7 @@ export class LedgersReportsComponent {
             if (!row.lines || !Array.isArray(row.lines)) return '₹0.00';
             const lines = row.lines.map((line: any) => {
               const debit = parseFloat(line.debit) || 0;
-              return `₹${debit.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+              return formatMoney(debit, { symbol: true });
             });
             return lines.join('<hr style="margin: 5px 0; border: 0; border-top: 1px dashed #ccc;">');
           },
@@ -575,7 +576,7 @@ export class LedgersReportsComponent {
             if (!row.lines || !Array.isArray(row.lines)) return '₹0.00';
             const lines = row.lines.map((line: any) => {
               const debit = parseFloat(line.debit) || 0;
-              return `₹${debit.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+              return formatMoney(debit, { symbol: true });
             });
             return lines.join(' | ');
           },
@@ -589,7 +590,7 @@ export class LedgersReportsComponent {
             if (!row.lines || !Array.isArray(row.lines)) return '₹0.00';
             const lines = row.lines.map((line: any) => {
               const credit = parseFloat(line.credit) || 0;
-              return `₹${credit.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+              return formatMoney(credit, { symbol: true });
             });
             return lines.join('<hr style="margin: 5px 0; border: 0; border-top: 1px dashed #ccc;">');
           },
@@ -598,7 +599,7 @@ export class LedgersReportsComponent {
             if (!row.lines || !Array.isArray(row.lines)) return '₹0.00';
             const lines = row.lines.map((line: any) => {
               const credit = parseFloat(line.credit) || 0;
-              return `₹${credit.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+              return formatMoney(credit, { symbol: true });
             });
             return lines.join(' | ');
           },
@@ -696,7 +697,7 @@ export class LedgersReportsComponent {
   }
 
   formatCurrency(amount: number): string {
-    return `₹${amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    return formatMoney(amount, { symbol: true });
   }
 
 }
