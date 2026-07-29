@@ -2226,6 +2226,7 @@ createSaleInovice() {
                   templateOptions: {
                     label: 'Items Total',
                     disabled: true,
+                    readonly: true,
                   },
                   defaultValue: '0.00'
                 },
@@ -2235,7 +2236,8 @@ createSaleInovice() {
                   className: 'col-12',
                   templateOptions: {
                     label: 'Product disocunt',
-                    required: false
+                    required: false,
+                    readonly: true,
                   },
                   defaultValue: '0.00'
                 },
@@ -2255,7 +2257,8 @@ createSaleInovice() {
                   className: 'col-12',
                   templateOptions: {
                     label: 'Cess Amount',
-                    required: false
+                    required: false,
+                    readonly: true,
                   },
                   defaultValue: '0.00',
                 },
@@ -2266,7 +2269,8 @@ createSaleInovice() {
                   templateOptions: {
                     label: 'Shipping Charges',
                     required: false,
-                    disabled: true
+                    disabled: true,
+                    readonly: true,
                   },
                   defaultValue: '0.00',
                 },
@@ -2276,7 +2280,8 @@ createSaleInovice() {
                   className: 'col-12',
                   templateOptions: {
                     label: 'Output CGST',
-                    required: false
+                    required: false,
+                    readonly: true,
                   },
                   defaultValue: '0.00',
                   expressionProperties: {
@@ -2307,7 +2312,8 @@ createSaleInovice() {
                   className: 'col-12',
                   templateOptions: {
                     label: 'Output SGST',
-                    required: false
+                    required: false,
+                    readonly: true,
                   },
                   defaultValue: '0.00',
                   expressionProperties: {
@@ -2338,7 +2344,8 @@ createSaleInovice() {
                   className: 'col-12',
                   templateOptions: {
                     label: 'Output IGST',
-                    required: false
+                    required: false,
+                    readonly: true,
                   },
                   defaultValue: '0.00',
                   expressionProperties: {
@@ -2389,7 +2396,8 @@ createSaleInovice() {
                   className: 'col-12',
                   templateOptions: {
                     label: 'Discount Amount',
-                    required: false
+                    required: false,
+                    readonly: true,
                   },
                   defaultValue: '0.00'
 
@@ -2400,7 +2408,19 @@ createSaleInovice() {
                   className: 'col-12',
                   templateOptions: {
                     label: 'Advance Amount',
-                    required: false
+                    required: false,
+                    readonly: true,
+                  },
+                  defaultValue: '0.00'
+                },
+                {
+                  key: 'round_off',
+                  type: 'text',
+                  className: 'col-12',
+                  templateOptions: {
+                    label: 'Round Off',
+                    required: false,
+                    readonly: true,
                   },
                   defaultValue: '0.00'
                 },
@@ -2413,6 +2433,7 @@ createSaleInovice() {
                     required: false,
                     placeholder: 'Total Amount',
                     disabled: true,
+                    readonly: true,
                   },
                   defaultValue: '0.00'
                 },
@@ -3709,6 +3730,125 @@ createSaleInovice() {
                                 }
                               }
                             },
+                            {
+                                key: 'round_off',
+                                type: 'input',
+                                defaultValue: "0",
+                                className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                                templateOptions: {
+                                  type: 'number',
+                                  label: 'Round Off',
+                                  placeholder: 'Enter Round Off amount',
+                                  description: 'Use + for rounding up, - for rounding down (e.g., +0.50 or -0.50)',
+                                },
+                                hooks: {
+                                  onInit: (field: any) => {
+                                    // Set the initial value from dataToPopulate if available
+                                    if (this.dataToPopulate && 
+                                        this.dataToPopulate.sale_invoice_order && 
+                                        this.dataToPopulate.sale_invoice_order.round_off !== undefined && 
+                                        this.dataToPopulate.sale_invoice_order.round_off !== null && 
+                                        field.formControl) {
+                                      field.formControl.setValue(this.dataToPopulate.sale_invoice_order.round_off);
+                                    }
+
+                                    // Subscribe to value changes
+                                    field.formControl.valueChanges.subscribe(data => {
+                                      // Handle empty/null/undefined
+                                      if (data === null || data === undefined || data === '') {
+                                        field.formControl.setValue(0, { emitEvent: false });
+                                        if (this.totalAmountCal) {
+                                          this.totalAmountCal();
+                                        }
+                                        return;
+                                      }
+
+                                      let value = data;
+                                      let numericValue = 0;
+                                      let isNegative = false;
+
+                                      // Check if it's a string and has + or - prefix
+                                      if (typeof value === 'string') {
+                                        const trimmed = value.trim();
+                                        
+                                        // Check for negative sign
+                                        if (trimmed.startsWith('-')) {
+                                          isNegative = true;
+                                          const numPart = trimmed.substring(1).trim();
+                                          // If it's just '-' or '- ' or '-0' 
+                                          if (numPart === '' || numPart === '0' || numPart === '0.00') {
+                                            // Allow user to type negative but keep it as -0 display
+                                            field.formControl.setValue('-0', { emitEvent: false });
+                                            if (this.totalAmountCal) {
+                                              this.totalAmountCal();
+                                            }
+                                            return;
+                                          }
+                                          numericValue = parseFloat(numPart);
+                                        } 
+                                        // Check for positive sign
+                                        else if (trimmed.startsWith('+')) {
+                                          const numPart = trimmed.substring(1).trim();
+                                          if (numPart === '' || numPart === '0' || numPart === '0.00') {
+                                            field.formControl.setValue(0, { emitEvent: false });
+                                            if (this.totalAmountCal) {
+                                              this.totalAmountCal();
+                                            }
+                                            return;
+                                          }
+                                          numericValue = parseFloat(numPart);
+                                        } 
+                                        // Regular number
+                                        else {
+                                          numericValue = parseFloat(trimmed);
+                                        }
+                                      } else {
+                                        numericValue = parseFloat(value);
+                                      }
+
+                                      // Check if it's a valid number
+                                      if (isNaN(numericValue)) {
+                                        field.formControl.setValue(0, { emitEvent: false });
+                                        if (this.totalAmountCal) {
+                                          this.totalAmountCal();
+                                        }
+                                        return;
+                                      }
+
+                                      // Apply negative sign if needed
+                                      let finalValue = numericValue;
+                                      if (isNegative) {
+                                        finalValue = -Math.abs(numericValue);
+                                      } else {
+                                        // If the value is -0 (negative zero), it should be 0
+                                        if (Object.is(finalValue, -0)) {
+                                          finalValue = 0;
+                                        } else {
+                                          finalValue = Math.abs(numericValue);
+                                        }
+                                      }
+
+                                      // Round to 2 decimal places
+                                      finalValue = parseFloat(finalValue.toFixed(2));
+
+                                      // If finalValue is -0, convert to 0
+                                      if (Object.is(finalValue, -0)) {
+                                        finalValue = 0;
+                                      }
+
+                                      // Update the form control
+                                      field.formControl.setValue(finalValue, { emitEvent: false });
+                                      
+                                      console.log('Round off value set to:', finalValue);
+                                      
+                                      // Recalculate total
+                                      if (this.totalAmountCal) {
+                                        this.totalAmountCal();
+                                      }
+                                    });
+                                  }
+                                }
+                              },
                             {
                               key: 'total_amount',
                               type: 'input',

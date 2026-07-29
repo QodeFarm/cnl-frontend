@@ -430,8 +430,10 @@ export class PurchaseComponent {
           ? Number(data.discount)
           : 0,
       unit_options_id: data.unit_options?.unit_options_id,
+      stock_unit_id: data.stock_unit?.stock_unit_id,
       print_name: data.print_name,
-      mrp: data.mrp
+      mrp: data.mrp,
+      tax: data.gst_input || 0,
     };
 
     Object.entries(fieldMappings).forEach(([key, value]) => {
@@ -1351,6 +1353,7 @@ loadQuickpackProducts() {
                   templateOptions: {
                     label: 'Items Total',
                     disabled: true,
+                    readonly: true,
                   }, 
                   defaultValue: '0.00'                    
                 },
@@ -1360,7 +1363,8 @@ loadQuickpackProducts() {
                   className: 'col-12',
                   templateOptions: {
                     label: 'Product Disocunt',
-                     required: false
+                     required: false,
+                     readonly: true,
                   },
                   defaultValue: '0.00'
                 },
@@ -1370,7 +1374,8 @@ loadQuickpackProducts() {
                   className: 'col-12',
                   templateOptions: {
                     label: 'Cess Amount',
-                    required: false
+                    required: false,
+                    readonly: true,
                   },
                   defaultValue: '0.00',
                 },
@@ -1380,7 +1385,8 @@ loadQuickpackProducts() {
                   className: 'col-12',
                   templateOptions: {
                     label: 'Discount Amount',
-                     required: false
+                     required: false,
+                     readonly: true,
                   },
                   defaultValue: '0.00'
 
@@ -1391,7 +1397,8 @@ loadQuickpackProducts() {
                   className: 'col-12',
                   templateOptions: {
                     label: 'Output CGST',
-                    required: false
+                    required: false,
+                    readonly: true,
                   },
                   defaultValue: '0.00',
                   expressionProperties: {
@@ -1414,7 +1421,8 @@ loadQuickpackProducts() {
                   className: 'col-12',
                   templateOptions: {
                     label: 'Output SGST',
-                    required: false
+                    required: false,
+                    readonly: true,
                   },
                   defaultValue: '0.00',
                   expressionProperties: {
@@ -1437,7 +1445,8 @@ loadQuickpackProducts() {
                   className: 'col-12',
                   templateOptions: {
                     label: 'Output IGST',
-                    required: false
+                    required: false,
+                    readonly: true,
                   },
                   defaultValue: '0.00',
                   expressionProperties: {
@@ -1460,7 +1469,19 @@ loadQuickpackProducts() {
                   className: 'col-12',
                   templateOptions: {
                     label: 'Advance Amount',
-                     required: false
+                     required: false,
+                     readonly: true,
+                  },
+                  defaultValue: '0.00'
+                },
+                {
+                  key: 'round_off',
+                  type: 'text',
+                  className: 'col-12',
+                  templateOptions: {
+                    label: 'Round Off',
+                    required: false,
+                    readonly: true,
                   },
                   defaultValue: '0.00'
                 },
@@ -1836,51 +1857,111 @@ loadQuickpackProducts() {
                   }
                 }
               },             
+              // {
+              //   type: 'input',
+              //   key: 'quantity',
+              //   //defaultValue: 1,
+              //   templateOptions: {
+              //     type: 'number',
+              //     label: 'Qty',
+              //     placeholder: 'Qty',
+              //     min: 1,
+              //     hideLabel: true,
+              //     required: false,
+              //   },
+              //   hooks: {
+              //     onInit: (field: any) => {
+              //       const parentArray = field.parent;
+              
+              //       // Check if parentArray exists and proceed
+              //       if (parentArray) {
+              //         const currentRowIndex = +parentArray.key; // Simplified number conversion
+              
+              //         // Check if there is a product already selected in this row (when data is copied)
+              //         if (this.dataToPopulate && this.dataToPopulate.purchase_order_items.length > currentRowIndex) {
+              //           const existingQuan = this.dataToPopulate.purchase_order_items[currentRowIndex].quantity;
+                        
+              //           // Set the full product object instead of just the product_id
+              //           if (existingQuan) {
+              //             field.formControl.setValue(existingQuan); // Set full product object (not just product_id)
+              //           }
+              //         }
+              //       }
+              
+              //       // Subscribe to value changes
+              //       field.formControl.valueChanges.subscribe(data => {
+              //         // this.totalAmountCal();
+              //         if (field.form && field.form.controls && field.form.controls.rate && data) {
+              //           const rate = field.form.controls.rate.value;
+              //           const discount = field.form.controls.discount.value;
+              //           const quantity = data;
+              //           const productDiscount = parseInt(rate) * parseInt(quantity) * parseInt(discount)/ 100
+              //           if (rate && quantity) {
+              //             field.form.controls.amount.setValue(parseInt(rate) * parseInt(quantity) - productDiscount) ;
+              //           }
+              //         }
+              //       });
+              //     },
+              //   }
+              // },
               {
                 type: 'input',
                 key: 'quantity',
-                //defaultValue: 1,
                 templateOptions: {
                   type: 'number',
+                  step: 0.01,
                   label: 'Qty',
                   placeholder: 'Qty',
                   min: 1,
                   hideLabel: true,
-                  required: false,
+                  required: false
                 },
                 hooks: {
                   onInit: (field: any) => {
                     const parentArray = field.parent;
-              
-                    // Check if parentArray exists and proceed
+
                     if (parentArray) {
-                      const currentRowIndex = +parentArray.key; // Simplified number conversion
-              
-                      // Check if there is a product already selected in this row (when data is copied)
-                      if (this.dataToPopulate && this.dataToPopulate.purchase_order_items.length > currentRowIndex) {
-                        const existingQuan = this.dataToPopulate.purchase_order_items[currentRowIndex].quantity;
-                        
-                        // Set the full product object instead of just the product_id
+                      const currentRowIndex = +parentArray.key;
+
+                      if (
+                        this.dataToPopulate &&
+                        this.dataToPopulate.purchase_order_items.length > currentRowIndex
+                      ) {
+                        const existingQuan =
+                          this.dataToPopulate.purchase_order_items[currentRowIndex].quantity;
+
                         if (existingQuan) {
-                          field.formControl.setValue(existingQuan); // Set full product object (not just product_id)
+                          field.formControl.setValue(existingQuan);
                         }
                       }
                     }
-              
-                    // Subscribe to value changes
-                    field.formControl.valueChanges.subscribe(data => {
-                      // this.totalAmountCal();
-                      if (field.form && field.form.controls && field.form.controls.rate && data) {
-                        const rate = field.form.controls.rate.value;
-                        const discount = field.form.controls.discount.value;
-                        const quantity = data;
-                        const productDiscount = parseInt(rate) * parseInt(quantity) * parseInt(discount)/ 100
-                        if (rate && quantity) {
-                          field.form.controls.amount.setValue(parseInt(rate) * parseInt(quantity) - productDiscount) ;
-                        }
+
+                    field.formControl.valueChanges.subscribe(quantity => {
+                      if (!field.form || !field.form.controls) return;
+
+                      const rate = Number(field.form.controls.rate?.value || 0);
+                      const discount = Number(field.form.controls.discount?.value || 0);
+                      const availableQty = Number(field.form.controls.available_qty?.value || 0);
+
+                      const qty = Number(quantity || 0);
+
+                      // Existing Amount Logic (KEEP) - with 2 decimal places
+                      const productDiscount = rate * qty * discount / 100;
+                      if (rate && qty) {
+                        const calculatedAmount = rate * qty - productDiscount;
+                        // Round to 2 decimal places
+                        const roundedAmount = Math.round(calculatedAmount * 100) / 100;
+                        field.form.controls.amount?.setValue(roundedAmount);
                       }
+
+                      // Production Qty Logic
+                      const productionQty = Math.max(0, qty - availableQty);
+                      field.form.controls.production_qty?.setValue(productionQty);
+
+                      this.totalAmountCal();
+                      // this.triggerDraftSave();
                     });
-                  },
+                  }
                 }
               },
               {
@@ -1895,34 +1976,37 @@ loadQuickpackProducts() {
                 hooks: {
                   onInit: (field: any) => {
                     const parentArray = field.parent;
-              
-                    // Check if parentArray exists and proceed
+
                     if (parentArray) {
-                      const currentRowIndex = +parentArray.key; // Simplified number conversion
-              
-                      // Check if there is a product already selected in this row (when data is copied)
+                      const currentRowIndex = +parentArray.key;
+
                       if (this.dataToPopulate && this.dataToPopulate.purchase_order_items.length > currentRowIndex) {
                         const existingPrice = this.dataToPopulate.purchase_order_items[currentRowIndex].rate;
-                        
-                        // Set the full product object instead of just the product_id
+
                         if (existingPrice) {
-                          field.formControl.setValue(existingPrice); // Set full product object (not just product_id)
+                          field.formControl.setValue(existingPrice);
                         }
                       }
                     }
-                    
-                    // Subscribe to value changes to update amount
+
                     field.formControl.valueChanges.subscribe(data => {
                       if (field.form && field.form.controls && field.form.controls.quantity && data) {
                         const quantity = field.form.controls.quantity.value;
                         const rate = data;
-                        // Keep the row's own model rate in sync (formly implicit sync can
-                        // lag after a row delete + re-add, corrupting the total).
-                        if (field.parent?.model) { field.parent.model.rate = data; }
+                        
+                        if (field.parent?.model) { 
+                          field.parent.model.rate = data; 
+                        }
+                        
                         if (rate && quantity) {
-                          field.form.controls.amount.setValue(parseFloat(rate) * parseFloat(quantity));
+                          const calculatedAmount = parseFloat(rate) * parseFloat(quantity);
+                          // Round to 2 decimal places
+                          const roundedAmount = Math.round(calculatedAmount * 100) / 100;
+                          field.form.controls.amount.setValue(roundedAmount);
                         }
                       }
+                      this.totalAmountCal();
+                      // this.triggerDraftSave();
                     });
                   }
                 }
@@ -1939,29 +2023,39 @@ loadQuickpackProducts() {
                 hooks: {
                   onInit: (field: any) => {
                     const parentArray = field.parent;
-              
-                    // Check if parentArray exists and proceed
+
                     if (parentArray) {
-                      const currentRowIndex = +parentArray.key; // Simplified number conversion
-              
-                      // Check if there is a product already selected in this row (when data is copied)
+                      const currentRowIndex = +parentArray.key;
+
                       if (this.dataToPopulate && this.dataToPopulate.purchase_order_items.length > currentRowIndex) {
                         const existingDisc = this.dataToPopulate.purchase_order_items[currentRowIndex].discount;
                         
-                        // Set the full product object instead of just the product_id
                         if (existingDisc) {
-                          field.formControl.setValue(existingDisc); // Set full product object (not just product_id)
+                          field.formControl.setValue(existingDisc);
                         }
                       }
                     }
+                    
                     field.formControl.valueChanges.subscribe(data => {
+                      // When discount changes, recalculate amount with 2 decimal places
+                      if (field.form && field.form.controls) {
+                        const quantity = Number(field.form.controls.quantity?.value || 0);
+                        const rate = Number(field.form.controls.rate?.value || 0);
+                        const discount = Number(data || 0);
+                        
+                        if (rate && quantity) {
+                          const productDiscount = rate * quantity * discount / 100;
+                          const calculatedAmount = rate * quantity - productDiscount;
+                          // Round to 2 decimal places
+                          const roundedAmount = Math.round(calculatedAmount * 100) / 100;
+                          field.form.controls.amount?.setValue(roundedAmount);
+                        }
+                      }
                       this.totalAmountCal();
-                      // Add any logic needed for when discount changes
                     });
                   }
                 },
-                expressionProperties: {
-                }
+                expressionProperties: {}
               },
               {
                 type: 'input',
@@ -1976,33 +2070,26 @@ loadQuickpackProducts() {
                 hooks: {
                   onInit: (field: any) => {
                     const parentArray = field.parent;
-              
-                    // Check if parentArray exists and proceed
+
                     if (parentArray) {
-                      const currentRowIndex = +parentArray.key; // Simplified number conversion
-              
-                      // Check if there is a product already selected in this row (when data is copied)
+                      const currentRowIndex = +parentArray.key;
+
                       if (this.dataToPopulate && this.dataToPopulate.purchase_order_items.length > currentRowIndex) {
                         const existingAmount = this.dataToPopulate.purchase_order_items[currentRowIndex].amount;
-                        
-                        // Set the full product object instead of just the product_id
+
                         if (existingAmount) {
-                          field.formControl.setValue(existingAmount); // Set full product object (not just product_id)
+                          // Ensure existing amount is rounded to 2 decimal places
+                          const roundedAmount = Math.round(existingAmount * 100) / 100;
+                          field.formControl.setValue(roundedAmount);
                         }
                       }
                     }
+                    
                     field.formControl.valueChanges.subscribe(data => {
                       this.totalAmountCal();
                     });
                   }
                 }
-                // hooks: {
-                //   onInit: (field: any) => {
-                //     field.formControl.valueChanges.subscribe(data => {
-                //       this.totalAmountCal();
-                //     })
-                //   }
-                // }
               },
               {
                 type: 'input',
@@ -2051,7 +2138,127 @@ loadQuickpackProducts() {
                   }
                 }
               },
-              
+              {
+                type: 'input',
+                key: 'tax',
+                templateOptions: {
+                  type: "number",
+                  step: 0.01,
+                  label: 'Tax',
+                  placeholder: 'Tax',
+                  hideLabel: false
+                },
+                expressionProperties: {
+                  'templateOptions.label': (model: any, formState: any, field: any) => {
+                    const rate = Number(field?.form?.controls?.rate?.value || 0);
+                    const qty = Number(field?.form?.controls?.quantity?.value || 0);
+                    const discount = Number(field?.form?.controls?.discount?.value || 0);
+                    const taxPercent = Number(model?.tax || 0);
+
+                    const grossAmount = rate * qty;
+                    
+                    // Calculate discount amount
+                    const productDiscount = (grossAmount * discount) / 100;
+                    
+                    // Calculate taxable amount (after discount)
+                    const taxableAmount = grossAmount - productDiscount;
+                    
+                    // Calculate tax amount
+                    const taxAmount = (taxableAmount * taxPercent) / 100;
+
+                    if (taxPercent > 0) {
+                      return `(${taxPercent}% | ₹${taxAmount.toFixed(2)})`;
+                    }
+
+                    return '';
+                  }
+                },
+                hooks: {
+                  onInit: (field: any) => {
+                    const parentArray = field.parent;
+
+                    if (parentArray) {
+                      const currentRowIndex = +parentArray.key;
+
+                      if (
+                        this.dataToPopulate &&
+                        this.dataToPopulate.purchase_order_items.length > currentRowIndex
+                      ) {
+                        const existingTax = this.dataToPopulate.purchase_order_items[currentRowIndex].tax;
+
+                        if (existingTax !== undefined && existingTax !== null) {
+                          field.formControl.setValue(existingTax);
+                        }
+                      }
+                    }
+
+                    // Subscribe to changes that affect tax display
+                    if (field.form && field.form.controls) {
+                      // When quantity, rate, or discount changes, update the label
+                      const controlsToWatch = ['quantity', 'rate', 'discount'];
+                      controlsToWatch.forEach(controlKey => {
+                        const control = field.form.controls[controlKey];
+                        if (control) {
+                          control.valueChanges.subscribe(() => {
+                            // Trigger expressionProperties update
+                            field.formControl.updateValueAndValidity({ onlySelf: false, emitEvent: false });
+                          });
+                        }
+                      });
+                    }
+                  }
+                }
+              },
+              // {
+              //   type: 'input',
+              //   key: 'tax',
+              //   templateOptions: {
+              //     type: "number",
+              //     label: 'Tax',
+              //     placeholder: 'Tax',
+              //     hideLabel: true,
+              //   },
+              //   hooks: {
+              //     onInit: (field: any) => {
+              //       const parentArray = field.parent;
+
+              //       // Check if parentArray exists and proceed
+              //       if (parentArray) {
+              //         const currentRowIndex = +parentArray.key;
+
+              //         // Check if there is a product already selected in this row (when data is copied)
+              //         if (this.dataToPopulate && this.dataToPopulate.purchase_order_items.length > currentRowIndex) {
+              //           const existingTax = this.dataToPopulate.purchase_order_items[currentRowIndex].tax;
+                        
+              //           if (existingTax !== undefined && existingTax !== null) {
+              //             // Round to 2 decimal places if needed
+              //             const roundedTax = Math.round(existingTax * 100) / 100;
+              //             field.formControl.setValue(roundedTax);
+              //           }
+              //         }
+              //       }
+                    
+              //       // Optional: Subscribe to tax changes if you need to recalculate anything
+              //       field.formControl.valueChanges.subscribe(taxValue => {
+              //         // If tax changes, you might want to recalculate amount with tax
+              //         if (field.form && field.form.controls) {
+              //           const quantity = Number(field.form.controls.quantity?.value || 0);
+              //           const rate = Number(field.form.controls.rate?.value || 0);
+              //           const discount = Number(field.form.controls.discount?.value || 0);
+                        
+              //           if (rate && quantity) {
+              //             const productDiscount = rate * quantity * discount / 100;
+              //             const calculatedAmount = rate * quantity - productDiscount;
+              //             // Round to 2 decimal places
+              //             const roundedAmount = Math.round(calculatedAmount * 100) / 100;
+              //             field.form.controls.amount?.setValue(roundedAmount);
+              //           }
+              //         }
+              //         this.totalAmountCal();
+              //       });
+              //     }
+              //   }
+              // },              
               {
                 type: 'input',
                 key: 'cgst',
@@ -2119,36 +2326,6 @@ loadQuickpackProducts() {
                 },
                 expressionProperties: {
                   'templateOptions.disabled': 'true' // Make it read-only
-                }
-              },
-              {
-                type: 'input',
-                key: 'tax',
-                templateOptions: {
-                  type: "number",
-                  label: 'Tax',
-                  placeholder: 'Tax',
-                  hideLabel: true
-                },
-                hooks: {
-                  onInit: (field: any) => {
-                    const parentArray = field.parent;
-              
-                    // Check if parentArray exists and proceed
-                    if (parentArray) {
-                      const currentRowIndex = +parentArray.key; // Simplified number conversion
-              
-                      // Check if there is a product already selected in this row (when data is copied)
-                      if (this.dataToPopulate && this.dataToPopulate.purchase_order_items.length > currentRowIndex) {
-                        const existingtax = this.dataToPopulate.purchase_order_items[currentRowIndex].tax;
-                        
-                        // Set the full product object instead of just the product_id
-                        if (existingtax) {
-                          field.formControl.setValue(existingtax); // Set full product object (not just product_id)
-                        }
-                      }
-                    }
-                  }
                 }
               },
               {
@@ -2541,6 +2718,125 @@ loadQuickpackProducts() {
                                 }
                               }
                             },
+                            {
+                                key: 'round_off',
+                                type: 'input',
+                                defaultValue: "0",
+                                className: 'col-md-4 col-lg-3 col-sm-6 col-12',
+                                templateOptions: {
+                                  type: 'number',
+                                  label: 'Round Off',
+                                  placeholder: 'Enter Round Off amount',
+                                  description: 'Use + for rounding up, - for rounding down (e.g., +0.50 or -0.50)',
+                                },
+                                hooks: {
+                                  onInit: (field: any) => {
+                                    // Set the initial value from dataToPopulate if available
+                                    if (this.dataToPopulate && 
+                                        this.dataToPopulate.purchase_order_data && 
+                                        this.dataToPopulate.purchase_order_data.round_off !== undefined && 
+                                        this.dataToPopulate.purchase_order_data.round_off !== null && 
+                                        field.formControl) {
+                                      field.formControl.setValue(this.dataToPopulate.purchase_order_data.round_off);
+                                    }
+
+                                    // Subscribe to value changes
+                                    field.formControl.valueChanges.subscribe(data => {
+                                      // Handle empty/null/undefined
+                                      if (data === null || data === undefined || data === '') {
+                                        field.formControl.setValue(0, { emitEvent: false });
+                                        if (this.totalAmountCal) {
+                                          this.totalAmountCal();
+                                        }
+                                        return;
+                                      }
+
+                                      let value = data;
+                                      let numericValue = 0;
+                                      let isNegative = false;
+
+                                      // Check if it's a string and has + or - prefix
+                                      if (typeof value === 'string') {
+                                        const trimmed = value.trim();
+                                        
+                                        // Check for negative sign
+                                        if (trimmed.startsWith('-')) {
+                                          isNegative = true;
+                                          const numPart = trimmed.substring(1).trim();
+                                          // If it's just '-' or '- ' or '-0' 
+                                          if (numPart === '' || numPart === '0' || numPart === '0.00') {
+                                            // Allow user to type negative but keep it as -0 display
+                                            field.formControl.setValue('-0', { emitEvent: false });
+                                            if (this.totalAmountCal) {
+                                              this.totalAmountCal();
+                                            }
+                                            return;
+                                          }
+                                          numericValue = parseFloat(numPart);
+                                        } 
+                                        // Check for positive sign
+                                        else if (trimmed.startsWith('+')) {
+                                          const numPart = trimmed.substring(1).trim();
+                                          if (numPart === '' || numPart === '0' || numPart === '0.00') {
+                                            field.formControl.setValue(0, { emitEvent: false });
+                                            if (this.totalAmountCal) {
+                                              this.totalAmountCal();
+                                            }
+                                            return;
+                                          }
+                                          numericValue = parseFloat(numPart);
+                                        } 
+                                        // Regular number
+                                        else {
+                                          numericValue = parseFloat(trimmed);
+                                        }
+                                      } else {
+                                        numericValue = parseFloat(value);
+                                      }
+
+                                      // Check if it's a valid number
+                                      if (isNaN(numericValue)) {
+                                        field.formControl.setValue(0, { emitEvent: false });
+                                        if (this.totalAmountCal) {
+                                          this.totalAmountCal();
+                                        }
+                                        return;
+                                      }
+
+                                      // Apply negative sign if needed
+                                      let finalValue = numericValue;
+                                      if (isNegative) {
+                                        finalValue = -Math.abs(numericValue);
+                                      } else {
+                                        // If the value is -0 (negative zero), it should be 0
+                                        if (Object.is(finalValue, -0)) {
+                                          finalValue = 0;
+                                        } else {
+                                          finalValue = Math.abs(numericValue);
+                                        }
+                                      }
+
+                                      // Round to 2 decimal places
+                                      finalValue = parseFloat(finalValue.toFixed(2));
+
+                                      // If finalValue is -0, convert to 0
+                                      if (Object.is(finalValue, -0)) {
+                                        finalValue = 0;
+                                      }
+
+                                      // Update the form control
+                                      field.formControl.setValue(finalValue, { emitEvent: false });
+                                      
+                                      console.log('Round off value set to:', finalValue);
+                                      
+                                      // Recalculate total
+                                      if (this.totalAmountCal) {
+                                        this.totalAmountCal();
+                                      }
+                                    });
+                                  }
+                                }
+                              },
                             {
                               key: 'total_amount',
                               type: 'input',

@@ -332,6 +332,7 @@ export class PaymentReceiptComponent implements OnInit, OnDestroy {
       next: (response: any) => this.handleSuccess(response),
       // error: (error: any) => this.handleError(error),
     });
+    this.ngOnInit();
   }
 
   /**  Update existing Bill Payment (PUT) */
@@ -340,6 +341,7 @@ export class PaymentReceiptComponent implements OnInit, OnDestroy {
       next: (response: any) => this.handleSuccess(response),
       // error: (error: any) => this.handleError(error),
     });
+    this.ngOnInit();
   }
 
   // Form configuration
