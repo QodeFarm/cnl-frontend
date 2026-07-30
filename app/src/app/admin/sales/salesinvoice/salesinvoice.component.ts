@@ -2824,21 +2824,32 @@ createSaleInovice() {
                   placeholder: 'Boxes',
                   hideLabel: true
                 },
+                parsers: [
+                  (value: any) => {
+                    // If value is empty string, treat it as null
+                    if (value === '' || value === null || value === undefined) {
+                      return null;
+                    }
+                    // Convert to number if it's a valid number
+                    const num = Number(value);
+                    if (!isNaN(num)) {
+                      return num;
+                    }
+                    return value;
+                  }
+                ],
                 hooks: {
                   onInit: (field: any) => {
                     const parentArray = field.parent;
 
-                    // Check if parentArray exists and proceed
                     if (parentArray) {
-                      const currentRowIndex = +parentArray.key; // Simplified number conversion
+                      const currentRowIndex = +parentArray.key;
 
-                      // Check if there is a product already selected in this row (when data is copied)
                       if (this.dataToPopulate && this.dataToPopulate.sale_invoice_items.length > currentRowIndex) {
                         const existingBox = this.dataToPopulate.sale_invoice_items[currentRowIndex].total_boxes;
 
-                        // Set the full product object instead of just the product_id
                         if (existingBox) {
-                          field.formControl.setValue(existingBox); // Set full product object (not just product_id)
+                          field.formControl.setValue(existingBox);
                         }
                       }
                     }
