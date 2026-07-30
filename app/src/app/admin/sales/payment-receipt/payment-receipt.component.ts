@@ -317,10 +317,11 @@ export class PaymentReceiptComponent implements OnInit, OnDestroy {
     if (this.SaleOrderEditID) {
       console.log('🔄 Updating existing record...');
       this.updateBillPayment(payload);
-      // this.ngOnInit();
+      this.ngOnInit();
     } else {
       console.log('🆕 Creating new record...');
       this.createBillPayment(payload);
+      this.ngOnInit();
     }
 
     return false; // prevent default form auto-submit
@@ -332,7 +333,7 @@ export class PaymentReceiptComponent implements OnInit, OnDestroy {
       next: (response: any) => this.handleSuccess(response),
       // error: (error: any) => this.handleError(error),
     });
-    this.ngOnInit();
+    // this.ngOnInit();
   }
 
   /**  Update existing Bill Payment (PUT) */
@@ -341,7 +342,7 @@ export class PaymentReceiptComponent implements OnInit, OnDestroy {
       next: (response: any) => this.handleSuccess(response),
       // error: (error: any) => this.handleError(error),
     });
-    this.ngOnInit();
+    // this.ngOnInit();
   }
 
   // Form configuration
