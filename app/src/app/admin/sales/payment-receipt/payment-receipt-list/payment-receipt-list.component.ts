@@ -399,19 +399,15 @@ export class PaymentReceiptListComponent implements OnInit {
         fieldKey: 'total_amount',
         name: 'Total Amount',
         sort: true,
-        displayType: 'map',
-        mapFn: (currentValue: any) => {
-          return currentValue ? `₹${currentValue}` : '₹0.00';
-        }
+        displayType: 'inr',
+        currencySymbol: true
       },
       {
         fieldKey: 'outstanding_amount',
         name: 'Outstanding',
         sort: true,
-        displayType: 'map',
-        mapFn: (currentValue: any) => {
-          return currentValue ? `₹${currentValue}` : '₹0.00';
-        }
+        displayType: 'inr',
+        currencySymbol: true
       },
       {
         fieldKey: 'adjust_now',

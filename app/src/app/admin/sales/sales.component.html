@@ -223,7 +223,7 @@
                         }">
 
                         <ng-container *ngIf="customerOutstandingAmount > 0">
-                            ₹{{ customerOutstandingAmount | number:'1.2-2' }}
+                            ₹{{ customerOutstandingAmount | inr }}
                         </ng-container>
 
                         <ng-container *ngIf="customerOutstandingAmount == 0">

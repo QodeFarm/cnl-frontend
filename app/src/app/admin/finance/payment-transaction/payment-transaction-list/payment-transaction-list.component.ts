@@ -62,9 +62,10 @@ export class PaymentTransactionListComponent {
         sort: true
       },
       {
-        fieldKey: 'amount', 
+        fieldKey: 'amount',
         name: 'Amount',
-        sort: true
+        sort: true,
+        displayType: 'inr'
       },
       {
         fieldKey: 'reference_number', 

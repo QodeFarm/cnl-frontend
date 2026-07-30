@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { MoneyPipe } from '@ta/ta-core';
 
 @Component({
   selector: 'app-customer-profile',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, MoneyPipe],
   template: `
     <div class="profile-container">
       <!-- Cover Image -->
@@ -67,7 +68,7 @@ import { FormsModule } from '@angular/forms';
             </div>
             <div class="card-content">
               <span class="card-label">Credit Limit</span>
-              <span class="card-value">{{ (customerData.credit_limit || 0) | currency:'INR' }}</span>
+              <span class="card-value">{{ (customerData.credit_limit || 0) | inr:true }}</span>
             </div>
           </div>
           <div class="info-card">

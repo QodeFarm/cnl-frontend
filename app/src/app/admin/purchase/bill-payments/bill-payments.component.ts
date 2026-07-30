@@ -26,6 +26,10 @@ export class BillPaymentsComponent implements OnInit, OnDestroy {
 
   showBillPaymentReceiptList: boolean = false;
   PurchaseOrderEditID: any = null;
+  // Gates the <ta-form>. ta-form binds to formConfig.model by reference at init, so on edit we
+  // tear it down and rebuild it after loading the record - otherwise edits don't bind and the
+  // update silently saves the OLD value. Same pattern as the Payment Receipt edit flow.
+  showForm: boolean = true;
   private drilldownSub: Subscription;
   showSuccessToast = false;
   showErrorToast = false;
@@ -361,7 +365,6 @@ fetchVendorPaymentData(vendorId: string) {
             defaultValue: this.nowDate(),
             templateOptions: {
               label: 'Date',
-              disabled: true,
               required: true,
             }
           },
@@ -557,6 +560,9 @@ fetchVendorPaymentData(vendorId: string) {
     console.log('📝 Edit mode triggered for ID:', event);
 
     this.PurchaseOrderEditID = event;
+    // Tear the form down first; it's rebuilt (showForm = true) once the record is loaded below,
+    // so the fields bind to the freshly loaded model and edits actually reach onSubmit.
+    this.showForm = false;
 
     this.http.get(`purchase/bill_payments/${event}`).subscribe((res: any) => {
       console.log('Payment receipt data:', res);
@@ -564,25 +570,24 @@ fetchVendorPaymentData(vendorId: string) {
       if (res && res.data) {
         console.log("Result data : ", res.data);
 
-        // Prepare vendor and account fields properly for select binding
+        // Prepare vendor field for select binding
         const vendorObj = {
           vendor_id: res.data.vendor_id,
           name: res.data.vendor_name
         };
 
-        const accountObj = res.data.account_id
-          ? {
-              account_id: res.data.account_id,
-              account_name: res.data.account_name
-            }
-          : null;
-
-        // Populate the form model
+        // Populate the form model. res.data already carries 'ledger_account' as the nested object
+        // {ledger_account_id, name, code} - which is exactly what the 'ledger_account' field and the
+        // payload (model.ledger_account.ledger_account_id) expect - so keep it from the spread and
+        // DON'T override it. Only remap the Date: the field key is 'date' but the record stores it
+        // as 'payment_date' (show the date part only).
         this.formConfig.model = {
           ...res.data,
-          vendor: vendorObj,       // 👈 Correctly formatted for select field
-          account: accountObj       // 👈 Same for account dropdown
+          vendor: vendorObj,          // 👈 Correctly formatted for select field
+          date: res.data.payment_date ? String(res.data.payment_date).slice(0, 10) : this.nowDate()
         };
+        // Rebuild the form now the record is loaded, so fields bind to THIS model.
+        this.showForm = true;
 
         // Store IDs for submission payload
         this.selectedVendorId = res.data.vendor_id;

@@ -3,11 +3,12 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { MoneyPipe } from '@ta/ta-core';
 
 @Component({
   selector: 'app-employee-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, MoneyPipe],
   template: `
     <div class="dashboard">
       <!-- Welcome Banner with Gradient -->
@@ -128,7 +129,7 @@ import { HttpClient } from '@angular/common/http';
             <span class="stat-title">Net Salary</span>
             <i class="fas fa-rupee-sign"></i>
           </div>
-          <div class="stat-value">₹{{ netSalary }}</div>
+          <div class="stat-value">₹{{ netSalary | inr }}</div>
           <div class="stat-footer">
             <span class="stat-period">This Month</span>
             <span class="stat-trend positive">Credited on 1st</span>

@@ -164,4 +164,36 @@ export function getValueByObject(obj:any, valuekey:any) {
   return keys.reduce((prev:any, key:any) => prev[key], obj);
 }
 
+/**
+ * Single source of truth for money DISPLAY across the app.
+ * Defaults to Indian output (48,42,000.00 / ₹48,42,000.00), always 2 decimals.
+ * Empty/non-numeric -> em dash.
+ *
+ * Multi-country: grouping and symbol placement come from the Unicode CLDR data
+ * built into Intl — pass `currency` (ISO 4217, e.g. 'ZAR', 'USD') + `locale`
+ * (e.g. 'en-ZA') and the same function formats any country correctly. Wire those
+ * two to a Company-level setting when a non-India tenant is onboarded; nothing
+ * else in the app needs to change (see CLAUDE.md §4).
+ *
+ * Format ONLY at display time — never store the result in a value that gets
+ * submitted, sorted, or exported (those keep the raw number).
+ */
+export function formatMoney(
+  value: any,
+  options: { symbol?: boolean; currency?: string; locale?: string } = {}
+): string {
+  const { symbol = false, currency = 'INR', locale = 'en-IN' } = options;
+  if (value === null || value === undefined || value === '') {
+    return '—';
+  }
+  const num = typeof value === 'number' ? value : Number(value);
+  if (isNaN(num)) {
+    return '—';
+  }
+  const opts: Intl.NumberFormatOptions = symbol
+    ? { style: 'currency', currency, currencyDisplay: 'narrowSymbol', minimumFractionDigits: 2, maximumFractionDigits: 2 }
+    : { minimumFractionDigits: 2, maximumFractionDigits: 2 };
+  return num.toLocaleString(locale, opts);
+}
+
 

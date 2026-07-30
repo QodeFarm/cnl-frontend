@@ -390,12 +390,14 @@ private fallbackPrint(pdfBlob: Blob): void {
         fieldKey: 'tax_amount',
         name: 'Tax amount',
         sort: true,
-        hidden: true
+        hidden: true,
+        displayType: 'inr'
       },
       {
         fieldKey: 'total_amount',
         name: 'Total amount',
-        sort: true
+        sort: true,
+        displayType: 'inr'
       },
       {
         fieldKey: 'vendor',

@@ -891,19 +891,22 @@ export class SalesInvoiceListComponent implements OnInit {
       {
         fieldKey: 'total_amount',
         name: 'Total Amount',
-        sort: true
+        sort: true,
+        displayType: 'inr'
       },
       {
         fieldKey: 'tax_amount',
         name: 'Tax Amount',
         sort: true,
-        hidden: true
+        hidden: true,
+        displayType: 'inr'
       },
       {
         fieldKey: 'advance_amount',
         name: 'Advance Amount',
         sort: true,
-        hidden: true
+        hidden: true,
+        displayType: 'inr'
       },
       {
         fieldKey: 'order_status',

@@ -10,21 +10,21 @@
 
     <div class="al-strip-stat">
       <span class="al-stat-label">Opening</span>
-      <span class="al-stat-value neutral">₹{{ openingBalance }}</span>
+      <span class="al-stat-value neutral">₹{{ openingBalance | inr }}</span>
     </div>
 
     <div class="al-strip-stat">
       <span class="al-stat-label">Total Debit</span>
       <span class="al-stat-value"
         [class.dr]="totalDebit !== '0.00'"
-        [class.neutral]="totalDebit === '0.00'">₹{{ totalDebit }}</span>
+        [class.neutral]="totalDebit === '0.00'">₹{{ totalDebit | inr }}</span>
     </div>
 
     <div class="al-strip-stat">
       <span class="al-stat-label">Total Credit</span>
       <span class="al-stat-value"
         [class.cr]="totalCredit !== '0.00'"
-        [class.neutral]="totalCredit === '0.00'">₹{{ totalCredit }}</span>
+        [class.neutral]="totalCredit === '0.00'">₹{{ totalCredit | inr }}</span>
     </div>
 
     <div class="al-strip-stat closing">
@@ -32,7 +32,7 @@
       <span class="al-stat-value"
         [class.dr]="isPositiveBalance"
         [class.cr]="!isPositiveBalance">
-        ₹{{ absBalance }}
+        ₹{{ absBalance | inr }}
         <em [class.suffix-dr]="isPositiveBalance" [class.suffix-cr]="!isPositiveBalance">
           {{ isPositiveBalance ? 'Dr' : 'Cr' }}
         </em>

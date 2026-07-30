@@ -16,5 +16,6 @@ export * from './lib/services/script.service';
 export * from './lib/utility';
 export * from './lib/pipe/concat.pipe';
 export * from './lib/pipe/ta-img.pipe';
+export * from './lib/pipe/money.pipe';
 export * from './lib/ta-core.component';
 export * from './lib/directives/image.directive';

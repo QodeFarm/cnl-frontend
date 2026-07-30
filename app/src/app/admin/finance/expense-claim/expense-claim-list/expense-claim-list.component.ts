@@ -56,9 +56,10 @@ export class ExpenseClaimListComponent {
         sort: true
       },
       {
-        fieldKey: 'total_amount', 
+        fieldKey: 'total_amount',
         name: 'Total Amount',
-        sort: true
+        sort: true,
+        displayType: 'inr'
       },
       {
         fieldKey: 'status', 

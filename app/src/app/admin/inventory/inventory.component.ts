@@ -101,20 +101,23 @@ export class InventoryComponent {
             displayType: "map", 
             mapFn: (v, row) => row?.stock_unit?.stock_unit_name || ''
           },
-          { 
-            fieldKey: 'mrp', 
-            name: 'MRP', 
-            sort: true 
+          {
+            fieldKey: 'mrp',
+            name: 'MRP',
+            sort: true,
+            displayType: 'inr'
           },
-          { 
-            fieldKey: 'purchase_rate', 
-            name: 'Purchase Rate', 
-            sort: true 
+          {
+            fieldKey: 'purchase_rate',
+            name: 'Purchase Rate',
+            sort: true,
+            displayType: 'inr'
           },
-          { 
-            fieldKey: 'sales_rate', 
-            name: 'Sales Rate', 
-            sort: true 
+          {
+            fieldKey: 'sales_rate',
+            name: 'Sales Rate',
+            sort: true,
+            displayType: 'inr'
           },
           { 
             fieldKey: 'wholesale_rate', 

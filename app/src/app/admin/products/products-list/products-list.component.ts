@@ -176,6 +176,7 @@ export class ProductsListComponent {
         fieldKey: 'sales_rate',
         name: 'Sales Rate',
         sort: true,
+        displayType: 'inr',
         isEdit: true,
         isEditSumbmit: (row, value, col) => {
           console.log("isEditSumbmit", row, value, col);
