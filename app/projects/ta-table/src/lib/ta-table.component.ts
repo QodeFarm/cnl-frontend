@@ -1211,8 +1211,13 @@ applyFilters() {
     };
 
     if (!this.options.pageSizeOptions) {
-      this.options.pageSizeOptions = [10, 20, 30, 50, 100, 300, 500, 1000]
+      // Capped at 100 on purpose. Every row here is a live Angular template across all
+      // columns, so a 1000-row page builds tens of thousands of cells and locks the tab.
+      // The server clamps `limit` to the same order of magnitude — see MAX_PAGE_LIMIT.
+      this.options.pageSizeOptions = [10, 20, 30, 50, 100]
     }
+    // Guard the same ceiling for screens that pass their own options in.
+    this.options.pageSizeOptions = this.options.pageSizeOptions.filter((n: number) => n <= 100);
     if (!this.options.tableLayout) this.options.tableLayout = "fixed";
     if (!this.options.cols) this.options.cols = [];
     if (this.options.bordered !== false) this.options.bordered = true;
@@ -1645,6 +1650,13 @@ applyFilters() {
 
     // this.loadDataFromServer(true);
   }
+  /**
+   * Without this Angular destroys and rebuilds every row — and every cell component in it —
+   * on each refresh, which is both the list flicker and most of the cost of a large page.
+   * Falls back to the index when a row has no primary key.
+   */
+  trackByRow = (index: number, row: any): any => row?.[this.options?.pkId] ?? index;
+
   reload() {
     this.invalidateResourceCache();
     this.loadDataFromServer(undefined, true);
