@@ -137,6 +137,9 @@ export class TaFormComponent implements OnInit, OnDestroy {
               } else {
                 this.notification.success(msg, '');
               }
+              // resetModel() clears parentForm.submitted but not our own formState.submitted,
+              // which field-tabs reads to flag tabs holding invalid fields.
+              this.clearSubmitState();
               this.formlyOptions.resetModel();
             } else {
               this.notification.error('Login Failed', res.message || 'Invalid credentials');
@@ -185,14 +188,34 @@ export class TaFormComponent implements OnInit, OnDestroy {
         if (this.options.submit && this.options.submit.submittedFn) {
           this.options.submit.submittedFn(this.options.model);
         }
+        // The caller owns the save (and the model) on this path, so we must not resetModel().
+        // But the submit flags stay on until something clears them, and formly shows an error
+        // whenever a control is invalid && (touched || parentForm.submitted) — so a caller that
+        // blanks the model after saving would repaint every required field red. Safe to clear
+        // here: this branch is only reached while the form is valid, so nothing is showing.
+        this.clearSubmitState();
       }
+    }
+  }
+
+  /**
+   * Clears the "this form has been submitted" state without touching the model.
+   * formlyOptions.parentForm is the <form> FormGroupDirective; formly reads its `submitted`
+   * flag when deciding whether to show a validation error, and only resetModel() or destroying
+   * the <form> would otherwise clear it.
+   */
+  clearSubmitState() {
+    this.formlyOptions.formState.submitted = false;
+    this.form.markAsUntouched();
+    if (this.formlyOptions.parentForm) {
+      this.formlyOptions.parentForm.submitted = false;
     }
   }
 
   onReset() {
     // Reset submitted flag
-    this.formlyOptions.formState.submitted = false;
-    
+    this.clearSubmitState();
+
     this.formlyOptions.resetModel();
     if (this.options.reset) {
       if (this.options.reset.resetFn) {
