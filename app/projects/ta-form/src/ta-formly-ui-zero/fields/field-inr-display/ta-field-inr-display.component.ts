@@ -17,6 +17,7 @@ import { formatMoney } from '@ta/ta-core';
   .ta-inr-display { 
     padding: 4px 11px; 
     font-weight: 600; 
+    font-size: 20px;
     line-height: 1.6; 
     color: white; 
     background-color: #041a61; 
