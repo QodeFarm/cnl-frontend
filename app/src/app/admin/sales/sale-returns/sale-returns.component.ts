@@ -1470,33 +1470,59 @@ private processProducts(products: any[]) {
                 //     }
                 //   }
                 // },
-                {
-                  key: 'tax',
-                  type: 'select',
-                  className: 'col-md-4 col-sm-6 col-12',
-                  templateOptions: {
-                    label: 'Tax',
-                    required: false,
-                    options: [
-                      { label: "Inclusive", value: 'Inclusive' },
-                      { label: "Exclusive", value: 'Exclusive' }
-                    ]
-                  },
-                  hooks: {
-                    onInit: (field: any) => {
-                      if (this.dataToPopulate?.sale_return_order?.tax) {
-                        field.formControl.setValue(this.dataToPopulate.sale_return_order.tax);
-                      } else {
-                        field.formControl.setValue('Exclusive');
-                      }
+                // {
+                //   key: 'tax',
+                //   type: 'select',
+                //   className: 'col-md-4 col-sm-6 col-12',
+                //   templateOptions: {
+                //     label: 'Tax',
+                //     required: false,
+                //     options: [
+                //       { label: "Inclusive", value: 'Inclusive' },
+                //       { label: "Exclusive", value: 'Exclusive' }
+                //     ]
+                //   },
+                //   hooks: {
+                //     onInit: (field: any) => {
+                //       if (this.dataToPopulate?.sale_return_order?.tax) {
+                //         field.formControl.setValue(this.dataToPopulate.sale_return_order.tax);
+                //       } else {
+                //         field.formControl.setValue('Exclusive');
+                //       }
 
-                      // 🔥 Recalculate when tax type changes
-                      field.formControl.valueChanges.subscribe(() => {
-                        this.totalAmountCal();
-                      });
+                //       // 🔥 Recalculate when tax type changes
+                //       field.formControl.valueChanges.subscribe(() => {
+                //         this.totalAmountCal();
+                //       });
+                //     }
+                //   }
+                // },
+                {
+                    key: 'tax',
+                    type: 'select',
+                    className: 'col-md-4 col-sm-6 col-12',
+                    templateOptions: {
+                      label: 'Tax',
+                      required: false,
+                      options: [
+                        { label: "Inclusive", value: 'Inclusive' },
+                        { label: "Exclusive", value: 'Exclusive' }
+                      ]
+                    },
+                    defaultValue: 'Exclusive', // This sets default for new forms
+                    hooks: {
+                      onInit: (field: any) => {
+                        // Override with edit data if available
+                        if (this.dataToPopulate?.sale_return_order?.tax) {
+                          field.formControl.setValue(this.dataToPopulate.sale_return_order.tax, { emitEvent: false });
+                        }
+
+                        field.formControl.valueChanges.subscribe(() => {
+                          this.totalAmountCal();
+                        });
+                      }
                     }
-                  }
-                },
+                  },
                 {
                   key: 'against_bill',
                   type: 'input',

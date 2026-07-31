@@ -6175,32 +6175,31 @@ createChildOrdersForProducts(productDetails, saleOrderDetails, orderAttachments,
                   }
                 },
                 {
-                  key: 'tax',
-                  type: 'select',
-                  className: 'col-md-4 col-sm-6 col-12',
-                  templateOptions: {
-                    label: 'Tax',
-                    required: false,
-                    options: [
-                      { label: "Inclusive", value: 'Inclusive' },
-                      { label: "Exclusive", value: 'Exclusive' }
-                    ]
-                  },
-                  hooks: {
-                    onInit: (field: any) => {
-                      if (this.dataToPopulate?.sale_order?.tax) {
-                        field.formControl.setValue(this.dataToPopulate.sale_order.tax);
-                      } else {
-                        field.formControl.setValue('Exclusive');
-                      }
+                    key: 'tax',
+                    type: 'select',
+                    className: 'col-md-4 col-sm-6 col-12',
+                    templateOptions: {
+                      label: 'Tax',
+                      required: false,
+                      options: [
+                        { label: "Inclusive", value: 'Inclusive' },
+                        { label: "Exclusive", value: 'Exclusive' }
+                      ]
+                    },
+                    defaultValue: 'Exclusive', // This sets default for new forms
+                    hooks: {
+                      onInit: (field: any) => {
+                        // Override with edit data if available
+                        if (this.dataToPopulate?.sale_order?.tax) {
+                          field.formControl.setValue(this.dataToPopulate.sale_order.tax, { emitEvent: false });
+                        }
 
-                      // 🔥 Recalculate when tax type changes
-                      field.formControl.valueChanges.subscribe(() => {
-                        this.totalAmountCal();
-                      });
+                        field.formControl.valueChanges.subscribe(() => {
+                          this.totalAmountCal();
+                        });
+                      }
                     }
-                  }
-                },
+                  },
                 // {
                 //   key: 'flow_status',
                 //   type: 'select',
@@ -9373,20 +9372,21 @@ createChildOrdersForProducts(productDetails, saleOrderDetails, orderAttachments,
                           { label: "Exclusive", value: 'Exclusive' }
                         ]
                       },
+                      defaultValue: 'Exclusive', // This sets default for new forms
                       hooks: {
-                        onInit: (field: any) => {
-                          if (this.dataToPopulate?.order_shipments?.tax) {
-                            field.formControl.setValue(this.dataToPopulate.order_shipments.tax);
-                          } else {
-                            field.formControl.setValue('Exclusive');
-                          }
-
-                          // 🔥 Recalculate when tax type changes
-                          field.formControl.valueChanges.subscribe(() => {
-                            this.totalAmountCal();
-                          });
-                        }
-                      }
+  onChanges: (field: any) => {
+    // This runs whenever field changes, but we only want to set initial value once
+    if (!field._initialValueSet && this.dataToPopulate?.order_shipments?.tax) {
+      field.formControl.setValue(this.dataToPopulate.order_shipments.tax, { emitEvent: false });
+      field._initialValueSet = true;
+    }
+  },
+  onInit: (field: any) => {
+    field.formControl.valueChanges.subscribe(() => {
+      this.totalAmountCal();
+    });
+  }
+}
                     },
                     {
                       key: 'shipping_charges',

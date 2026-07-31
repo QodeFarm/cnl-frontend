@@ -987,29 +987,31 @@ loadQuickpackProducts() {
                   }
                 },
                 {
-                  key: 'tax',
-                  type: 'select',
-                  // defaultValue: 'Exclusive',
-                  className: 'col-md-4 col-sm-6 col-12',
-                  templateOptions: {
-                    label: 'Tax',
-                    options: [
-                      { 'label': "Inclusive", value: 'Inclusive' },
-                      { 'label': "Exclusive", value: 'Exclusive' }
-                    ],
-                    required: false
-                  },
-                  hooks: {
-                    onInit: (field: any) => {
-                      if (this.dataToPopulate && this.dataToPopulate.purchase_invoice_orders.tax && field.formControl) {
-                        field.formControl.setValue(this.dataToPopulate.purchase_invoice_orders.tax);
-                      }
-                      else {
-                        field.formControl.setValue('Exclusive');
+                    key: 'tax',
+                    type: 'select',
+                    className: 'col-md-4 col-sm-6 col-12',
+                    templateOptions: {
+                      label: 'Tax',
+                      required: false,
+                      options: [
+                        { label: "Inclusive", value: 'Inclusive' },
+                        { label: "Exclusive", value: 'Exclusive' }
+                      ]
+                    },
+                    defaultValue: 'Exclusive', // This sets default for new forms
+                    hooks: {
+                      onInit: (field: any) => {
+                        // Override with edit data if available
+                        if (this.dataToPopulate?.purchase_invoice_orders?.tax) {
+                          field.formControl.setValue(this.dataToPopulate.purchase_invoice_orders.tax, { emitEvent: false });
+                        }
+
+                        field.formControl.valueChanges.subscribe(() => {
+                          this.totalAmountCal();
+                        });
                       }
                     }
-                  }
-                },
+                  },
                 // {
                 //   key: 'voucher',
                 //   type: 'select',
