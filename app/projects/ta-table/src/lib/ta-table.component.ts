@@ -1369,10 +1369,10 @@ applyFilters() {
         filterParams.push(`period_name=${this.selectedQuickPeriod}`);
       }
       
-      if (filterParams.length > 0) {
-        const connector = apiUrl.includes('?') ? '&' : '?';
-        apiUrl = `${apiUrl}${connector}${filterParams.join('&')}`;
-      }
+      // if (filterParams.length > 0) {
+      //   const connector = apiUrl.includes('?') ? '&' : '?';
+      //   apiUrl = `${apiUrl}${connector}${filterParams.join('&')}`;
+      // }
     }
     
     const tableParamConfig: TaParamsConfig = {
