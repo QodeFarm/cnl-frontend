@@ -170,60 +170,128 @@ warehouseOptions: Array<{ value: string; label: string }> = [];
   selectedLedgerAccount: any;
   ledgerAccountOptions: any;
 
-  onQuickPeriodChange() {
+  // onQuickPeriodChange() {
+  //   // If the quick period is cleared, clear both date fields
+  //   if (!this.selectedQuickPeriod) {
+  //     this.fromDate = null;
+  //     this.toDate = null;
+  //     return;
+  //   }
+    
+  //   const today = new Date();
+  //   let startDate: Date | null = null;
+  //   let endDate: Date | null = today;
+
+  //   switch (this.selectedQuickPeriod) {
+  //     case 'today':
+  //       startDate = endDate;
+  //       break;
+  //     case 'yesterday':
+  //       startDate = new Date(today.setDate(today.getDate() - 1));
+  //       endDate = startDate;
+  //       break;
+  //     case 'last_week':
+  //       startDate = new Date(today.setDate(today.getDate() - today.getDay() - 6));
+  //       endDate = new Date(today.setDate(startDate.getDate() + 6));
+  //       break;
+  //     case 'current_month':
+  //       startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+  //       break;
+  //     case 'last_month':
+  //       startDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+  //       endDate = new Date(today.getFullYear(), today.getMonth(), 0);
+  //       break;
+  //     case 'last_six_months':
+  //       startDate = new Date(today);
+  //       startDate.setMonth(startDate.getMonth() - 6);
+  //       // Set the day to the start of the month for consistency
+  //       startDate.setDate(1);
+  //       break;
+  //     case 'current_quarter':
+  //       const currentMonth = today.getMonth();
+  //       const quarterStartMonth = currentMonth - (currentMonth % 3);
+  //       startDate = new Date(today.getFullYear(), quarterStartMonth, 1);
+  //       break;
+  //     case 'year_to_date':
+  //       startDate = new Date(today.getFullYear(), 3, 1); // Assuming fiscal year starts in April
+  //       break;
+  //     case 'last_year':
+  //       startDate = new Date(today.getFullYear() - 1, 3, 1);
+  //       endDate = new Date(today.getFullYear(), 2, 31);
+  //       break;
+  //   }
+
+  //   this.fromDate = startDate;
+  //   this.toDate = endDate;
+  // }
+  
+onQuickPeriodChange() {
     // If the quick period is cleared, clear both date fields
     if (!this.selectedQuickPeriod) {
-      this.fromDate = null;
-      this.toDate = null;
-      return;
+        this.fromDate = null;
+        this.toDate = null;
+        return;
     }
     
     const today = new Date();
+    // ✅ Get today in UTC
+    const utcToday = new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()));
     let startDate: Date | null = null;
-    let endDate: Date | null = today;
+    let endDate: Date | null = utcToday;
 
     switch (this.selectedQuickPeriod) {
-      case 'today':
-        startDate = endDate;
-        break;
-      case 'yesterday':
-        startDate = new Date(today.setDate(today.getDate() - 1));
-        endDate = startDate;
-        break;
-      case 'last_week':
-        startDate = new Date(today.setDate(today.getDate() - today.getDay() - 6));
-        endDate = new Date(today.setDate(startDate.getDate() + 6));
-        break;
-      case 'current_month':
-        startDate = new Date(today.getFullYear(), today.getMonth(), 1);
-        break;
-      case 'last_month':
-        startDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
-        endDate = new Date(today.getFullYear(), today.getMonth(), 0);
-        break;
-      case 'last_six_months':
-        startDate = new Date(today);
-        startDate.setMonth(startDate.getMonth() - 6);
-        // Set the day to the start of the month for consistency
-        startDate.setDate(1);
-        break;
-      case 'current_quarter':
-        const currentMonth = today.getMonth();
-        const quarterStartMonth = currentMonth - (currentMonth % 3);
-        startDate = new Date(today.getFullYear(), quarterStartMonth, 1);
-        break;
-      case 'year_to_date':
-        startDate = new Date(today.getFullYear(), 3, 1); // Assuming fiscal year starts in April
-        break;
-      case 'last_year':
-        startDate = new Date(today.getFullYear() - 1, 3, 1);
-        endDate = new Date(today.getFullYear(), 2, 31);
-        break;
+        case 'today':
+            startDate = utcToday;
+            endDate = utcToday;
+            break;
+        case 'yesterday':
+            const yesterday = new Date(utcToday);
+            yesterday.setUTCDate(utcToday.getUTCDate() - 1);
+            startDate = yesterday;
+            endDate = yesterday;
+            break;
+        case 'last_week':
+            const lastWeekStart = new Date(utcToday);
+            lastWeekStart.setUTCDate(utcToday.getUTCDate() - utcToday.getUTCDay() - 6);
+            startDate = lastWeekStart;
+            const lastWeekEnd = new Date(lastWeekStart);
+            lastWeekEnd.setUTCDate(lastWeekStart.getUTCDate() + 6);
+            endDate = lastWeekEnd;
+            break;
+        case 'current_month':
+            startDate = new Date(Date.UTC(utcToday.getUTCFullYear(), utcToday.getUTCMonth(), 1));
+            endDate = utcToday;
+            break;
+        case 'last_month':
+            startDate = new Date(Date.UTC(utcToday.getUTCFullYear(), utcToday.getUTCMonth() - 1, 1));
+            endDate = new Date(Date.UTC(utcToday.getUTCFullYear(), utcToday.getUTCMonth(), 0));
+            break;
+        case 'last_six_months':
+            startDate = new Date(utcToday);
+            startDate.setUTCMonth(utcToday.getUTCMonth() - 6);
+            startDate.setUTCDate(1);
+            endDate = utcToday;
+            break;
+        case 'current_quarter':
+            const currentMonth = utcToday.getUTCMonth();
+            const quarterStartMonth = currentMonth - (currentMonth % 3);
+            startDate = new Date(Date.UTC(utcToday.getUTCFullYear(), quarterStartMonth, 1));
+            endDate = utcToday;
+            break;
+        case 'year_to_date':
+            startDate = new Date(Date.UTC(utcToday.getUTCFullYear(), 3, 1)); // April 1st
+            endDate = utcToday;
+            break;
+        case 'last_year':
+            startDate = new Date(Date.UTC(utcToday.getUTCFullYear() - 1, 3, 1));
+            endDate = new Date(Date.UTC(utcToday.getUTCFullYear(), 2, 31));
+            break;
     }
 
     this.fromDate = startDate;
     this.toDate = endDate;
-  }
+}
+
   loadStatuses() {
     const url = 'masters/order_status/';
 
@@ -945,11 +1013,18 @@ applyFilters() {
     return queryParts.length ? '&' + queryParts.join('&') : '';
     }
 
+  // formatDate(date: Date): string {
+  //   // Format date as 'yyyy-MM-dd'
+  //   const year = date.getFullYear();
+  //   const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  //   const day = date.getDate().toString().padStart(2, '0');
+  //   return `${year}-${month}-${day}`;
+  // }
   formatDate(date: Date): string {
-    // Format date as 'yyyy-MM-dd'
-    const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const day = date.getDate().toString().padStart(2, '0');
+    // ✅ Always use UTC to send consistent dates to backend
+    const year = date.getUTCFullYear();
+    const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
+    const day = date.getUTCDate().toString().padStart(2, '0');
     return `${year}-${month}-${day}`;
   }
 
