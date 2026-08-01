@@ -170,128 +170,60 @@ warehouseOptions: Array<{ value: string; label: string }> = [];
   selectedLedgerAccount: any;
   ledgerAccountOptions: any;
 
-  // onQuickPeriodChange() {
-  //   // If the quick period is cleared, clear both date fields
-  //   if (!this.selectedQuickPeriod) {
-  //     this.fromDate = null;
-  //     this.toDate = null;
-  //     return;
-  //   }
-    
-  //   const today = new Date();
-  //   let startDate: Date | null = null;
-  //   let endDate: Date | null = today;
-
-  //   switch (this.selectedQuickPeriod) {
-  //     case 'today':
-  //       startDate = endDate;
-  //       break;
-  //     case 'yesterday':
-  //       startDate = new Date(today.setDate(today.getDate() - 1));
-  //       endDate = startDate;
-  //       break;
-  //     case 'last_week':
-  //       startDate = new Date(today.setDate(today.getDate() - today.getDay() - 6));
-  //       endDate = new Date(today.setDate(startDate.getDate() + 6));
-  //       break;
-  //     case 'current_month':
-  //       startDate = new Date(today.getFullYear(), today.getMonth(), 1);
-  //       break;
-  //     case 'last_month':
-  //       startDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
-  //       endDate = new Date(today.getFullYear(), today.getMonth(), 0);
-  //       break;
-  //     case 'last_six_months':
-  //       startDate = new Date(today);
-  //       startDate.setMonth(startDate.getMonth() - 6);
-  //       // Set the day to the start of the month for consistency
-  //       startDate.setDate(1);
-  //       break;
-  //     case 'current_quarter':
-  //       const currentMonth = today.getMonth();
-  //       const quarterStartMonth = currentMonth - (currentMonth % 3);
-  //       startDate = new Date(today.getFullYear(), quarterStartMonth, 1);
-  //       break;
-  //     case 'year_to_date':
-  //       startDate = new Date(today.getFullYear(), 3, 1); // Assuming fiscal year starts in April
-  //       break;
-  //     case 'last_year':
-  //       startDate = new Date(today.getFullYear() - 1, 3, 1);
-  //       endDate = new Date(today.getFullYear(), 2, 31);
-  //       break;
-  //   }
-
-  //   this.fromDate = startDate;
-  //   this.toDate = endDate;
-  // }
-  
-onQuickPeriodChange() {
+  onQuickPeriodChange() {
     // If the quick period is cleared, clear both date fields
     if (!this.selectedQuickPeriod) {
-        this.fromDate = null;
-        this.toDate = null;
-        return;
+      this.fromDate = null;
+      this.toDate = null;
+      return;
     }
     
     const today = new Date();
-    // ✅ Get today in UTC
-    const utcToday = new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()));
     let startDate: Date | null = null;
-    let endDate: Date | null = utcToday;
+    let endDate: Date | null = today;
 
     switch (this.selectedQuickPeriod) {
-        case 'today':
-            startDate = utcToday;
-            endDate = utcToday;
-            break;
-        case 'yesterday':
-            const yesterday = new Date(utcToday);
-            yesterday.setUTCDate(utcToday.getUTCDate() - 1);
-            startDate = yesterday;
-            endDate = yesterday;
-            break;
-        case 'last_week':
-            const lastWeekStart = new Date(utcToday);
-            lastWeekStart.setUTCDate(utcToday.getUTCDate() - utcToday.getUTCDay() - 6);
-            startDate = lastWeekStart;
-            const lastWeekEnd = new Date(lastWeekStart);
-            lastWeekEnd.setUTCDate(lastWeekStart.getUTCDate() + 6);
-            endDate = lastWeekEnd;
-            break;
-        case 'current_month':
-            startDate = new Date(Date.UTC(utcToday.getUTCFullYear(), utcToday.getUTCMonth(), 1));
-            endDate = utcToday;
-            break;
-        case 'last_month':
-            startDate = new Date(Date.UTC(utcToday.getUTCFullYear(), utcToday.getUTCMonth() - 1, 1));
-            endDate = new Date(Date.UTC(utcToday.getUTCFullYear(), utcToday.getUTCMonth(), 0));
-            break;
-        case 'last_six_months':
-            startDate = new Date(utcToday);
-            startDate.setUTCMonth(utcToday.getUTCMonth() - 6);
-            startDate.setUTCDate(1);
-            endDate = utcToday;
-            break;
-        case 'current_quarter':
-            const currentMonth = utcToday.getUTCMonth();
-            const quarterStartMonth = currentMonth - (currentMonth % 3);
-            startDate = new Date(Date.UTC(utcToday.getUTCFullYear(), quarterStartMonth, 1));
-            endDate = utcToday;
-            break;
-        case 'year_to_date':
-            startDate = new Date(Date.UTC(utcToday.getUTCFullYear(), 3, 1)); // April 1st
-            endDate = utcToday;
-            break;
-        case 'last_year':
-            startDate = new Date(Date.UTC(utcToday.getUTCFullYear() - 1, 3, 1));
-            endDate = new Date(Date.UTC(utcToday.getUTCFullYear(), 2, 31));
-            break;
+      case 'today':
+        startDate = endDate;
+        break;
+      case 'yesterday':
+        startDate = new Date(today.setDate(today.getDate() - 1));
+        endDate = startDate;
+        break;
+      case 'last_week':
+        startDate = new Date(today.setDate(today.getDate() - today.getDay() - 6));
+        endDate = new Date(today.setDate(startDate.getDate() + 6));
+        break;
+      case 'current_month':
+        startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+        break;
+      case 'last_month':
+        startDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+        endDate = new Date(today.getFullYear(), today.getMonth(), 0);
+        break;
+      case 'last_six_months':
+        startDate = new Date(today);
+        startDate.setMonth(startDate.getMonth() - 6);
+        // Set the day to the start of the month for consistency
+        startDate.setDate(1);
+        break;
+      case 'current_quarter':
+        const currentMonth = today.getMonth();
+        const quarterStartMonth = currentMonth - (currentMonth % 3);
+        startDate = new Date(today.getFullYear(), quarterStartMonth, 1);
+        break;
+      case 'year_to_date':
+        startDate = new Date(today.getFullYear(), 3, 1); // Assuming fiscal year starts in April
+        break;
+      case 'last_year':
+        startDate = new Date(today.getFullYear() - 1, 3, 1);
+        endDate = new Date(today.getFullYear(), 2, 31);
+        break;
     }
 
     this.fromDate = startDate;
     this.toDate = endDate;
-}
-
+  }
   loadStatuses() {
     const url = 'masters/order_status/';
 
@@ -931,89 +863,7 @@ applyFilters() {
   //    return queryParts.length ? '&' + queryParts.join('&') : '';
   // }
 
-  // generateQueryString(filters: {
-  //   quickPeriod?: string | null,
-  //   fromDate?: Date | null,
-  //   toDate?: Date | null,
-  //   status?: string | null,
-  //   employee?: string | number | null,
-  //   group?: string | number | null,
-  //   category?: string | number | null,
-  //   type?: string | number | null,
-  //   warehouse?: string | number | null,
-  //   ledgerAccount?: string | number | null,
-  //   stockStatus?: string | null,
-  //   city?: string | null
-  //   }): string {
-  //   const queryParts: string[] = [];
-
-  //   // For Stock Forecast page: Quick Period sends period_name for avg sales calculation
-  //   // For Sales Report pages: period name sent directly; custom dates use from_date/to_date
-  //   // For Other pages: Quick Period sets fromDate/toDate for date filtering
-  //   if (this.isStockForecastPage) {
-  //     if (filters.quickPeriod) {
-  //       queryParts.push(`period_name=${encodeURIComponent(filters.quickPeriod)}`);
-  //     }
-  //   } else if (this.isSalesReportPage || this.options?.showDateFilters) {
-  //     // Report pages: period sent as-is; custom dates use from_date/to_date
-  //     if (filters.quickPeriod) {
-  //       queryParts.push(`period=${encodeURIComponent(filters.quickPeriod)}`);
-  //     } else {
-  //       if (filters.fromDate) queryParts.push(`from_date=${encodeURIComponent(this.formatDate(filters.fromDate))}`);
-  //       if (filters.toDate) queryParts.push(`to_date=${encodeURIComponent(this.formatDate(filters.toDate))}`);
-  //     }
-  //     return queryParts.length ? '&' + queryParts.join('&') : '';
-  //   } else {
-  //     // Other modules use date filtering
-  //     if (filters.fromDate) {
-  //       const fromDateStr = this.formatDate(filters.fromDate);
-  //       queryParts.push(`created_at_after=${encodeURIComponent(fromDateStr)}`);
-  //     }
-  //     if (filters.toDate) {
-  //       const toDateStr = this.formatDate(filters.toDate);
-  //       queryParts.push(`created_at_before=${encodeURIComponent(toDateStr)}`);
-  //     }
-  //   }
-
-  //   // Add filter for status if available
-  //   if (filters.status) {
-  //     queryParts.push(`status_name=${encodeURIComponent(filters.status)}`);
-  //   }
-
-  //   // Add filter for status if available
-  //   if (filters.employee) {
-  //     queryParts.push(`employee_id=${encodeURIComponent(filters.employee)}`);
-  //   }
-
-  //   if (filters.group) {
-  //     queryParts.push(`product_group_id=${encodeURIComponent(filters.group.toString())}`);
-  //   }
-
-  //   if (filters.category) {
-  //     queryParts.push(`category_id=${encodeURIComponent(filters.category.toString())}`);
-  //   }
-
-  //   if (filters.type) {
-  //     // Use item_type_id for inventory/stock forecast APIs, type_id for others
-  //     queryParts.push(`item_type_id=${encodeURIComponent(filters.type.toString())}`);
-  //   }
-
-  //   if (filters.warehouse) {
-  //     queryParts.push(`warehouse_id=${encodeURIComponent(filters.warehouse.toString())}`);
-  //   }
-
-  //   if (filters.ledgerAccount) {
-  //     queryParts.push(`ledger_account_id=${encodeURIComponent(filters.ledgerAccount.toString())}`);
-  //   }
-
-  //   if (filters.city) {
-  //     queryParts.push(`city=${encodeURIComponent(filters.city.toString())}`);
-  //   }
-
-  //   return queryParts.length ? '&' + queryParts.join('&') : '';
-  //   }
-
-generateQueryString(filters: {
+  generateQueryString(filters: {
     quickPeriod?: string | null,
     fromDate?: Date | null,
     toDate?: Date | null,
@@ -1030,88 +880,76 @@ generateQueryString(filters: {
     const queryParts: string[] = [];
 
     // For Stock Forecast page: Quick Period sends period_name for avg sales calculation
+    // For Sales Report pages: period name sent directly; custom dates use from_date/to_date
+    // For Other pages: Quick Period sets fromDate/toDate for date filtering
     if (this.isStockForecastPage) {
-        if (filters.quickPeriod) {
-            queryParts.push(`period_name=${encodeURIComponent(filters.quickPeriod)}`);
-        }
+      if (filters.quickPeriod) {
+        queryParts.push(`period_name=${encodeURIComponent(filters.quickPeriod)}`);
+      }
     } else if (this.isSalesReportPage || this.options?.showDateFilters) {
-        // Report pages: period sent as-is; custom dates use from_date/to_date
-        if (filters.quickPeriod) {
-            queryParts.push(`period=${encodeURIComponent(filters.quickPeriod)}`);
-        } else {
-            if (filters.fromDate) {
-                // ✅ Use order_date_after for Sales Report pages
-                queryParts.push(`order_date_after=${encodeURIComponent(this.formatDate(filters.fromDate))}`);
-            }
-            if (filters.toDate) {
-                // ✅ Use order_date_before for Sales Report pages
-                queryParts.push(`order_date_before=${encodeURIComponent(this.formatDate(filters.toDate))}`);
-            }
-        }
-        return queryParts.length ? '&' + queryParts.join('&') : '';
+      // Report pages: period sent as-is; custom dates use from_date/to_date
+      if (filters.quickPeriod) {
+        queryParts.push(`period=${encodeURIComponent(filters.quickPeriod)}`);
+      } else {
+        if (filters.fromDate) queryParts.push(`from_date=${encodeURIComponent(this.formatDate(filters.fromDate))}`);
+        if (filters.toDate) queryParts.push(`to_date=${encodeURIComponent(this.formatDate(filters.toDate))}`);
+      }
+      return queryParts.length ? '&' + queryParts.join('&') : '';
     } else {
-        // Other modules use date filtering
-        if (filters.fromDate) {
-            const fromDateStr = this.formatDate(filters.fromDate);
-            // ✅ Use order_date_after instead of created_at_after
-            queryParts.push(`order_date_after=${encodeURIComponent(fromDateStr)}`);
-        }
-        if (filters.toDate) {
-            const toDateStr = this.formatDate(filters.toDate);
-            // ✅ Use order_date_before instead of created_at_before
-            queryParts.push(`order_date_before=${encodeURIComponent(toDateStr)}`);
-        }
+      // Other modules use date filtering
+      if (filters.fromDate) {
+        const fromDateStr = this.formatDate(filters.fromDate);
+        queryParts.push(`created_at_after=${encodeURIComponent(fromDateStr)}`);
+      }
+      if (filters.toDate) {
+        const toDateStr = this.formatDate(filters.toDate);
+        queryParts.push(`created_at_before=${encodeURIComponent(toDateStr)}`);
+      }
     }
 
     // Add filter for status if available
     if (filters.status) {
-        queryParts.push(`status_name=${encodeURIComponent(filters.status)}`);
+      queryParts.push(`status_name=${encodeURIComponent(filters.status)}`);
     }
 
     // Add filter for status if available
     if (filters.employee) {
-        queryParts.push(`employee_id=${encodeURIComponent(filters.employee)}`);
+      queryParts.push(`employee_id=${encodeURIComponent(filters.employee)}`);
     }
 
     if (filters.group) {
-        queryParts.push(`product_group_id=${encodeURIComponent(filters.group.toString())}`);
+      queryParts.push(`product_group_id=${encodeURIComponent(filters.group.toString())}`);
     }
 
     if (filters.category) {
-        queryParts.push(`category_id=${encodeURIComponent(filters.category.toString())}`);
+      queryParts.push(`category_id=${encodeURIComponent(filters.category.toString())}`);
     }
 
     if (filters.type) {
-        queryParts.push(`item_type_id=${encodeURIComponent(filters.type.toString())}`);
+      // Use item_type_id for inventory/stock forecast APIs, type_id for others
+      queryParts.push(`item_type_id=${encodeURIComponent(filters.type.toString())}`);
     }
 
     if (filters.warehouse) {
-        queryParts.push(`warehouse_id=${encodeURIComponent(filters.warehouse.toString())}`);
+      queryParts.push(`warehouse_id=${encodeURIComponent(filters.warehouse.toString())}`);
     }
 
     if (filters.ledgerAccount) {
-        queryParts.push(`ledger_account_id=${encodeURIComponent(filters.ledgerAccount.toString())}`);
+      queryParts.push(`ledger_account_id=${encodeURIComponent(filters.ledgerAccount.toString())}`);
     }
 
     if (filters.city) {
-        queryParts.push(`city=${encodeURIComponent(filters.city.toString())}`);
+      queryParts.push(`city=${encodeURIComponent(filters.city.toString())}`);
     }
 
     return queryParts.length ? '&' + queryParts.join('&') : '';
-}
+    }
 
-  // formatDate(date: Date): string {
-  //   // Format date as 'yyyy-MM-dd'
-  //   const year = date.getFullYear();
-  //   const month = (date.getMonth() + 1).toString().padStart(2, '0');
-  //   const day = date.getDate().toString().padStart(2, '0');
-  //   return `${year}-${month}-${day}`;
-  // }
   formatDate(date: Date): string {
-    // ✅ Always use UTC to send consistent dates to backend
-    const year = date.getUTCFullYear();
-    const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
-    const day = date.getUTCDate().toString().padStart(2, '0');
+    // Format date as 'yyyy-MM-dd'
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
     return `${year}-${month}-${day}`;
   }
 
@@ -1525,16 +1363,6 @@ loadDataFromServer(startIntial?: boolean, bypassCache = false): void {
         }
     }
 
-    // ✅ Check if API URL is valid before proceeding
-    if (!this.options.apiUrl || this.options.apiUrl === '/api/v1/' || this.options.apiUrl === '/api/v1') {
-        console.warn('No valid API URL provided. Skipping data load.');
-        this.rows = [];
-        this.total = 0;
-        this.loading = false;
-        this.cdr.detectChanges();
-        return;
-    }
-
     // ✅ Build the full URL with ALL active filters
     let apiUrl = this.options.apiUrl;
     const filterParams: string[] = [];
@@ -1547,24 +1375,20 @@ loadDataFromServer(startIntial?: boolean, bypassCache = false): void {
                 filterParams.push(`period=${encodeURIComponent(this.selectedQuickPeriod)}`);
             } else {
                 if (this.fromDate) {
-                    // ✅ Use order_date_after for Sales Report pages
-                    filterParams.push(`order_date_after=${encodeURIComponent(this.formatDate(this.fromDate))}`);
+                    filterParams.push(`from_date=${encodeURIComponent(this.formatDate(this.fromDate))}`);
                 }
                 if (this.toDate) {
-                    // ✅ Use order_date_before for Sales Report pages
-                    filterParams.push(`order_date_before=${encodeURIComponent(this.formatDate(this.toDate))}`);
+                    filterParams.push(`to_date=${encodeURIComponent(this.formatDate(this.toDate))}`);
                 }
             }
         } 
         // For other pages with date filters (not account ledger, not stock forecast)
         else if (!this.isAccountLedgerPage && !this.isStockForecastPage) {
             if (this.fromDate) {
-                // ✅ Changed from created_at_after to order_date_after
-                filterParams.push(`order_date_after=${encodeURIComponent(this.formatDate(this.fromDate))}`);
+                filterParams.push(`created_at_after=${encodeURIComponent(this.formatDate(this.fromDate))}`);
             }
             if (this.toDate) {
-                // ✅ Changed from created_at_before to order_date_before
-                filterParams.push(`order_date_before=${encodeURIComponent(this.formatDate(this.toDate))}`);
+                filterParams.push(`created_at_before=${encodeURIComponent(this.formatDate(this.toDate))}`);
             }
         }
     }
