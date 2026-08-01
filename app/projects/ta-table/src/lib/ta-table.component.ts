@@ -931,7 +931,89 @@ applyFilters() {
   //    return queryParts.length ? '&' + queryParts.join('&') : '';
   // }
 
-  generateQueryString(filters: {
+  // generateQueryString(filters: {
+  //   quickPeriod?: string | null,
+  //   fromDate?: Date | null,
+  //   toDate?: Date | null,
+  //   status?: string | null,
+  //   employee?: string | number | null,
+  //   group?: string | number | null,
+  //   category?: string | number | null,
+  //   type?: string | number | null,
+  //   warehouse?: string | number | null,
+  //   ledgerAccount?: string | number | null,
+  //   stockStatus?: string | null,
+  //   city?: string | null
+  //   }): string {
+  //   const queryParts: string[] = [];
+
+  //   // For Stock Forecast page: Quick Period sends period_name for avg sales calculation
+  //   // For Sales Report pages: period name sent directly; custom dates use from_date/to_date
+  //   // For Other pages: Quick Period sets fromDate/toDate for date filtering
+  //   if (this.isStockForecastPage) {
+  //     if (filters.quickPeriod) {
+  //       queryParts.push(`period_name=${encodeURIComponent(filters.quickPeriod)}`);
+  //     }
+  //   } else if (this.isSalesReportPage || this.options?.showDateFilters) {
+  //     // Report pages: period sent as-is; custom dates use from_date/to_date
+  //     if (filters.quickPeriod) {
+  //       queryParts.push(`period=${encodeURIComponent(filters.quickPeriod)}`);
+  //     } else {
+  //       if (filters.fromDate) queryParts.push(`from_date=${encodeURIComponent(this.formatDate(filters.fromDate))}`);
+  //       if (filters.toDate) queryParts.push(`to_date=${encodeURIComponent(this.formatDate(filters.toDate))}`);
+  //     }
+  //     return queryParts.length ? '&' + queryParts.join('&') : '';
+  //   } else {
+  //     // Other modules use date filtering
+  //     if (filters.fromDate) {
+  //       const fromDateStr = this.formatDate(filters.fromDate);
+  //       queryParts.push(`created_at_after=${encodeURIComponent(fromDateStr)}`);
+  //     }
+  //     if (filters.toDate) {
+  //       const toDateStr = this.formatDate(filters.toDate);
+  //       queryParts.push(`created_at_before=${encodeURIComponent(toDateStr)}`);
+  //     }
+  //   }
+
+  //   // Add filter for status if available
+  //   if (filters.status) {
+  //     queryParts.push(`status_name=${encodeURIComponent(filters.status)}`);
+  //   }
+
+  //   // Add filter for status if available
+  //   if (filters.employee) {
+  //     queryParts.push(`employee_id=${encodeURIComponent(filters.employee)}`);
+  //   }
+
+  //   if (filters.group) {
+  //     queryParts.push(`product_group_id=${encodeURIComponent(filters.group.toString())}`);
+  //   }
+
+  //   if (filters.category) {
+  //     queryParts.push(`category_id=${encodeURIComponent(filters.category.toString())}`);
+  //   }
+
+  //   if (filters.type) {
+  //     // Use item_type_id for inventory/stock forecast APIs, type_id for others
+  //     queryParts.push(`item_type_id=${encodeURIComponent(filters.type.toString())}`);
+  //   }
+
+  //   if (filters.warehouse) {
+  //     queryParts.push(`warehouse_id=${encodeURIComponent(filters.warehouse.toString())}`);
+  //   }
+
+  //   if (filters.ledgerAccount) {
+  //     queryParts.push(`ledger_account_id=${encodeURIComponent(filters.ledgerAccount.toString())}`);
+  //   }
+
+  //   if (filters.city) {
+  //     queryParts.push(`city=${encodeURIComponent(filters.city.toString())}`);
+  //   }
+
+  //   return queryParts.length ? '&' + queryParts.join('&') : '';
+  //   }
+
+generateQueryString(filters: {
     quickPeriod?: string | null,
     fromDate?: Date | null,
     toDate?: Date | null,
@@ -948,70 +1030,75 @@ applyFilters() {
     const queryParts: string[] = [];
 
     // For Stock Forecast page: Quick Period sends period_name for avg sales calculation
-    // For Sales Report pages: period name sent directly; custom dates use from_date/to_date
-    // For Other pages: Quick Period sets fromDate/toDate for date filtering
     if (this.isStockForecastPage) {
-      if (filters.quickPeriod) {
-        queryParts.push(`period_name=${encodeURIComponent(filters.quickPeriod)}`);
-      }
+        if (filters.quickPeriod) {
+            queryParts.push(`period_name=${encodeURIComponent(filters.quickPeriod)}`);
+        }
     } else if (this.isSalesReportPage || this.options?.showDateFilters) {
-      // Report pages: period sent as-is; custom dates use from_date/to_date
-      if (filters.quickPeriod) {
-        queryParts.push(`period=${encodeURIComponent(filters.quickPeriod)}`);
-      } else {
-        if (filters.fromDate) queryParts.push(`from_date=${encodeURIComponent(this.formatDate(filters.fromDate))}`);
-        if (filters.toDate) queryParts.push(`to_date=${encodeURIComponent(this.formatDate(filters.toDate))}`);
-      }
-      return queryParts.length ? '&' + queryParts.join('&') : '';
+        // Report pages: period sent as-is; custom dates use from_date/to_date
+        if (filters.quickPeriod) {
+            queryParts.push(`period=${encodeURIComponent(filters.quickPeriod)}`);
+        } else {
+            if (filters.fromDate) {
+                // ✅ Use order_date_after for Sales Report pages
+                queryParts.push(`order_date_after=${encodeURIComponent(this.formatDate(filters.fromDate))}`);
+            }
+            if (filters.toDate) {
+                // ✅ Use order_date_before for Sales Report pages
+                queryParts.push(`order_date_before=${encodeURIComponent(this.formatDate(filters.toDate))}`);
+            }
+        }
+        return queryParts.length ? '&' + queryParts.join('&') : '';
     } else {
-      // Other modules use date filtering
-      if (filters.fromDate) {
-        const fromDateStr = this.formatDate(filters.fromDate);
-        queryParts.push(`created_at_after=${encodeURIComponent(fromDateStr)}`);
-      }
-      if (filters.toDate) {
-        const toDateStr = this.formatDate(filters.toDate);
-        queryParts.push(`created_at_before=${encodeURIComponent(toDateStr)}`);
-      }
+        // Other modules use date filtering
+        if (filters.fromDate) {
+            const fromDateStr = this.formatDate(filters.fromDate);
+            // ✅ Use order_date_after instead of created_at_after
+            queryParts.push(`order_date_after=${encodeURIComponent(fromDateStr)}`);
+        }
+        if (filters.toDate) {
+            const toDateStr = this.formatDate(filters.toDate);
+            // ✅ Use order_date_before instead of created_at_before
+            queryParts.push(`order_date_before=${encodeURIComponent(toDateStr)}`);
+        }
     }
 
     // Add filter for status if available
     if (filters.status) {
-      queryParts.push(`status_name=${encodeURIComponent(filters.status)}`);
+        queryParts.push(`status_name=${encodeURIComponent(filters.status)}`);
     }
 
     // Add filter for status if available
     if (filters.employee) {
-      queryParts.push(`employee_id=${encodeURIComponent(filters.employee)}`);
+        queryParts.push(`employee_id=${encodeURIComponent(filters.employee)}`);
     }
 
     if (filters.group) {
-      queryParts.push(`product_group_id=${encodeURIComponent(filters.group.toString())}`);
+        queryParts.push(`product_group_id=${encodeURIComponent(filters.group.toString())}`);
     }
 
     if (filters.category) {
-      queryParts.push(`category_id=${encodeURIComponent(filters.category.toString())}`);
+        queryParts.push(`category_id=${encodeURIComponent(filters.category.toString())}`);
     }
 
     if (filters.type) {
-      // Use item_type_id for inventory/stock forecast APIs, type_id for others
-      queryParts.push(`item_type_id=${encodeURIComponent(filters.type.toString())}`);
+        queryParts.push(`item_type_id=${encodeURIComponent(filters.type.toString())}`);
     }
 
     if (filters.warehouse) {
-      queryParts.push(`warehouse_id=${encodeURIComponent(filters.warehouse.toString())}`);
+        queryParts.push(`warehouse_id=${encodeURIComponent(filters.warehouse.toString())}`);
     }
 
     if (filters.ledgerAccount) {
-      queryParts.push(`ledger_account_id=${encodeURIComponent(filters.ledgerAccount.toString())}`);
+        queryParts.push(`ledger_account_id=${encodeURIComponent(filters.ledgerAccount.toString())}`);
     }
 
     if (filters.city) {
-      queryParts.push(`city=${encodeURIComponent(filters.city.toString())}`);
+        queryParts.push(`city=${encodeURIComponent(filters.city.toString())}`);
     }
 
     return queryParts.length ? '&' + queryParts.join('&') : '';
-    }
+}
 
   // formatDate(date: Date): string {
   //   // Format date as 'yyyy-MM-dd'
@@ -1460,20 +1547,24 @@ loadDataFromServer(startIntial?: boolean, bypassCache = false): void {
                 filterParams.push(`period=${encodeURIComponent(this.selectedQuickPeriod)}`);
             } else {
                 if (this.fromDate) {
-                    filterParams.push(`from_date=${encodeURIComponent(this.formatDate(this.fromDate))}`);
+                    // ✅ Use order_date_after for Sales Report pages
+                    filterParams.push(`order_date_after=${encodeURIComponent(this.formatDate(this.fromDate))}`);
                 }
                 if (this.toDate) {
-                    filterParams.push(`to_date=${encodeURIComponent(this.formatDate(this.toDate))}`);
+                    // ✅ Use order_date_before for Sales Report pages
+                    filterParams.push(`order_date_before=${encodeURIComponent(this.formatDate(this.toDate))}`);
                 }
             }
         } 
         // For other pages with date filters (not account ledger, not stock forecast)
         else if (!this.isAccountLedgerPage && !this.isStockForecastPage) {
             if (this.fromDate) {
-                filterParams.push(`created_at_after=${encodeURIComponent(this.formatDate(this.fromDate))}`);
+                // ✅ Changed from created_at_after to order_date_after
+                filterParams.push(`order_date_after=${encodeURIComponent(this.formatDate(this.fromDate))}`);
             }
             if (this.toDate) {
-                filterParams.push(`created_at_before=${encodeURIComponent(this.formatDate(this.toDate))}`);
+                // ✅ Changed from created_at_before to order_date_before
+                filterParams.push(`order_date_before=${encodeURIComponent(this.formatDate(this.toDate))}`);
             }
         }
     }
