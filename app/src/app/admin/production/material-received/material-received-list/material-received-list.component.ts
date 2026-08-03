@@ -27,6 +27,10 @@ export class MaterialReceivedListComponent {
 
   tableConfig: TaTableConfig = {
     apiUrl: 'production/material-received/?summary=true',
+    // Filter on the document's own date, not when the row was saved — a backdated
+    // document belongs to the date on the document.
+    dateFilterKey: 'receipt_date',
+
     showCheckbox: true,
     pkId: "material_received_id",
     rowEvents: {

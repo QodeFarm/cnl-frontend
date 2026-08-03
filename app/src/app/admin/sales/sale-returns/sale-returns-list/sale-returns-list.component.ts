@@ -819,6 +819,10 @@ export class SaleReturnsListComponent implements OnInit {
   //---------------print & Preview - end --------------------------
   tableConfig: TaTableConfig = {
     apiUrl: 'sales/sale_return_order/?summary=true',
+    // Filter on the document's own date, not when the row was saved — a backdated
+    // document belongs to the date on the document.
+    dateFilterKey: 'return_date',
+
     showCheckbox: true,
     pkId: "sale_return_id",
     rowEvents: {

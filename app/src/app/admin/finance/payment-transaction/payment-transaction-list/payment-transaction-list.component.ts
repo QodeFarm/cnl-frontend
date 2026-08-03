@@ -24,6 +24,10 @@ export class PaymentTransactionListComponent {
 
   tableConfig: TaTableConfig = {
     apiUrl: 'finance/payment_transactions/',
+    // Filter on the document's own date, not when the row was saved — a backdated
+    // document belongs to the date on the document.
+    dateFilterKey: 'payment_date',
+
     showCheckbox:true,
     pkId: "payment_id",
     rowEvents: {

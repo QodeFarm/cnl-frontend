@@ -24,6 +24,10 @@ export class DebitNoteListComponent {
 
   tableConfig: TaTableConfig = {
     apiUrl: 'sales/sale_debit_notes/',
+    // Filter on the document's own date, not when the row was saved — a backdated
+    // document belongs to the date on the document.
+    dateFilterKey: 'debit_date',
+
     showCheckbox: true,
     pkId: "debit_note_id",
     rowEvents: {

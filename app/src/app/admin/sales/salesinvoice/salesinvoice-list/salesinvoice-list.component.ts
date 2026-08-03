@@ -848,6 +848,10 @@ export class SalesInvoiceListComponent implements OnInit {
   //---------------print & Preview - end --------------------------
   tableConfig: TaTableConfig = {
     apiUrl: '',//'sales/sale_invoice_order/?records_all=true',
+    // Filter on the document's own date, not when the row was saved — a backdated
+    // document belongs to the date on the document.
+    dateFilterKey: 'invoice_date',
+
     showCheckbox: true,
     pkId: "sale_invoice_id",
     rowEvents: {

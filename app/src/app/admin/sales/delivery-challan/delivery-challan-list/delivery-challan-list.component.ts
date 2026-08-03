@@ -233,6 +233,10 @@ export class DeliveryChallanListComponent implements OnInit {
   // ─── Table config ─────────────────────────────────────────────────────────────
   tableConfig: TaTableConfig = {
     apiUrl: 'sales/delivery_challan/',
+    // Filter on the document's own date, not when the row was saved — a backdated
+    // document belongs to the date on the document.
+    dateFilterKey: 'challan_date',
+
     showCheckbox: true,
     pkId: 'delivery_challan_id',
     rowEvents: {

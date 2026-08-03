@@ -30,6 +30,10 @@ export class SaleinvoiceorderlistComponent implements OnChanges{
 
   tableConfig: TaTableConfig = {
     apiUrl: 'sales/sale_order/?summary=true&flow_status_name=Ready for Invoice',
+    // Filter on the document's own date, not when the row was saved — a backdated
+    // document belongs to the date on the document.
+    dateFilterKey: 'order_date',
+
     showCheckbox: true,
     pkId: 'sale_order_id',
     pageSize: 10,

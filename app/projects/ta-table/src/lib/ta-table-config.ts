@@ -32,6 +32,13 @@ export interface TaTableConfig {
   showDateFilters?: boolean; // Force Quick Period + From/To Date filters on (used by report pages not matched by URL)
   periodOnly?: boolean; // With showDateFilters: show only Quick Period, hide From/To date (e.g. Stock Forecast)
   quickPeriodOptions?: { value: string; label: string }[]; // Override the Quick Period choices (e.g. Stock Forecast = meaningful periods only)
+  /**
+   * Column the date filter and Quick Period search on — the document's own date
+   * ('order_date', 'invoice_date', …), NOT the row's insert timestamp. Defaults to
+   * 'created_at', which stays right for audit-style screens. The backend FilterSet must
+   * expose the matching range filter and declare `document_date_field`.
+   */
+  dateFilterKey?: string;
   hideRefreshBtn?: boolean; // Hides the refresh button (useful in selection popups)
   hideColChooser?: boolean; // Hides the Columns chooser button (useful in selection popups)
   /** IDs of rows that just arrived — table will blink them for 8 s then clear */

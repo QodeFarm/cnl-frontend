@@ -29,6 +29,10 @@ export class OrderListComponent implements OnChanges {
 
   tableConfig: TaTableConfig = {
     apiUrl: 'purchase/purchase_order/?summary=true',
+    // Filter on the document's own date, not when the row was saved — a backdated
+    // document belongs to the date on the document.
+    dateFilterKey: 'order_date',
+
     showCheckbox: true,
     pkId: 'purchase_order_id',
     pageSize: 10,
