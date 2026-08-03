@@ -646,7 +646,16 @@ ledgerAccount() {
 // }
 
 public lastApiUrl: string = '';
-applyFilters() {
+/**
+ * @param resetPage  Go back to page 1. Changing a filter changes the result set, so the
+ *   page you were on may no longer exist — picking "Today" while on page 2 of 21 asked
+ *   for page 2 of a single-row result and rendered "No Data". Only the account-ledger
+ *   paging path passes false, because there this method IS the paging call.
+ */
+applyFilters(resetPage: boolean = true) {
+  if (resetPage) {
+    this.pageIndex = 1;
+  }
   // ---------------------------
   //  FILTER OBJECT
   // ---------------------------
@@ -882,33 +891,12 @@ applyFilters() {
     // For Stock Forecast page: Quick Period sends period_name for avg sales calculation
     // For Sales Report pages: period name sent directly; custom dates use from_date/to_date
     // For Other pages: Quick Period sets fromDate/toDate for date filtering
+    queryParts.push(...this.buildDateFilterParams(filters.fromDate, filters.toDate, filters.quickPeriod));
     if (this.isStockForecastPage) {
-      if (filters.quickPeriod) {
-        queryParts.push(`period_name=${encodeURIComponent(filters.quickPeriod)}`);
-      }
+      // Stock forecast carries no other filters here.
     } else if (this.isSalesReportPage || this.options?.showDateFilters) {
-      // Report pages: quick period + custom dates use from_date/to_date.
-      // The parameter is `period_name` — every FilterSet declares that name, and nothing
-      // on the backend has ever read plain `period`, so Quick Period silently did nothing
-      // on report screens.
-      if (filters.quickPeriod) {
-        queryParts.push(`period_name=${encodeURIComponent(filters.quickPeriod)}`);
-      } else {
-        if (filters.fromDate) queryParts.push(`from_date=${encodeURIComponent(this.formatDate(filters.fromDate))}`);
-        if (filters.toDate) queryParts.push(`to_date=${encodeURIComponent(this.formatDate(filters.toDate))}`);
-      }
+      // Report pages send only the date params from this method.
       return queryParts.length ? '&' + queryParts.join('&') : '';
-    } else {
-      // Other modules use date filtering, on the screen's own document date.
-      const dateKey = this.dateFilterKey;
-      if (filters.fromDate) {
-        const fromDateStr = this.formatDate(filters.fromDate);
-        queryParts.push(`${dateKey}_after=${encodeURIComponent(fromDateStr)}`);
-      }
-      if (filters.toDate) {
-        const toDateStr = this.formatDate(filters.toDate);
-        queryParts.push(`${dateKey}_before=${encodeURIComponent(toDateStr)}`);
-      }
     }
 
     // Add filter for status if available
@@ -1353,7 +1341,8 @@ loadDataFromServer(startIntial?: boolean, bypassCache = false): void {
     // For Account Ledger page - use applyFilters() logic
     if (this.isAccountLedgerPage) {
         if (this.selectedAccountId) {
-            this.applyFilters();
+            // This IS the paging call for that screen — keep the page the user asked for.
+            this.applyFilters(false);
             return;
         } else {
             this.rows = [];
@@ -1373,27 +1362,10 @@ loadDataFromServer(startIntial?: boolean, bypassCache = false): void {
     
     // 1. Date Filters (for non-account-ledger pages)
     if (this.isButtonVisible && !this.isStockForecastPage) {
-        // For Sales Report pages
-        if (this.isSalesReportPage) {
-            if (this.selectedQuickPeriod) {
-                filterParams.push(`period=${encodeURIComponent(this.selectedQuickPeriod)}`);
-            } else {
-                if (this.fromDate) {
-                    filterParams.push(`from_date=${encodeURIComponent(this.formatDate(this.fromDate))}`);
-                }
-                if (this.toDate) {
-                    filterParams.push(`to_date=${encodeURIComponent(this.formatDate(this.toDate))}`);
-                }
-            }
-        } 
-        // For other pages with date filters (not account ledger, not stock forecast)
-        else if (!this.isAccountLedgerPage && !this.isStockForecastPage) {
-            if (this.fromDate) {
-                filterParams.push(`created_at_after=${encodeURIComponent(this.formatDate(this.fromDate))}`);
-            }
-            if (this.toDate) {
-                filterParams.push(`created_at_before=${encodeURIComponent(this.formatDate(this.toDate))}`);
-            }
+        // Same builder generateQueryString() uses, so paging cannot query with different
+        // filters than the ones the user applied.
+        if (!this.isAccountLedgerPage) {
+            filterParams.push(...this.buildDateFilterParams(this.fromDate, this.toDate, this.selectedQuickPeriod));
         }
     }
     
@@ -1792,6 +1764,39 @@ loadDataFromServer(startIntial?: boolean, bypassCache = false): void {
    */
   get dateFilterKey(): string {
     return this.options?.dateFilterKey || 'created_at';
+  }
+
+  /**
+   * THE single place date filter params are built.
+   *
+   * Two methods need them — generateQueryString() when a filter is applied, and
+   * loadDataFromServer() when the page or sort changes. They used to build the params
+   * separately, drifted apart, and paging then silently re-queried with a DIFFERENT
+   * filter: the total jumped between pages and rows outside the range appeared. Both call
+   * this now, so they cannot disagree again.
+   */
+  buildDateFilterParams(fromDate: any, toDate: any, quickPeriod: string | null): string[] {
+    const parts: string[] = [];
+    if (this.isStockForecastPage) {
+      if (quickPeriod) { parts.push(`period_name=${encodeURIComponent(quickPeriod)}`); }
+      return parts;
+    }
+    if (this.isSalesReportPage || this.options?.showDateFilters) {
+      // Report endpoints take from_date/to_date. `period_name` is the parameter every
+      // FilterSet declares — plain `period` was never read by anything.
+      if (quickPeriod) {
+        parts.push(`period_name=${encodeURIComponent(quickPeriod)}`);
+      } else {
+        if (fromDate) { parts.push(`from_date=${encodeURIComponent(this.formatDate(fromDate))}`); }
+        if (toDate) { parts.push(`to_date=${encodeURIComponent(this.formatDate(toDate))}`); }
+      }
+      return parts;
+    }
+    // Everything else filters on the screen's own document date.
+    const dateKey = this.dateFilterKey;
+    if (fromDate) { parts.push(`${dateKey}_after=${encodeURIComponent(this.formatDate(fromDate))}`); }
+    if (toDate) { parts.push(`${dateKey}_before=${encodeURIComponent(this.formatDate(toDate))}`); }
+    return parts;
   }
 
   reload() {
