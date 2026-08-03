@@ -31,6 +31,9 @@ export class EmployeeSalaryListComponent implements OnInit {
 
   tableConfig: TaTableConfig = {
     apiUrl: 'hrms/employee_salary/',
+    // Filter on the document's own date, not when the row was saved.
+    dateFilterKey: 'salary_start_date',
+
     showCheckbox: true,
     pkId: "salary_id",
     rowEvents: {

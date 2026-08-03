@@ -887,23 +887,27 @@ applyFilters() {
         queryParts.push(`period_name=${encodeURIComponent(filters.quickPeriod)}`);
       }
     } else if (this.isSalesReportPage || this.options?.showDateFilters) {
-      // Report pages: period sent as-is; custom dates use from_date/to_date
+      // Report pages: quick period + custom dates use from_date/to_date.
+      // The parameter is `period_name` — every FilterSet declares that name, and nothing
+      // on the backend has ever read plain `period`, so Quick Period silently did nothing
+      // on report screens.
       if (filters.quickPeriod) {
-        queryParts.push(`period=${encodeURIComponent(filters.quickPeriod)}`);
+        queryParts.push(`period_name=${encodeURIComponent(filters.quickPeriod)}`);
       } else {
         if (filters.fromDate) queryParts.push(`from_date=${encodeURIComponent(this.formatDate(filters.fromDate))}`);
         if (filters.toDate) queryParts.push(`to_date=${encodeURIComponent(this.formatDate(filters.toDate))}`);
       }
       return queryParts.length ? '&' + queryParts.join('&') : '';
     } else {
-      // Other modules use date filtering
+      // Other modules use date filtering, on the screen's own document date.
+      const dateKey = this.dateFilterKey;
       if (filters.fromDate) {
         const fromDateStr = this.formatDate(filters.fromDate);
-        queryParts.push(`created_at_after=${encodeURIComponent(fromDateStr)}`);
+        queryParts.push(`${dateKey}_after=${encodeURIComponent(fromDateStr)}`);
       }
       if (filters.toDate) {
         const toDateStr = this.formatDate(filters.toDate);
-        queryParts.push(`created_at_before=${encodeURIComponent(toDateStr)}`);
+        queryParts.push(`${dateKey}_before=${encodeURIComponent(toDateStr)}`);
       }
     }
 
@@ -1656,6 +1660,19 @@ applyFilters() {
    * Falls back to the index when a row has no primary key.
    */
   trackByRow = (index: number, row: any): any => row?.[this.options?.pkId] ?? index;
+
+  /**
+   * The column the date filter and Quick Period run on.
+   *
+   * A document has two dates: the one the user picked (order_date, invoice_date) and the
+   * timestamp its row was saved (created_at). Lists must filter on the former — an order
+   * entered today but dated the 1st belongs to the 1st. Screens declare theirs via
+   * `dateFilterKey`; anything that doesn't stays on created_at, which is still correct
+   * for audit-style screens.
+   */
+  get dateFilterKey(): string {
+    return this.options?.dateFilterKey || 'created_at';
+  }
 
   reload() {
     this.invalidateResourceCache();

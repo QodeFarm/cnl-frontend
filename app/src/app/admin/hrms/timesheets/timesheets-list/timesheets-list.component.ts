@@ -25,6 +25,9 @@ export class TimesheetsListComponent {
 
   tableConfig: TaTableConfig = {
     apiUrl:      'hrms/timesheets/',
+    // Filter on the document's own date, not when the row was saved.
+    dateFilterKey: 'start_date',
+
     showCheckbox: true,
     pkId:        'timesheet_id',
 

@@ -25,6 +25,9 @@ export class WorkOrderListComponent {
 
   tableConfig: TaTableConfig = {
     apiUrl: 'production/work_order/',
+    // Filter on the document's own date, not when the row was saved.
+    dateFilterKey: 'start_date',
+
     showCheckbox: true,
     title: 'Work Order',
     pkId: "work_order_id",

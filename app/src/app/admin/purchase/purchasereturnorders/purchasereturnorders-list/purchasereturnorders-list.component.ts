@@ -338,6 +338,10 @@ private fallbackPrint(pdfBlob: Blob): void {
 
   tableConfig: TaTableConfig = {
     apiUrl: 'purchase/purchase_return_order/?summary=true',
+    // The document date is return_date (due_date is a payment deadline, not the document's
+    // own date). This screen does not currently show a Return Date column — worth adding,
+    // so the date being filtered is visible to the user.
+    dateFilterKey: 'return_date',
     showCheckbox: true,
     pkId: "purchase_return_id",
     rowEvents: {

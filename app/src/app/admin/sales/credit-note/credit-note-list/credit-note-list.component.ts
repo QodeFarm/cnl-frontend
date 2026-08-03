@@ -216,6 +216,10 @@ export class CreditNoteListComponent implements OnInit {
 
   tableConfig: TaTableConfig = {
     apiUrl: 'sales/sale_credit_notes/',
+    // Filter on the document's own date, not when the row was saved — a backdated
+    // document belongs to the date on the document.
+    dateFilterKey: 'credit_date',
+
     showCheckbox: true,
     pkId: "credit_note_id",
     rowEvents: {
