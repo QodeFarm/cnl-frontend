@@ -1343,114 +1343,234 @@ applyFilters() {
     //   this.isStatusButtonVisible = true;   // Show Status dropdown for other URLs
     // }
   }
-  loadDataFromServer(startIntial?: boolean, bypassCache = false): void {
-
-    // let _pageIndex = this.pageIndex;
-    // if(startIntial){
-    //   _pageIndex = 1;
-    // }
-    
-    // Build API URL with filters for Stock Forecast page (preserves filters during pagination)
-    let apiUrl = this.options.apiUrl;
-    if (this.isStockForecastPage) {
-      const filterParams: string[] = [];
-      
-      // Category filter
-      if (this.selectedCategory) {
-        filterParams.push(`category_id=${this.selectedCategory}`);
-      }
-      // Product Group filter
-      if (this.selectedGroup) {
-        filterParams.push(`product_group_id=${this.selectedGroup}`);
-      }
-      // Item Type filter
-      if (this.selectedType) {
-        filterParams.push(`item_type_id=${this.selectedType}`);
-      }
-      // Quick Period filter for Stock Forecast - sends period_name for avg sales calculation
-      // (NOT date filtering like other modules)
-      if (this.selectedQuickPeriod) {
-        filterParams.push(`period_name=${this.selectedQuickPeriod}`);
-      }
-      
-      // if (filterParams.length > 0) {
-      //   const connector = apiUrl.includes('?') ? '&' : '?';
-      //   apiUrl = `${apiUrl}${connector}${filterParams.join('&')}`;
-      // }
+  
+loadDataFromServer(startIntial?: boolean, bypassCache = false): void {
+    // If startIntial is true, reset to page 1
+    if (startIntial) {
+        this.pageIndex = 1;
     }
-    
-    const tableParamConfig: TaParamsConfig = {
-      apiUrl: this.options.apiUrl,
-      pageIndex: this.pageIndex,
-      pageSize: this.pageSize,
-      sort: this.sort,
-      filters: this.filters,
-      globalSearch: this.options.globalSearch,
-      fixedFilters: this.options.fixedFilters
-    }
-    if (tableParamConfig.apiUrl) {
-      // Cache is only used for selection popups (rowSelectionEnabled = true).
-      // Regular list pages always fetch fresh data.
-      const isSelectionPopup = !!this.options.rowSelectionEnabled;
-      const cacheKey = isSelectionPopup
-        ? `${tableParamConfig.apiUrl}|p${tableParamConfig.pageIndex}|s${tableParamConfig.pageSize}|q${tableParamConfig.globalSearch?.value || ''}`
-        : null;
 
-      if (isSelectionPopup && !bypassCache && cacheKey) {
-        const cached = this.tableCache.get(cacheKey);
-        if (cached) {
-          this.total = cached.totalCount;
-          this.rows = cached.data || cached;
-          if (this.options.showCheckbox) { this.refreshCheckedStatus(); }
-          this.cdr.detectChanges();
-          return;
-        }
-      }
-
-      this.loading = true;
-      this.taTableS.getTableData(tableParamConfig).subscribe((data: any) => {
-        this.loading = false;
-        this.total = data.totalCount;
-        this.rows = data.data || data;
-
-        // Blink newly-arrived rows when requested (e.g. dispatch page polling)
-        if (this.options.newRowIds?.length) {
-          clearTimeout(this.blinkTimeout);
-          this.blinkingRowIds = new Set(this.options.newRowIds.map((id: any) => String(id)));
-          this.options.newRowIds = []; // consume so next refresh doesn't re-blink
-          this.blinkTimeout = setTimeout(() => {
-            this.blinkingRowIds.clear();
+    // For Account Ledger page - use applyFilters() logic
+    if (this.isAccountLedgerPage) {
+        if (this.selectedAccountId) {
+            this.applyFilters();
+            return;
+        } else {
+            this.rows = [];
+            this.total = 0;
+            this.loading = false;
+            if (this.options.showCheckbox) {
+                this.refreshCheckedStatus();
+            }
             this.cdr.detectChanges();
-          }, 25000);
+            return;
         }
-
-        // Store in cache for selection popups
-        if (isSelectionPopup && cacheKey) {
-          this.tableCache.set(cacheKey, data);
-        }
-
-        // Sync balance summary with Account Ledger Component during pagination
-        if (window['accountLedgerComponentInstance'] && this.isAccountLedgerPage) {
-          const instance = window['accountLedgerComponentInstance'];
-          instance.openingBalance = data.opening_balance || '0.00';
-          instance.totalDebit     = data.total_debit    || '0.00';
-          instance.totalCredit    = data.total_credit   || '0.00';
-          instance.finalBalance   = data.final_balance  || data.closing_balance || '0.00';
-          instance.showBalanceSummary = !!(data.data && data.data.length > 0);
-        }
-
-        if (this.options.showCheckbox) {
-          this.refreshCheckedStatus();
-        }
-        this.cdr.detectChanges();
-        // Emit full response so parent components can read summary, totals, etc.
-        this.dataLoaded.emit(data);
-      }, (error) => {
-        this.loading = false;
-      });
     }
 
-  }
+    // ✅ Build the full URL with ALL active filters
+    let apiUrl = this.options.apiUrl;
+    const filterParams: string[] = [];
+    
+    // 1. Date Filters (for non-account-ledger pages)
+    if (this.isButtonVisible && !this.isStockForecastPage) {
+        // For Sales Report pages
+        if (this.isSalesReportPage) {
+            if (this.selectedQuickPeriod) {
+                filterParams.push(`period=${encodeURIComponent(this.selectedQuickPeriod)}`);
+            } else {
+                if (this.fromDate) {
+                    filterParams.push(`from_date=${encodeURIComponent(this.formatDate(this.fromDate))}`);
+                }
+                if (this.toDate) {
+                    filterParams.push(`to_date=${encodeURIComponent(this.formatDate(this.toDate))}`);
+                }
+            }
+        } 
+        // For other pages with date filters (not account ledger, not stock forecast)
+        else if (!this.isAccountLedgerPage && !this.isStockForecastPage) {
+            if (this.fromDate) {
+                filterParams.push(`created_at_after=${encodeURIComponent(this.formatDate(this.fromDate))}`);
+            }
+            if (this.toDate) {
+                filterParams.push(`created_at_before=${encodeURIComponent(this.formatDate(this.toDate))}`);
+            }
+        }
+    }
+    
+    // 2. Stock Forecast specific filters
+    if (this.isStockForecastPage) {
+        if (this.selectedCategory) {
+            filterParams.push(`category_id=${this.selectedCategory}`);
+        }
+        if (this.selectedGroup) {
+            filterParams.push(`product_group_id=${this.selectedGroup}`);
+        }
+        if (this.selectedType) {
+            filterParams.push(`item_type_id=${this.selectedType}`);
+        }
+        if (this.selectedQuickPeriod) {
+            filterParams.push(`period_name=${encodeURIComponent(this.selectedQuickPeriod)}`);
+        }
+    }
+    
+    // 3. Status filter (for pages that show status dropdown)
+    if (this.isStatusButtonVisible && this.selectedStatus) {
+        filterParams.push(`status_name=${encodeURIComponent(this.selectedStatus)}`);
+    }
+    
+    // 4. Employee filter
+    if (this.isEmployeeFilterVisible && this.selectedEmployee) {
+        filterParams.push(`employee_id=${encodeURIComponent(this.selectedEmployee)}`);
+    }
+    
+    // 5. Product/Inventory filters
+    if (this.selectedGroup && (this.isProductFilterVisible || this.isInventoryFilterVisible || this.isStockSummaryFilterVisible)) {
+        filterParams.push(`product_group_id=${encodeURIComponent(this.selectedGroup)}`);
+    }
+    if (this.selectedCategory && (this.isProductFilterVisible || this.isInventoryFilterVisible)) {
+        filterParams.push(`category_id=${encodeURIComponent(this.selectedCategory)}`);
+    }
+    if (this.selectedType && (this.isProductFilterVisible || this.isInventoryFilterVisible)) {
+        filterParams.push(`item_type_id=${encodeURIComponent(this.selectedType)}`);
+    }
+    if (this.selectedWarehouse && this.isInventoryFilterVisible && !this.isStockForecastPage) {
+        filterParams.push(`warehouse_id=${encodeURIComponent(this.selectedWarehouse)}`);
+    }
+    
+    // 6. Ledger Account filter (for ledger reports)
+    if (this.isLegerAccountFilterVisible && this.selectedLedgerAccount) {
+        filterParams.push(`ledger_account_id=${encodeURIComponent(this.selectedLedgerAccount)}`);
+    }
+    
+    // 7. Stock Status filter (if enabled)
+    if (this.isStockStatusFilterVisible && this.selectedStockStatus) {
+        filterParams.push(`stock_status=${encodeURIComponent(this.selectedStockStatus)}`);
+    }
+    
+    // 8. Global Search
+    if (this.options.globalSearch?.value) {
+        filterParams.push(`s=${encodeURIComponent(this.options.globalSearch.value)}`);
+    }
+    
+    // 9. Column filters (from filter dropdowns)
+    if (this.filters && this.filters.length > 0) {
+        this.filters.forEach((filter: any) => {
+            if (filter.value) {
+                filterParams.push(`${filter.key}=${encodeURIComponent(filter.value)}`);
+            }
+        });
+    }
+    
+    // 10. Fixed filters (from options)
+    if (this.options.fixedFilters) {
+        Object.keys(this.options.fixedFilters).forEach(key => {
+            const value = this.options.fixedFilters[key];
+            if (value !== null && value !== undefined) {
+                filterParams.push(`${key}=${encodeURIComponent(value)}`);
+            }
+        });
+    }
+    
+    // ✅ ALWAYS include pagination parameters
+    filterParams.push(`page=${this.pageIndex}`);
+    filterParams.push(`limit=${this.pageSize}`);
+    
+    // 11. Sorting
+    if (this.sort) {
+        let sortDirection = 'ASC';
+        if (this.sort.value === 'descend') {
+            sortDirection = 'DESC';
+        } else if (this.sort.value === 'ascend') {
+            sortDirection = 'ASC';
+        }
+        filterParams.push(`sort[0]=${this.sort.key},${sortDirection}`);
+    }
+    
+    // ✅ Build the final URL with all filters
+    if (filterParams.length > 0) {
+        const connector = apiUrl.includes('?') ? '&' : '?';
+        apiUrl = `${apiUrl}${connector}${filterParams.join('&')}`;
+    }
+    
+    // Log the URL for debugging
+    console.log('Loading data with URL:', apiUrl);
+    
+    // Configure table parameters
+    const tableParamConfig: TaParamsConfig = {
+        apiUrl: apiUrl, // Use the full URL with all filters
+        pageIndex: this.pageIndex,
+        pageSize: this.pageSize,
+        sort: this.sort,
+        filters: this.filters,
+        globalSearch: this.options.globalSearch,
+        fixedFilters: this.options.fixedFilters
+    };
+    
+    if (tableParamConfig.apiUrl) {
+        // Cache is only used for selection popups (rowSelectionEnabled = true).
+        const isSelectionPopup = !!this.options.rowSelectionEnabled;
+        const cacheKey = isSelectionPopup
+            ? `${tableParamConfig.apiUrl}|p${tableParamConfig.pageIndex}|s${tableParamConfig.pageSize}|q${tableParamConfig.globalSearch?.value || ''}`
+            : null;
+
+        if (isSelectionPopup && !bypassCache && cacheKey) {
+            const cached = this.tableCache.get(cacheKey);
+            if (cached) {
+                this.total = cached.totalCount;
+                this.rows = cached.data || cached;
+                if (this.options.showCheckbox) { this.refreshCheckedStatus(); }
+                this.cdr.detectChanges();
+                return;
+            }
+        }
+
+        this.loading = true;
+        this.taTableS.getTableData(tableParamConfig).subscribe((data: any) => {
+            this.loading = false;
+            this.total = data.totalCount || data.count || 0;
+            this.rows = data.data || data || [];
+
+            // Blink newly-arrived rows when requested
+            if (this.options.newRowIds?.length) {
+                clearTimeout(this.blinkTimeout);
+                this.blinkingRowIds = new Set(this.options.newRowIds.map((id: any) => String(id)));
+                this.options.newRowIds = [];
+                this.blinkTimeout = setTimeout(() => {
+                    this.blinkingRowIds.clear();
+                    this.cdr.detectChanges();
+                }, 25000);
+            }
+
+            // Store in cache for selection popups
+            if (isSelectionPopup && cacheKey) {
+                this.tableCache.set(cacheKey, data);
+            }
+
+            // Sync balance summary with Account Ledger Component during pagination
+            if (window['accountLedgerComponentInstance'] && this.isAccountLedgerPage) {
+                const instance = window['accountLedgerComponentInstance'];
+                instance.openingBalance = data.opening_balance || '0.00';
+                instance.totalDebit = data.total_debit || '0.00';
+                instance.totalCredit = data.total_credit || '0.00';
+                instance.finalBalance = data.final_balance || data.closing_balance || '0.00';
+                instance.showBalanceSummary = !!(data.data && data.data.length > 0);
+            }
+
+            if (this.options.showCheckbox) {
+                this.refreshCheckedStatus();
+            }
+            this.cdr.detectChanges();
+            // Emit full response so parent components can read summary, totals, etc.
+            this.dataLoaded.emit(data);
+        }, (error) => {
+            this.loading = false;
+            console.error('Error loading data from server:', error);
+            this.rows = [];
+            this.total = 0;
+            this.cdr.detectChanges();
+        });
+    }
+}
 
   onQueryParamsChange(params: NzTableQueryParams): void {
     // // console.log('onQueryParamsChange', params);

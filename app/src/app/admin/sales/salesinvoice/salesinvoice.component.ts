@@ -2166,36 +2166,62 @@ createSaleInovice() {
                 //     }
                 //   }
                 // },
+                // {
+                //   key: 'tax',
+                //   type: 'select',
+                //   className: 'col-md-4 col-sm-6 col-12',
+                //   templateOptions: {
+                //     label: 'Tax',
+                //     required: false,
+                //     disabled: false,
+                //     options: [
+                //       { 'label': "Inclusive", value: 'Inclusive' },
+                //       { 'label': "Exclusive", value: 'Exclusive' }
+
+                //     ]
+                //   },
+                //   hooks: {
+                //     onInit: (field: any) => {
+                //     if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order.tax && field.formControl) {
+                //       field.formControl.setValue(this.dataToPopulate.sale_invoice_order.tax);
+                //       } else {
+                //         // Set default value to 'Exclusive'
+                //         field.formControl.setValue('Exclusive');
+                //       }
+
+                //       // 🔥 Recalculate when tax type changes
+                //       field.formControl.valueChanges.subscribe(() => {
+                //         this.totalAmountCal();
+                //       });
+                //     }
+                //   }
+                // },
                 {
-                  key: 'tax',
-                  type: 'select',
-                  className: 'col-md-4 col-sm-6 col-12',
-                  templateOptions: {
-                    label: 'Tax',
-                    required: false,
-                    disabled: false,
-                    options: [
-                      { 'label': "Inclusive", value: 'Inclusive' },
-                      { 'label': "Exclusive", value: 'Exclusive' }
+                    key: 'tax',
+                    type: 'select',
+                    className: 'col-md-4 col-sm-6 col-12',
+                    templateOptions: {
+                      label: 'Tax',
+                      required: false,
+                      options: [
+                        { label: "Inclusive", value: 'Inclusive' },
+                        { label: "Exclusive", value: 'Exclusive' }
+                      ]
+                    },
+                    defaultValue: 'Exclusive', // This sets default for new forms
+                    hooks: {
+                      onInit: (field: any) => {
+                        // Override with edit data if available
+                        if (this.dataToPopulate?.sale_invoice_order?.tax) {
+                          field.formControl.setValue(this.dataToPopulate.sale_invoice_order.tax, { emitEvent: false });
+                        }
 
-                    ]
-                  },
-                  hooks: {
-                    onInit: (field: any) => {
-                    if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order.tax && field.formControl) {
-                      field.formControl.setValue(this.dataToPopulate.sale_invoice_order.tax);
-                      } else {
-                        // Set default value to 'Exclusive'
-                        field.formControl.setValue('Exclusive');
+                        field.formControl.valueChanges.subscribe(() => {
+                          this.totalAmountCal();
+                        });
                       }
-
-                      // 🔥 Recalculate when tax type changes
-                      field.formControl.valueChanges.subscribe(() => {
-                        this.totalAmountCal();
-                      });
                     }
-                  }
-                },
+                  },
                 {
                   key: 'remarks',
                   type: 'textarea',
@@ -4067,15 +4093,16 @@ createSaleInovice() {
                           { label: "Exclusive", value: 'Exclusive' }
                         ]
                       },
+                      defaultValue: 'Exclusive', // This sets default for new forms
                       hooks: {
-                        onInit: (field: any) => {
-                          if (this.dataToPopulate?.order_shipments?.tax) {
-                            field.formControl.setValue(this.dataToPopulate.order_shipments.tax);
-                          } else {
-                            field.formControl.setValue('Exclusive');
+                        onChanges: (field: any) => {
+                          // This runs whenever field changes, but we only want to set initial value once
+                          if (!field._initialValueSet && this.dataToPopulate?.order_shipments?.tax) {
+                            field.formControl.setValue(this.dataToPopulate.order_shipments.tax, { emitEvent: false });
+                            field._initialValueSet = true;
                           }
-
-                          // 🔥 Recalculate when tax type changes
+                        },
+                        onInit: (field: any) => {
                           field.formControl.valueChanges.subscribe(() => {
                             this.totalAmountCal();
                           });
