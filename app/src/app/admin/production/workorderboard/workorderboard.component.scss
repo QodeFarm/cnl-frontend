@@ -1,5 +1,79 @@
-﻿.work-order-board{
+﻿// ── Project Design Tokens (same set as document-print-settings) ──────
+$primary:       #142768;
+$primary-hover: #1a3278;
+$font:          'Poppins', sans-serif;
+
+.work-order-board{
+  font-family: $font;
   padding: 15px;
+}
+
+.planning-toggle-btn {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 15px;
+}
+
+.wob-header-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  // 44px so it stays tappable on a phone.
+  min-height: 44px;
+  padding: 0 18px;
+  border: none;
+  border-radius: 8px;
+  background: $primary;
+  color: #fff;
+  font-family: $font;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:hover { background: $primary-hover; }
+}
+
+// ── Floor filter ─────────────────────────────────────────────────────
+// Sizing, spacing and alignment all come from the app's own .filter-group / .select-field
+// rules in styles.scss. Only the width is widened here: floor names like
+// "INJECTION MOULDING FLOOR" are far longer than "Warehouse", and the shared 155px
+// truncated them mid-word.
+:host ::ng-deep nz-select.board-floor-select {
+  width: 200px;
+}
+
+// ── Row action buttons ───────────────────────────────────────────────
+// Scoped to this component only — the shared table is untouched.
+// The two actions were stacking and colliding with the column edge because the cell had
+// no explicit layout and the sticky column had no room.
+:host ::ng-deep ta-table-actions {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+
+  > a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    // 32px keeps both actions on one line without making the row taller.
+    min-height: 32px;
+    padding: 0 12px;
+    border-radius: 6px;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  // The divider between actions is redundant once they are spaced buttons.
+  .ant-divider-vertical { display: none; }
+}
+
+@media (max-width: 575px) {
+  :host ::ng-deep nz-select.board-floor-select { width: 100%; }
+  .wob-header-action { width: 100%; justify-content: center; }
 }
 /* Overlay to cover the entire viewport */
 .custom-dialog-overlay {
@@ -324,12 +398,6 @@
 .production-qty {
   font-size: 22px;
   margin-top: 5px;
-}
-
-.planning-toggle-btn {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 15px;
 }
 
 .production-progress-list {

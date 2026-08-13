@@ -196,8 +196,20 @@ export class ProductsComponent implements OnInit, OnDestroy {
     this.ProductEditID = null;
     this.selectedProductMode = "Inventory";
     this.setFormConfig();
-    this.formConfig.fields[0].fieldGroup[0].fieldGroup[0].fieldGroup[11].hide = true;
-    this.formConfig.fields[0].fieldGroup[0].fieldGroup[0].fieldGroup[12].hide = true;
+    this.setProductFieldHidden('physical_balance', true);
+    this.setProductFieldHidden('balance_diff', true);
+  }
+
+  /**
+   * Hide or show a field in the main product fieldGroup, by key.
+   * Replaces `fieldGroup[11].hide` / `[12].hide`: those were positional, so adding or moving
+   * any field above them silently hid the wrong control — Physical Balance vanished from the
+   * form exactly that way. Keys cannot drift.
+   */
+  private setProductFieldHidden(key: string, hide: boolean): void {
+    const group = this.formConfig?.fields?.[0]?.fieldGroup?.[0]?.fieldGroup?.[0]?.fieldGroup;
+    const field = group?.find((f: any) => f.key === key);
+    if (field) { field.hide = hide; }
   }
 
   ngOnDestroy() {
@@ -293,8 +305,8 @@ editProducts(event: any) {
       this.formConfig.model['product_id'] = this.ProductEditID;
       this.showForm = true;
 
-      this.formConfig.fields[0].fieldGroup[0].fieldGroup[0].fieldGroup[11].hide = true;
-      this.formConfig.fields[0].fieldGroup[0].fieldGroup[0].fieldGroup[12].hide = true;
+      this.setProductFieldHidden('physical_balance', true);
+      this.setProductFieldHidden('balance_diff', true);
     }
   });
 
@@ -1116,6 +1128,37 @@ preprocessFormData() {
                     }, 
                     {
                       className: 'col-md-4 col-sm-6 col-12',
+                      key: 'default_production_floor',
+                      type: 'productionFloors-dropdown',
+                      templateOptions: {
+                        label: 'Production Floor',
+                        placeholder: 'Select Production Floor',
+                        dataKey: 'production_floor_id',
+                        dataLabel: 'name',
+                        options: [],
+                        required: false,
+                        lazy: {
+                          url: 'masters/production_floors/',
+                          lazyOneTime: true
+                        },
+                      },
+                      hooks: {
+                        onChanges: (field: any) => {
+                          // onChanges can fire more than once for the same field. Subscribing on
+                          // every call is how per-field valueChanges subscriptions have piled up
+                          // elsewhere in this app, so subscribe once and remember it.
+                          if (field._floorSub) { return; }
+                          field._floorSub = field.formControl.valueChanges.subscribe((data: any) => {
+                            const products = this.formConfig?.model?.['products'];
+                            if (products) {
+                              products['default_production_floor_id'] = data?.production_floor_id || null;
+                            }
+                          });
+                        }
+                      }
+                    },
+                    {
+                      className: 'col-md-4 col-sm-6 col-12',
                       key: 'has_opening_balance',
                       type: 'toggle', // or checkbox / switch (based on your UI lib)
                       defaultValue: false,
@@ -1186,7 +1229,6 @@ preprocessFormData() {
                       }
                     }
                   },
-
                   ]
                 },
                 {
