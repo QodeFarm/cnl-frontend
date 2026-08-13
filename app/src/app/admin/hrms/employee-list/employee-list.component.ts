@@ -25,6 +25,9 @@ export class EmployeeListComponent {
 
   tableConfig: TaTableConfig = {
     apiUrl: 'hrms/employees/',
+    // Filter on the document's own date, not when the row was saved.
+    dateFilterKey: 'hire_date',
+
     // title: 'Edit Sales Order List',
     showCheckbox:true,
     pkId: "employee_id",

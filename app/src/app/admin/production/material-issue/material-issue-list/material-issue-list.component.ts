@@ -27,6 +27,10 @@ export class MaterialIssueListComponent {
 
   tableConfig: TaTableConfig = {
     apiUrl: 'production/material-issues/?summary=true',
+    // Filter on the document's own date, not when the row was saved — a backdated
+    // document belongs to the date on the document.
+    dateFilterKey: 'issue_date',
+
     showCheckbox: true,
     pkId: "material_issue_id",
     rowEvents: {

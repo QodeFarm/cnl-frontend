@@ -1591,6 +1591,38 @@ closeSyncModal() {
                 placeholder: 'Temperory Quantity'
               }
             },
+            // Appended, never inserted: hideFields() and editWorkorder() address this
+            // fieldGroup by hard-coded index ([4], [9], [10], [11]). Inserting anywhere above
+            // shifts those and hides the wrong controls.
+            {
+              key: 'production_floor',
+              type: 'productionFloors-dropdown',
+              className: 'col-md-4 col-sm-6 col-12',
+              templateOptions: {
+                label: 'Production Floor',
+                placeholder: 'Select Production Floor',
+                dataKey: 'production_floor_id',
+                dataLabel: 'name',
+                options: [],
+                required: false,
+                lazy: {
+                  url: 'masters/production_floors/',
+                  lazyOneTime: true
+                }
+              },
+              hooks: {
+                onChanges: (field: any) => {
+                  // Subscribe once — onChanges can fire repeatedly for the same field.
+                  if (field._floorSub) { return; }
+                  field._floorSub = field.formControl.valueChanges.subscribe((data: any) => {
+                    const workOrder = this.formConfig?.model?.['work_order'];
+                    if (workOrder) {
+                      workOrder['production_floor_id'] = data?.production_floor_id || null;
+                    }
+                  });
+                }
+              }
+            },
           ]
         },
         // ----------------*** Tab menu starts here ***--------------------

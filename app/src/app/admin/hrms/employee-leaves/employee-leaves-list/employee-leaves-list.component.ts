@@ -93,6 +93,9 @@ export class EmployeeLeavesListComponent implements OnInit {
 
   tableConfig: TaTableConfig = {
     apiUrl: 'hrms/employee_leaves/',
+    // Filter on the document's own date, not when the row was saved.
+    dateFilterKey: 'start_date',
+
     showCheckbox: true,
     pkId: "leave_id",
     title: 'Employee Leaves',

@@ -24,6 +24,10 @@ export class RemindersListComponent {
 
   tableConfig: TaTableConfig = {
     apiUrl: 'reminders/reminders/',
+    // Filter on the document's own date, not when the row was saved — a backdated
+    // document belongs to the date on the document.
+    dateFilterKey: 'reminder_date',
+
     showCheckbox:true,
     pkId: "reminder_id",
     rowEvents: {

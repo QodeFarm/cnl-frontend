@@ -24,6 +24,9 @@ export class TasksListComponent {
 
   tableConfig: TaTableConfig = {
     apiUrl: 'tasks/task/',
+    // Filter on the document's own date, not when the row was saved.
+    dateFilterKey: 'due_date',
+
     showCheckbox:true,
     pkId: "task_id",
     rowEvents: {

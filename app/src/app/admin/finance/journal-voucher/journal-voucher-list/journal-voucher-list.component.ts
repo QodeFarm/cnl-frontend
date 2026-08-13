@@ -24,6 +24,10 @@ export class JournalVoucherListComponent {
 
   tableConfig: TaTableConfig = {
     apiUrl: 'finance/journal_vouchers/',
+    // Filter on the document's own date, not when the row was saved — a backdated
+    // document belongs to the date on the document.
+    dateFilterKey: 'voucher_date',
+
     showCheckbox: true,
     pkId: "journal_voucher_id",
     rowEvents: {

@@ -1,8 +1,10 @@
 <div class="work-order-board">
 
-  <!-- Toggle Button -->
+  <!-- No page heading here on purpose: ta-table renders its own `custom-heading`, the same
+       one every other list screen uses. A second one duplicated it in a different colour. -->
   <div class="planning-toggle-btn">
-    <button class="btn btn-primary" (click)="toggleProductionPlanning()">
+    <button type="button" class="wob-header-action" (click)="toggleProductionPlanning()">
+      <span nz-icon [nzType]="showProductionPlanning ? 'minus' : 'plus'" nzTheme="outline"></span>
       {{ showProductionPlanning ? 'Hide Production Planning' : 'Show Production Planning' }}
     </button>
   </div>
@@ -42,9 +44,46 @@
   </div>
 
   <!-- Work Order List Table -->
+  <!-- Never wrapped in *ngIf: recreating ta-table makes it recompute which global filters to
+       show from router.url, which made the Quick Period / date / Status bar come and go. -->
   <ta-table
     [options]="curdConfig.tableConfig"
     class="custom-list sale-receipt-table">
+
+    <!-- Projected into ta-table's own toolbar row, so the floor filter sits on the same
+         line as Search / Export / Refresh / Columns instead of on a line of its own.
+         .filter-group + .select-field are the app's existing filter classes (same as the
+         Warehouse and Status filters), so this inherits their size, spacing and alignment.
+         Cleared = no floor filter, matching how every other filter in the app behaves. -->
+    <div before-search class="filter-group">
+      <nz-select
+        class="select-field board-floor-select"
+        [ngModel]="activeFloorId === ALL_FLOORS ? null : activeFloorId"
+        (ngModelChange)="selectFloor($event)"
+        nzAllowClear
+        nzShowSearch
+        nzServerSearch
+        nzPlaceHolder="Production Floor"
+        (nzOnSearch)="onFloorSearch($event)">
+        <nz-option [nzValue]="UNASSIGNED" nzLabel="Unassigned"></nz-option>
+        <!-- The current selection, always rendered: if it disappears while a search is in
+             flight, nz-select has no option matching the value and blanks the label. -->
+        <nz-option
+          *ngIf="selectedFloor"
+          [nzValue]="selectedFloor.production_floor_id"
+          [nzLabel]="selectedFloor.name"></nz-option>
+        <ng-container *ngFor="let floor of floorOptions">
+          <nz-option
+            *ngIf="!floorsLoading && floor.production_floor_id !== selectedFloor?.production_floor_id"
+            [nzValue]="floor.production_floor_id"
+            [nzLabel]="floor.name"></nz-option>
+        </ng-container>
+        <nz-option *ngIf="floorsLoading" nzDisabled nzCustomContent>
+          <span nz-icon nzType="loading"></span> Searching…
+        </nz-option>
+      </nz-select>
+    </div>
+
   </ta-table>
 
 </div>

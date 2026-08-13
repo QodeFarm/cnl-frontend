@@ -24,6 +24,10 @@ export class JournalEntryListComponent {
 
   tableConfig: TaTableConfig = {
     apiUrl: 'finance/journal_entries/',
+    // Filter on the document's own date, not when the row was saved — a backdated
+    // document belongs to the date on the document.
+    dateFilterKey: 'entry_date',
+
     showCheckbox: true,
     pkId: "journal_entry_id",
     rowEvents: {

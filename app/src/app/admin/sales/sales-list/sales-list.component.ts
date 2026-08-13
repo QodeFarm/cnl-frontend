@@ -363,6 +363,9 @@ export class SalesListComponent implements OnInit {
     apiUrl: '',
     showCheckbox: true,
     pkId: "sale_order_id",
+    // Filter on the order's own date, not when the row was saved — a backdated order
+    // belongs to the date on the document.
+    dateFilterKey: 'order_date',
     rowEvents: {
       dblclick: this.dblClickNav.createHandler({ pkField: 'sale_order_id', moduleName: 'Sales', sectionName: 'Sale Order', editEmitter: this.edit }),
     },

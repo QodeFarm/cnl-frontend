@@ -4,8 +4,13 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { TaCurdConfig } from '@ta/ta-curd';
 import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { HttpClient } from '@angular/common/http';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription, of } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, switchMap, takeUntil, tap } from 'rxjs/operators';
+import { TaTableComponent } from 'projects/ta-table/src/lib/ta-table.component';
+import { FormsModule } from '@angular/forms';
 import { NzModalModule } from 'ng-zorro-antd/modal';
+import { NzSelectModule } from 'ng-zorro-antd/select';
+import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { NzNotificationModule } from 'ng-zorro-antd/notification';
@@ -48,12 +53,13 @@ const TABLE_FIELDS = {
 @Component({
   selector: 'app-workorderboard',
   standalone: true,
-  imports: [CommonModule, AdminCommmonModule, NzModalModule, NzTableModule, NzNotificationModule],
+  imports: [CommonModule, FormsModule, AdminCommmonModule, NzModalModule, NzTableModule, NzNotificationModule, NzSelectModule, NzIconModule],
   templateUrl: './workorderboard.component.html',
   styleUrls: ['./workorderboard.component.scss']
 })
 export class WorkorderboardComponent implements OnInit, OnDestroy {
   @ViewChild('woCompletedTpl', { static: false }) woCompletedTpl: TemplateRef<{}>;
+  @ViewChild(TaTableComponent) taTable!: TaTableComponent;
   woNotifRef: any = null;
   woNotifProductName = '';
 
@@ -65,6 +71,22 @@ export class WorkorderboardComponent implements OnInit, OnDestroy {
   workOrderData: any = null;
   tableFields = TABLE_FIELDS;
   private routeSub: Subscription;
+  private destroy$ = new Subject<void>();
+  private summaryTrigger$ = new Subject<void>();
+
+  // Floor picker. A tab per floor does not survive a tenant that models each machine as a
+  // floor, so the list is a server-searched select that never loads more than one page.
+  // 'unassigned' is kept as a fixed option so work orders created before any floor was set
+  // stay reachable — a job reachable from nowhere is worse than a job on the wrong floor.
+  readonly ALL_FLOORS = 'all';
+  readonly UNASSIGNED = 'unassigned';
+  private readonly FLOOR_PAGE = 20;
+  activeFloorId: string = this.ALL_FLOORS;
+  floorOptions: any[] = [];
+  floorsLoading = false;
+  /** Held separately so a search that filters it out cannot blank the picker's label. */
+  selectedFloor: any = null;
+  private floorSearch$ = new Subject<string>();
 
   @Output() view = new EventEmitter<any>();
 
@@ -72,24 +94,159 @@ export class WorkorderboardComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.isLoading = false;
-    this.http.get('production/work_order/?flow_status=Production')
-      .subscribe((res: any) => {
-        const records = res?.data || res?.results || [];
-        this.generateProductionSummary(records);
-      });
-    // Rebuild curdConfig whenever the 'refresh' query param changes.
-    // This handles the case where the tab is already open and Angular
-    // reuses the component instance instead of creating a new one.
+    // switchMap so a slower earlier request cannot land after a newer one. Deep-linking to
+    // ?floor=<id> fires an 'all floors' load and a per-floor load back to back; without this
+    // the panel could settle on every floor's totals while the table below shows one floor.
+    this.summaryTrigger$.pipe(
+      switchMap(() => this.http
+        .get(this.boardApiUrl())
+        .pipe(catchError(() => of({ data: [] })))),
+      takeUntil(this.destroy$)
+    ).subscribe((res: any) => {
+      this.generateProductionSummary(res?.data || res?.results || []);
+    });
+
+    this.initFloorPicker();
+    this.loadProductionSummary();
+    // Reload whenever the 'refresh' query param changes (the tab may already be open and
+    // Angular reuses the component instance), or when the selected floor changes.
     this.routeSub = this.route.queryParams.subscribe(params => {
-      if (params['refresh']) {
-        this.curdConfig = this.getCurdConfig();
+      const floor = params['floor'] || this.ALL_FLOORS;
+      if (floor !== this.activeFloorId) {
+        this.activeFloorId = floor;
+        this.resolveSelectedFloor(floor);
+        this.reloadBoard();
+      } else if (params['refresh']) {
+        // Same floor, just newer data — keep the operator's page, search and sort.
+        this.refreshRows();
       }
     });
   }
-  
+
 
   ngOnDestroy() {
     this.routeSub?.unsubscribe();
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  /**
+   * Floor options, fetched one page at a time and narrowed server-side by `name`. The whole
+   * master is never pulled down: a tenant with thousands of floors costs the same as one with
+   * three, and the picker stays usable at both ends.
+   */
+  private initFloorPicker(): void {
+    this.floorSearch$.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      tap(() => { this.floorsLoading = true; }),
+      switchMap((term: string) => this.http
+        .get(`masters/production_floors/?limit=${this.FLOOR_PAGE}` +
+             (term ? `&name=${encodeURIComponent(term)}` : ''))
+        .pipe(catchError(() => of({ data: [] })))),
+      takeUntil(this.destroy$)
+    ).subscribe((res: any) => {
+      this.floorsLoading = false;
+      this.floorOptions = (res?.data || []).filter((f: any) => !f.is_deleted);
+    });
+
+    this.floorSearch$.next('');
+  }
+
+  onFloorSearch(term: string): void {
+    this.floorSearch$.next(term || '');
+  }
+
+  /**
+   * A bookmarked ?floor=<id> may not appear in the first page of options, which would leave
+   * the picker showing an empty box over a filtered list. Fetch that one floor by id.
+   */
+  private resolveSelectedFloor(id: string): void {
+    if (!id || id === this.ALL_FLOORS || id === this.UNASSIGNED) {
+      this.selectedFloor = null;
+      return;
+    }
+    const known = this.floorOptions.find((f: any) => f.production_floor_id === id);
+    if (known) {
+      this.selectedFloor = known;
+      return;
+    }
+    this.http.get(`masters/production_floors/${id}/`)
+      .pipe(catchError(() => of(null)), takeUntil(this.destroy$))
+      .subscribe((res: any) => {
+        const data = res?.data ?? res;
+        this.selectedFloor = Array.isArray(data) ? data[0] : data;
+      });
+  }
+
+  selectFloor(floorId: string | null): void {
+    // Clearing the picker means "no floor filter", the same as clearing Warehouse or Status.
+    const next = floorId || this.ALL_FLOORS;
+    if (next === this.activeFloorId) { return; }
+    // Kept in the URL so a floor view can be bookmarked or pinned and the back button works.
+    // The queryParams subscription above is what actually applies it. The default is written
+    // as null so the URL stays clean when no floor is chosen.
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { floor: next === this.ALL_FLOORS ? null : next },
+      queryParamsHandling: 'merge'
+    });
+  }
+
+  /**
+   * The active floor as a query-string fragment. One source of truth for both the table and
+   * the planning summary, so the two can never disagree about which floor is on screen.
+   *
+   * Appended to apiUrl rather than passed as `fixedFilters`: ta-table reads fixedFilters with
+   * Object.keys() while every caller supplies an array, so an array yields the junk parameter
+   * `0=[object Object]`. The apiUrl query string is the mechanism `flow_status=Production`
+   * already uses on this screen.
+   */
+  /** The list endpoint for the board, including the active floor. One source of truth. */
+  private boardApiUrl(): string {
+    return `production/work_order/?flow_status=Production${this.floorQuery()}`;
+  }
+
+  private floorQuery(): string {
+    if (this.activeFloorId === this.UNASSIGNED) {
+      return '&production_floor_isnull=true';
+    }
+    if (this.activeFloorId !== this.ALL_FLOORS) {
+      return `&production_floor_id=${encodeURIComponent(this.activeFloorId)}`;
+    }
+    return '';
+  }
+
+  /**
+   * Apply a floor change to the list.
+   *
+   * The table is NOT destroyed and recreated. ta-table computes which global filters to show
+   * (Quick Period, From/To date, Status) in its own ngOnInit from router.url; recreating it
+   * recomputed those flags at an unpredictable moment, so the filter bar appeared or vanished
+   * depending on which tab the router happened to be on. Instead the apiUrl on the config
+   * object ta-table already holds is mutated in place — loadDataFromServer reads it verbatim
+   * on every request — and refresh() reloads from page 1.
+   */
+  reloadBoard(): void {
+    // Mutate, never reassign: ta-table captured this object reference at init, so a fresh
+    // object from getCurdConfig() would leave it reading the old apiUrl.
+    this.curdConfig.tableConfig.apiUrl = this.boardApiUrl();
+    this.taTable?.refresh();
+    this.loadProductionSummary();
+  }
+
+  /**
+   * Reload the ROWS only, keeping the operator's page, search and sort. Used after a dispatch:
+   * recreating the table there would bounce someone back to page 1 with their search cleared
+   * on every single Done click.
+   */
+  refreshRows(): void {
+    this.taTable?.refresh();
+    this.loadProductionSummary();
+  }
+
+  loadProductionSummary(): void {
+    this.summaryTrigger$.next();
   }
 
   getNestedValue(obj: any, path: string): any {
@@ -155,7 +312,9 @@ zeroBalanceProductName = '';
 showZeroBalancePopup(item: any) {
   this.zeroBalanceProductName = item.product?.name || 'This product';
   this.showZeroBalanceModal = true;
-  this.ngOnInit();
+  // refreshRows(), not ngOnInit() — calling the lifecycle hook by hand re-subscribed
+  // queryParams every time, stacking a new subscription per dispatch.
+  this.refreshRows();
 }
 
 closeZeroBalanceModal() {
@@ -407,8 +566,7 @@ confirmDispatch() {
                 console.log('Dispatch confirmed & moved to next stage');
 
                 this.closeModal();
-                this.curdConfig = this.getCurdConfig();
-                this.ngOnInit();
+                this.refreshRows();
 
               },
               error => {
@@ -421,8 +579,7 @@ confirmDispatch() {
             console.log('Partial dispatch - staying in current stage');
 
             this.closeModal();
-            this.curdConfig = this.getCurdConfig();
-            this.ngOnInit();
+            this.refreshRows();
 
           }
 
@@ -593,7 +750,7 @@ confirmDispatch() {
       drawerSize: 500,
       drawerPlacement: 'right',
       tableConfig: {
-        apiUrl: 'production/work_order/?flow_status=Production',
+        apiUrl: this.boardApiUrl(),
         title: 'Work Order Board',
         pkId: "work_order_id",
         pageSize: 10,
@@ -629,6 +786,15 @@ confirmDispatch() {
                   mapFn: (cv, row) => `${row.size?.size_name || '-'}`,
                   sort: true
                 },
+                {
+                  fieldKey: 'production_floor',
+                  name: 'Floor',
+                  displayType: "map",
+                  // Never blank: a job with no floor reads 'Unassigned', matching the option
+                  // it can be found under.
+                  mapFn: (cv, row) => `${row.production_floor?.name || 'Unassigned'}`,
+                  sort: false
+                },
                 { fieldKey: 'ordered_qty', name: 'Quantity', sort: true },
                 { fieldKey: 'available_qty', name: 'Available Qty', sort: true },
 
@@ -657,6 +823,9 @@ confirmDispatch() {
                   fieldKey: 'actions',
                   name: 'Actions',
                   type: 'action',
+                  // Explicit width: the default 150px left the sticky action column too narrow
+                  // for two buttons, so Done/View wrapped and overlapped End Date.
+                  width: '170px',
                   actions: [
                     { type: 'callBackFn', label: 'Done', callBackFn: (row) => this.openModal(row) },
                     { type: 'callBackFn', label: 'View', callBackFn: (row) => this.viewWorkOrder(row.work_order_id) }

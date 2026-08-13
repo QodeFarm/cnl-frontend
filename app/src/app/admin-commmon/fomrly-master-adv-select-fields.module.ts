@@ -953,8 +953,10 @@ import { AssetCategoriesConfig, AssetStatusConfig, cityConfig, CountryConfig, cu
               placeholder: ' Select Production Floor',
               label: 'Production Floor',
               dataKey: 'production_floor_id',
-              dataLabel: 'floor_name',
-              required: true,
+              // The master column is `name` (masters.ProductionFloor) — `floor_name` does not
+              // exist, so every option rendered with a blank label.
+              dataLabel: 'name',
+              required: false,
               curdConfig: productionFloorsConfig
             }
           }

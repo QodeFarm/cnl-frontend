@@ -33,6 +33,9 @@ export class OrderslistComponent implements OnChanges {
     showCheckbox: true,
     pkId: 'sale_order_id',
     pageSize: 10,
+    // Filter on the order's own date, not when the row was saved — a backdated order
+    // belongs to the date on the document.
+    dateFilterKey: 'order_date',
     globalSearch: {
       keys: ['order_date', 'order_no', 'sale_type', 'customer', 'amount', 'tax', 'advance_amount', 'status_name', 'flow_status']
     },
