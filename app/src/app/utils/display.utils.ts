@@ -1246,9 +1246,13 @@ export function calculateTotalAmount(data: any, modelName: string, form: any) {
   const billingAddress =
     data[parentModel]?.billing_address || '';
 
-  const isLocalState =
-    !billingAddress ||
-    billingAddress.includes(companyState);
+  // const isLocalState =
+  //   !billingAddress ||
+  //   billingAddress.includes(companyState);
+  const isLocalState = !billingAddress || 
+                     billingAddress.toLowerCase() === 'null' ||
+                     billingAddress.toLowerCase() === 'none' ||
+                     billingAddress.includes(companyState);
 
   // Tax types
   const productTaxType =
