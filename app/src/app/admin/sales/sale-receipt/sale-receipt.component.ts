@@ -6,6 +6,7 @@ import { AdminCommmonModule } from 'src/app/admin-commmon/admin-commmon.module';
 import { HttpClient } from '@angular/common/http';
 import { LocalStorageService } from '@ta/ta-core';
 import { NzNotificationService, NzNotificationModule } from 'ng-zorro-antd/notification';
+import { TaCurdModalComponent } from 'projects/ta-curd/src/lib/ta-curd-modal/ta-curd-modal.component';
 
 @Component({
   standalone: true,
@@ -24,6 +25,7 @@ export class SaleReceiptComponent implements OnInit {
   confirmedParentOrderNo: string = '';
   parentNewStatus: string = '';
   @ViewChild('postConfirmTpl', { static: true }) postConfirmTpl!: TemplateRef<{}>;
+  @ViewChild(TaCurdModalComponent) curdModalComponent?: TaCurdModalComponent;
   // Initial curdConfig setup for sale receipt
   curdConfig: TaCurdConfig = this.getCurdConfig();
 
@@ -186,8 +188,9 @@ export class SaleReceiptComponent implements OnInit {
 
 
   // Refresh the curdConfig object to reload the data in ta-curd-modal
+
   refreshCurdConfig() {
-    this.curdConfig = this.getCurdConfig(); // Reset the curdConfig with a fresh configuration
+    this.curdModalComponent?.table?.refresh();
   }
 
   // Callback method for handling the "Upload File" action
@@ -404,9 +407,8 @@ async confirmReceipt() {
                 //   );
                 // }
 
-                this.closeModal();
-                this.refreshCurdConfig();
-
+                // The modal deliberately stays open here. The parent order is still being
+          
                 const childOrdersUrl = `sales/sale_order/?parent_order_no=${parentOrderNo}`;
                 console.log("Fetching child orders with URL:", childOrdersUrl);
                 this.http.get<any>(childOrdersUrl).subscribe(
@@ -452,6 +454,9 @@ async confirmReceipt() {
                               },
                               error => {
                                 console.error(" Error updating parent sale order status:", error);
+                                
+                                this.closeModal();
+                                this.refreshCurdConfig();
                                 alert("Failed to update parent sale order status. Please try again.");
                               }
                             );
@@ -475,6 +480,10 @@ async confirmReceipt() {
                               },
                               error => {
                                 console.error(" Error updating parent sale order status:", error);
+                                // The child order WAS updated, so the list is out of date either
+                                // way — close and reload so the screen shows what actually landed.
+                                this.closeModal();
+                                this.refreshCurdConfig();
                                 alert("Failed to update parent sale order status. Please try again.");
                               }
                             );
@@ -483,10 +492,14 @@ async confirmReceipt() {
                       }
                     } else {
                       console.error(` Parent Sale Order ${parentOrderNo} not found.`);
+                      this.closeModal();
+                      this.refreshCurdConfig();
                     }
                   },
                   (error) => {
                     console.error(" Error fetching child sale orders:", error);
+                    this.closeModal();
+                    this.refreshCurdConfig();
                     alert("Failed to fetch child sale orders. Please try again.");
                   }
                 );

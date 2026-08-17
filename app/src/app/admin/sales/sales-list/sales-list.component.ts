@@ -877,6 +877,9 @@ createInvoiceFromList(sale_order_id: any) {
 
                       this.showLoading = false;
 
+                     
+                      this.refreshTable();
+
                     },
 
                     nextStageErr => {

@@ -46,6 +46,8 @@ export class SalesComponent {
   invoiceNumber: string = '';
   salesReceiptForm: FormGroup;
   showSaleOrderList: boolean = false;
+  private saleOrderListRefreshBound = false;
+  private saleOrderListShownOnce = false;
   showInvoiceListModal: boolean = false;
   showForm: boolean = false;
   SaleOrderEditID: any;
@@ -536,10 +538,16 @@ export class SalesComponent {
       if (url !== '/admin/sales') {
         // User navigated to a different page
         this.wasNavigatedAway = true;
-      } else if (this.wasNavigatedAway && this.SaleOrderEditID) {
-        // User came back to sales with an active edit session — refresh data
+      } else if (this.wasNavigatedAway) {
         this.wasNavigatedAway = false;
-        this.editSaleOrder(this.SaleOrderEditID);
+        // User came back to sales with an active edit session — refresh the form
+        if (this.SaleOrderEditID) {
+          this.editSaleOrder(this.SaleOrderEditID);
+        }
+        // ...and the list, which still holds rows fetched before the user left. A flow status
+        // changed on another screen (Order Acknowledgement confirms a delivery) is invisible
+        // here otherwise, until the tab is closed and reopened.
+        this.SalesListComponent?.refreshTable();
       }
     });
     // =============================================
@@ -1624,7 +1632,37 @@ editSaleOrder(event) {
       this.SalesListComponent.refreshTable();
     }
 
+    this.bindSaleOrderListRefresh();
   }
+
+  /**
+   * Reload the Sale Order list every time the modal is actually shown.
+   *
+   * Refreshing from the button's (click) alone is not enough: it fires before Angular has
+   * rendered the list, so on the first open the ViewChild is still undefined and the refresh
+   * is skipped, and any path that opens the modal without going through that button — the
+   * programmatic bsModal.show() used when arriving with ?showList=true — refreshes nothing at
+   * all. 'shown.bs.modal' fires after the modal is on screen, on every open, whichever route
+   * opened it, so the rows can never be older than the moment the user looked at them.
+   *
+   * The first open is skipped because the list component is created right then and loads on
+   * init; refreshing again would only duplicate that request.
+   */
+  private bindSaleOrderListRefresh(): void {
+    if (this.saleOrderListRefreshBound) { return; }
+    const modalEl = document.getElementById('saleOrderListModal');
+    if (!modalEl) { return; }
+    this.saleOrderListRefreshBound = true;
+    modalEl.addEventListener('shown.bs.modal', this.onSaleOrderListShown);
+  }
+
+  private onSaleOrderListShown = (): void => {
+    if (this.saleOrderListShownOnce) {
+      this.SalesListComponent?.taTableComponent?.resetFilterValues();
+      this.SalesListComponent?.refreshTable();
+    }
+    this.saleOrderListShownOnce = true;
+  };
 
   // Shows the past orders list modal and fetches orders based on the selected customer
   showOrdersList() {
@@ -2057,6 +2095,10 @@ editSaleOrder(event) {
     this.destroy$.next();
     this.destroy$.complete();
     this.drilldownSub?.unsubscribe();
+    // The modal element outlives this component instance when a tab is remounted, so the
+    // listener has to come off with it or every remount stacks another one.
+    document.getElementById('saleOrderListModal')
+      ?.removeEventListener('shown.bs.modal', this.onSaleOrderListShown);
     // Ensure modals are disposed of correctly
     document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
 
