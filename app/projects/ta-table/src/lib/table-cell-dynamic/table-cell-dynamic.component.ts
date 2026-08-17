@@ -1,6 +1,6 @@
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component, Input, OnInit, Output } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, Output } from '@angular/core';
 import { evalFn, formatMoney } from '@ta/ta-core';
 
 @Component({
@@ -9,7 +9,7 @@ import { evalFn, formatMoney } from '@ta/ta-core';
   styleUrls: ['./table-cell-dynamic.component.css'],
   providers: [DatePipe, CurrencyPipe]
 })
-export class TableCellDynamicComponent implements OnInit {
+export class TableCellDynamicComponent implements OnInit, OnChanges {
   @Input() options: any;
   @Input() col: any;
   @Input() row: any;
@@ -21,6 +21,13 @@ export class TableCellDynamicComponent implements OnInit {
   constructor(public datepipe: DatePipe, public currency: CurrencyPipe, private http: HttpClient) { }
 
   ngOnInit(): void {
+    this.render();
+  }
+  ngOnChanges(): void {
+    this.render();
+  }
+
+  private render(): void {
     this.loading = false;
     this.inputValue = this.value;
     switch (this.col.displayType) {
@@ -88,6 +95,6 @@ export class TableCellDynamicComponent implements OnInit {
   }
   cancelCell() {
     this.showEditContain = false;
-    this.ngOnInit();
+    this.render();
   }
 }
