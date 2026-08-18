@@ -3536,7 +3536,10 @@ createSaleInovice() {
                               hooks: {
                                 onInit: (field: any) => {
                                   if (this.dataToPopulate && this.dataToPopulate.sale_invoice_order && this.dataToPopulate.sale_invoice_order.tax_amount && field.formControl) {
-                                    field.formControl.setValue(this.dataToPopulate.sale_invoice_order.tax_amount);
+                                    // Round to 2 decimal places before setting value
+                                    const taxAmount = this.dataToPopulate.sale_invoice_order.tax_amount;
+                                    const roundedTaxAmount = Number(taxAmount.toFixed(2));
+                                    field.formControl.setValue(roundedTaxAmount);
                                     this.totalAmountCal();
                                   }
                                   field.formControl.valueChanges.subscribe(data => {
