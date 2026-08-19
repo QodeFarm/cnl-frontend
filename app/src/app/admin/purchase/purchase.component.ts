@@ -16,6 +16,7 @@ import { CustomFieldHelper } from '../utils/custom_field_fetch';
 import { FormlyFieldConfig } from '@ngx-formly/core';
 import { DrilldownEditService } from 'src/app/services/drilldown-edit.service';
 import { HelpIconComponent } from '../help/help-icon.component';
+import { ANDHRA_PRADESH_CITIES } from '../utils/andhra_cities';
 declare var bootstrap;
 @Component({
   selector: 'app-purchase',
@@ -1079,6 +1080,8 @@ loadQuickpackProducts() {
   }
 //=====================================================
 
+readonly ANDHRA_PRADESH_CITIES = ANDHRA_PRADESH_CITIES;
+
   setFormConfig() {
     this.PurchaseOrderEditID = null;
     this.formConfig = {
@@ -1392,77 +1395,178 @@ loadQuickpackProducts() {
 
                 },
                 {
-                  key: 'cgst',
-                  type: 'text',
-                  className: 'col-12',
-                  templateOptions: {
-                    label: 'Output CGST',
-                    required: false,
-                    readonly: true,
-                  },
-                  defaultValue: '0.00',
-                  expressionProperties: {
-                    'model.cgst': (model, field) => {
-                      if (!field._lastValue || field._lastValue !== model.tax_amount) {
-                        const isTamilnadu = model.billing_address?.includes('Andhra Pradesh');
-                        field._lastValue = model.tax_amount; // Store last value to avoid infinite logs
-                      }
-                      return model.billing_address?.includes('Andhra Pradesh') 
-                        ? (parseFloat(model.tax_amount) / 2).toFixed(2) 
-                        : '0.00';
-                    },
-                    'templateOptions.disabled': 'true' // Make it read-only
-                  },
-                  hideExpression: (model) => !model.billing_address || !model.billing_address?.includes('Andhra Pradesh') // Hide CGST for inter-state
-                },
-                {
-                  key: 'sgst',
-                  type: 'text',
-                  className: 'col-12',
-                  templateOptions: {
-                    label: 'Output SGST',
-                    required: false,
-                    readonly: true,
-                  },
-                  defaultValue: '0.00',
-                  expressionProperties: {
-                    'model.sgst': (model, field) => {
-                      if (!field._lastValue || field._lastValue !== model.tax_amount) {
-                        const isTamilnadu = model.billing_address?.includes('Andhra Pradesh');
-                        field._lastValue = model.tax_amount;
-                      }
-                      return model.billing_address?.includes('Andhra Pradesh') 
-                        ? (parseFloat(model.tax_amount) / 2).toFixed(2) 
-                        : '0.00';
-                    },
-                    'templateOptions.disabled': 'true' // Make it read-only
-                  },
-                  hideExpression: (model) => !model.billing_address || !model.billing_address?.includes('Andhra Pradesh') // Hide CGST for inter-state
-                },
-                {
-                  key: 'igst',
-                  type: 'text',
-                  className: 'col-12',
-                  templateOptions: {
-                    label: 'Output IGST',
-                    required: false,
-                    readonly: true,
-                  },
-                  defaultValue: '0.00',
-                  expressionProperties: {
-                    'model.igst': (model, field) => {
-                      if (!field._lastValue || field._lastValue !== model.tax_amount) {
-                        const isTamilnadu = model.billing_address?.includes('Andhra Pradesh');
-                        field._lastValue = model.tax_amount;
-                      }
-                      return !model.billing_address?.includes('Andhra Pradesh') 
-                        ? parseFloat(model.tax_amount).toFixed(2) 
-                        : '0.00';
-                    },
-                    'templateOptions.disabled': 'true' // Make it read-only
-                  },
-                  hideExpression: (model) => !model.billing_address || model.billing_address?.includes('Andhra Pradesh') // Hide if intra-state
-                }, 
+      key: 'cgst',
+      type: 'text',
+      className: 'col-12',
+      templateOptions: {
+        label: 'Output CGST',
+        required: false,
+        readonly: true,
+      },
+      defaultValue: '0.00',
+      expressionProperties: {
+        'model.cgst': (model, field) => {
+          if (!field._lastValue || field._lastValue !== model.tax_amount) {
+            field._lastValue = model.tax_amount;
+          }
+          
+          const address = model.billing_address || model.shipping_address || '';
+          
+          // Check if address is in Andhra Pradesh
+          const isAPState = address.toLowerCase().includes('andhra pradesh');
+          const addressIsAPCity = this.ANDHRA_PRADESH_CITIES.includes(address.toLowerCase().trim());
+          
+          // Split address and check each part
+          const addressParts = address.toLowerCase().trim().split(/[,.\-\s]+/);
+          let isAPCity = false;
+          for (const part of addressParts) {
+            if (this.ANDHRA_PRADESH_CITIES.includes(part)) {
+              isAPCity = true;
+              break;
+            }
+          }
+          
+          const isIntraState = !address || isAPState || addressIsAPCity || isAPCity;
+          
+          return isIntraState 
+            ? (parseFloat(model.tax_amount || 0) / 2).toFixed(2) 
+            : '0.00';
+        },
+        'templateOptions.disabled': 'true'
+      },
+      hideExpression: (model) => {
+        const address = model.billing_address || model.shipping_address || '';
+        
+        const isAPState = address.toLowerCase().includes('andhra pradesh');
+        const addressIsAPCity = this.ANDHRA_PRADESH_CITIES.includes(address.toLowerCase().trim());
+        
+        const addressParts = address.toLowerCase().trim().split(/[,.\-\s]+/);
+        let isAPCity = false;
+        for (const part of addressParts) {
+          if (this.ANDHRA_PRADESH_CITIES.includes(part)) {
+            isAPCity = true;
+            break;
+          }
+        }
+        
+        const isIntraState = !address || isAPState || addressIsAPCity || isAPCity;
+        return !isIntraState;
+      }
+    },
+    {
+      key: 'sgst',
+      type: 'text',
+      className: 'col-12',
+      templateOptions: {
+        label: 'Output SGST',
+        required: false,
+        readonly: true,
+      },
+      defaultValue: '0.00',
+      expressionProperties: {
+        'model.sgst': (model, field) => {
+          if (!field._lastValue || field._lastValue !== model.tax_amount) {
+            field._lastValue = model.tax_amount;
+          }
+          
+          const address = model.billing_address || model.shipping_address || '';
+          
+          const isAPState = address.toLowerCase().includes('andhra pradesh');
+          const addressIsAPCity = this.ANDHRA_PRADESH_CITIES.includes(address.toLowerCase().trim());
+          
+          const addressParts = address.toLowerCase().trim().split(/[,.\-\s]+/);
+          let isAPCity = false;
+          for (const part of addressParts) {
+            if (this.ANDHRA_PRADESH_CITIES.includes(part)) {
+              isAPCity = true;
+              break;
+            }
+          }
+          
+          const isIntraState = !address || isAPState || addressIsAPCity || isAPCity;
+          
+          return isIntraState 
+            ? (parseFloat(model.tax_amount || 0) / 2).toFixed(2) 
+            : '0.00';
+        },
+        'templateOptions.disabled': 'true'
+      },
+      hideExpression: (model) => {
+        const address = model.billing_address || model.shipping_address || '';
+        
+        const isAPState = address.toLowerCase().includes('andhra pradesh');
+        const addressIsAPCity = this.ANDHRA_PRADESH_CITIES.includes(address.toLowerCase().trim());
+        
+        const addressParts = address.toLowerCase().trim().split(/[,.\-\s]+/);
+        let isAPCity = false;
+        for (const part of addressParts) {
+          if (this.ANDHRA_PRADESH_CITIES.includes(part)) {
+            isAPCity = true;
+            break;
+          }
+        }
+        
+        const isIntraState = !address || isAPState || addressIsAPCity || isAPCity;
+        return !isIntraState;
+      }
+    },
+    {
+      key: 'igst',
+      type: 'text',
+      className: 'col-12',
+      templateOptions: {
+        label: 'Output IGST',
+        required: false,
+        readonly: true,
+      },
+      defaultValue: '0.00',
+      expressionProperties: {
+        'model.igst': (model, field) => {
+          if (!field._lastValue || field._lastValue !== model.tax_amount) {
+            field._lastValue = model.tax_amount;
+          }
+          
+          const address = model.billing_address || model.shipping_address || '';
+          
+          const isAPState = address.toLowerCase().includes('andhra pradesh');
+          const addressIsAPCity = this.ANDHRA_PRADESH_CITIES.includes(address.toLowerCase().trim());
+          
+          const addressParts = address.toLowerCase().trim().split(/[,.\-\s]+/);
+          let isAPCity = false;
+          for (const part of addressParts) {
+            if (this.ANDHRA_PRADESH_CITIES.includes(part)) {
+              isAPCity = true;
+              break;
+            }
+          }
+          
+          const isIntraState = !address || isAPState || addressIsAPCity || isAPCity;
+          
+          return !isIntraState 
+            ? parseFloat(model.tax_amount || 0).toFixed(2) 
+            : '0.00';
+        },
+        'templateOptions.disabled': 'true'
+      },
+      hideExpression: (model) => {
+        const address = model.billing_address || model.shipping_address || '';
+        
+        const isAPState = address.toLowerCase().includes('andhra pradesh');
+        const addressIsAPCity = this.ANDHRA_PRADESH_CITIES.includes(address.toLowerCase().trim());
+        
+        const addressParts = address.toLowerCase().trim().split(/[,.\-\s]+/);
+        let isAPCity = false;
+        for (const part of addressParts) {
+          if (this.ANDHRA_PRADESH_CITIES.includes(part)) {
+            isAPCity = true;
+            break;
+          }
+        }
+        
+        const isIntraState = !address || isAPState || addressIsAPCity || isAPCity;
+        return isIntraState;
+      }
+    },
                 {
                   key: 'advance_amount',
                   type: 'text',

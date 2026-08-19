@@ -19,6 +19,7 @@ import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { SaleinvoiceorderlistComponent } from '../saleinvoiceorderlist/saleinvoiceorderlist.component';
 import { HelpIconComponent } from '../../help/help-icon.component';
+import { ANDHRA_PRADESH_CITIES } from '../../utils/andhra_cities';
 
 
 
@@ -50,6 +51,7 @@ export class SalesinvoiceComponent {
   // customerOrders: any[] = [];
   // Tracks sale_order_ids pulled into this invoice so we can update their flow_status after creation
   private pulledSaleOrderIds: Set<string> = new Set(); 
+  readonly ANDHRA_PRADESH_CITIES = ANDHRA_PRADESH_CITIES;
 
   
     // ========== DRAFT AUTO-SAVE PROPERTIES ==========
@@ -2301,101 +2303,160 @@ createSaleInovice() {
                   defaultValue: '0.00',
                 },
                 {
-                  key: 'cgst',
-                  type: 'text',
-                  className: 'col-12',
-                  templateOptions: {
-                    label: 'Output CGST',
-                    required: false,
-                    readonly: true,
-                  },
-                  defaultValue: '0.00',
-                  expressionProperties: {
-                    'model.cgst': (model) => {
-                      const address = model.billing_address || model.shipping_address || '';
-
-                      const isIntraState =
-                        address === '' || address.toLowerCase().includes('andhra pradesh');
-
-                      const taxAmount = parseFloat(model.tax_amount || 0);
-
-                      return isIntraState
-                        ? (taxAmount / 2).toFixed(2)
-                        : '0.00';
-                    }
-                  },
-                  hideExpression: (model) => {
-                    const address = model.billing_address || model.shipping_address || '';
-                    const isIntraState =
-                      address === '' || address.toLowerCase().includes('andhra pradesh');
-
-                    return !isIntraState;
-                  }
-                  },
-                {
-                  key: 'sgst',
-                  type: 'text',
-                  className: 'col-12',
-                  templateOptions: {
-                    label: 'Output SGST',
-                    required: false,
-                    readonly: true,
-                  },
-                  defaultValue: '0.00',
-                  expressionProperties: {
-                    'model.sgst': (model) => {
-                      const address = model.billing_address || model.shipping_address || '';
-
-                      const isIntraState =
-                        address === '' || address.toLowerCase().includes('andhra pradesh');
-
-                      const taxAmount = parseFloat(model.tax_amount || 0);
-
-                      return isIntraState
-                        ? (taxAmount / 2).toFixed(2)
-                        : '0.00';
-                    }
-                  },
-                  hideExpression: (model) => {
-                    const address = model.billing_address || model.shipping_address || '';
-                    const isIntraState =
-                      address === '' || address.toLowerCase().includes('andhra pradesh');
-
-                    return !isIntraState;
-                  }
-                },
-                                {
-                  key: 'igst',
-                  type: 'text',
-                  className: 'col-12',
-                  templateOptions: {
-                    label: 'Output IGST',
-                    required: false,
-                    readonly: true,
-                  },
-                  defaultValue: '0.00',
-                  expressionProperties: {
-                    'model.igst': (model) => {
-                      const address = model.billing_address || model.shipping_address || '';
-
-                      const isIntraState =
-                        address === '' || address.toLowerCase().includes('andhra pradesh');
-
-                      const taxAmount = parseFloat(model.tax_amount || 0);
-
-                      return !isIntraState
-                        ? taxAmount.toFixed(2)
-                        : '0.00';
-                    }
-                  },
-                  hideExpression: (model) => {
-                    const address = model.billing_address || model.shipping_address || '';
-                    const isIntraState =
-                      address === '' || address.toLowerCase().includes('andhra pradesh');
-
-                    return isIntraState;
-                  },
-                }, 
+      key: 'cgst',
+      type: 'text',
+      className: 'col-12',
+      templateOptions: {
+        label: 'Output CGST',
+        required: false,
+        readonly: true,
+      },
+      defaultValue: '0.00',
+      expressionProperties: {
+        'model.cgst': (model) => {
+          const address = model.billing_address || model.shipping_address || '';
+          
+          // Check if address is in Andhra Pradesh
+          const isAPState = address.toLowerCase().includes('andhra pradesh');
+          const addressIsAPCity = this.ANDHRA_PRADESH_CITIES.includes(address.toLowerCase().trim());
+          
+          // Split address and check each part
+          const addressParts = address.toLowerCase().trim().split(/[,.\-\s]+/);
+          let isAPCity = false;
+          for (const part of addressParts) {
+            if (this.ANDHRA_PRADESH_CITIES.includes(part)) {
+              isAPCity = true;
+              break;
+            }
+          }
+          
+          const isIntraState = address === '' || isAPState || addressIsAPCity || isAPCity;
+          
+          const taxAmount = parseFloat(model.tax_amount || 0);
+          return isIntraState ? (taxAmount / 2).toFixed(2) : '0.00';
+        }
+      },
+      hideExpression: (model) => {
+        const address = model.billing_address || model.shipping_address || '';
+        
+        const isAPState = address.toLowerCase().includes('andhra pradesh');
+        const addressIsAPCity = this.ANDHRA_PRADESH_CITIES.includes(address.toLowerCase().trim());
+        
+        const addressParts = address.toLowerCase().trim().split(/[,.\-\s]+/);
+        let isAPCity = false;
+        for (const part of addressParts) {
+          if (this.ANDHRA_PRADESH_CITIES.includes(part)) {
+            isAPCity = true;
+            break;
+          }
+        }
+        
+        const isIntraState = address === '' || isAPState || addressIsAPCity || isAPCity;
+        return !isIntraState;
+      }
+    },
+    {
+      key: 'sgst',
+      type: 'text',
+      className: 'col-12',
+      templateOptions: {
+        label: 'Output SGST',
+        required: false,
+        readonly: true,
+      },
+      defaultValue: '0.00',
+      expressionProperties: {
+        'model.sgst': (model) => {
+          const address = model.billing_address || model.shipping_address || '';
+          
+          const isAPState = address.toLowerCase().includes('andhra pradesh');
+          const addressIsAPCity = this.ANDHRA_PRADESH_CITIES.includes(address.toLowerCase().trim());
+          
+          const addressParts = address.toLowerCase().trim().split(/[,.\-\s]+/);
+          let isAPCity = false;
+          for (const part of addressParts) {
+            if (this.ANDHRA_PRADESH_CITIES.includes(part)) {
+              isAPCity = true;
+              break;
+            }
+          }
+          
+          const isIntraState = address === '' || isAPState || addressIsAPCity || isAPCity;
+          
+          const taxAmount = parseFloat(model.tax_amount || 0);
+          return isIntraState ? (taxAmount / 2).toFixed(2) : '0.00';
+        }
+      },
+      hideExpression: (model) => {
+        const address = model.billing_address || model.shipping_address || '';
+        
+        const isAPState = address.toLowerCase().includes('andhra pradesh');
+        const addressIsAPCity = this.ANDHRA_PRADESH_CITIES.includes(address.toLowerCase().trim());
+        
+        const addressParts = address.toLowerCase().trim().split(/[,.\-\s]+/);
+        let isAPCity = false;
+        for (const part of addressParts) {
+          if (this.ANDHRA_PRADESH_CITIES.includes(part)) {
+            isAPCity = true;
+            break;
+          }
+        }
+        
+        const isIntraState = address === '' || isAPState || addressIsAPCity || isAPCity;
+        return !isIntraState;
+      }
+    },
+    {
+      key: 'igst',
+      type: 'text',
+      className: 'col-12',
+      templateOptions: {
+        label: 'Output IGST',
+        required: false,
+        readonly: true,
+      },
+      defaultValue: '0.00',
+      expressionProperties: {
+        'model.igst': (model) => {
+          const address = model.billing_address || model.shipping_address || '';
+          
+          const isAPState = address.toLowerCase().includes('andhra pradesh');
+          const addressIsAPCity = this.ANDHRA_PRADESH_CITIES.includes(address.toLowerCase().trim());
+          
+          const addressParts = address.toLowerCase().trim().split(/[,.\-\s]+/);
+          let isAPCity = false;
+          for (const part of addressParts) {
+            if (this.ANDHRA_PRADESH_CITIES.includes(part)) {
+              isAPCity = true;
+              break;
+            }
+          }
+          
+          const isIntraState = address === '' || isAPState || addressIsAPCity || isAPCity;
+          
+          const taxAmount = parseFloat(model.tax_amount || 0);
+          return !isIntraState ? taxAmount.toFixed(2) : '0.00';
+        }
+      },
+      hideExpression: (model) => {
+        const address = model.billing_address || model.shipping_address || '';
+        
+        const isAPState = address.toLowerCase().includes('andhra pradesh');
+        const addressIsAPCity = this.ANDHRA_PRADESH_CITIES.includes(address.toLowerCase().trim());
+        
+        const addressParts = address.toLowerCase().trim().split(/[,.\-\s]+/);
+        let isAPCity = false;
+        for (const part of addressParts) {
+          if (this.ANDHRA_PRADESH_CITIES.includes(part)) {
+            isAPCity = true;
+            break;
+          }
+        }
+        
+        const isIntraState = address === '' || isAPState || addressIsAPCity || isAPCity;
+        return isIntraState;
+      }
+    },
                 // {
                 //   key: 'tax_amount',
                 //   type: 'text',
@@ -3291,67 +3352,74 @@ createSaleInovice() {
                 },
               },
               {
-                type: 'input',
-                key: 'tax',
-                templateOptions: {
-                  type: "number",
-                  step: 0.01,
-                  label: 'Tax',
-                  placeholder: 'Tax',
-                  hideLabel: false
-                },
-                expressionProperties: {
-                  'templateOptions.label': (model: any, formState: any, field: any) => {
+  type: 'input',
+  key: 'tax',
+  templateOptions: {
+    type: "number",
+    step: 0.01,
+    label: 'Tax',
+    placeholder: 'Tax',
+    hideLabel: false
+  },
+  expressionProperties: {
+    'templateOptions.label': (model: any, formState: any, field: any) => {
+      const rate = Number(field?.form?.controls?.rate?.value || 0);
+      const qty = Number(field?.form?.controls?.quantity?.value || 0);
 
-                    const rate = Number(field?.form?.controls?.rate?.value || 0);
-                    const qty = Number(field?.form?.controls?.quantity?.value || 0);
+      const discountPercent = Number(field?.form?.controls?.discount?.value || 0);
+      const discountAmountField = Number(field?.form?.controls?.discount_amount?.value || 0);
 
-                    const discountPercent = Number(field?.form?.controls?.discount?.value || 0);
-                    const discountAmountField = Number(field?.form?.controls?.discount_amount?.value || 0);
+      const taxPercent = Number(model?.tax || 0);
+      
+      // Get tax type from parent sale_invoice model
+      const saleInvoiceModel = this.formConfig?.model?.sale_invoice_order || {};
+      const taxType = saleInvoiceModel.tax || 'Exclusive';
 
-                    const taxPercent = Number(model?.tax || 0);
+      const grossAmount = rate * qty;
 
-                    const grossAmount = rate * qty;
+      // ERP priority
+      const discountAmount = model.discount_type === 'amount'
+        ? discountAmountField
+        : (grossAmount * discountPercent) / 100;
 
-                    // ERP priority
-                    const discountAmount =
-                      model.discount_type === 'amount'
-                        ? discountAmountField
-                        : (grossAmount * discountPercent) / 100;
+      const taxableAmount = grossAmount - discountAmount;
+      let taxAmount = 0;
 
-                    const taxableAmount = grossAmount - discountAmount;
+      if (taxPercent > 0) {
+        if (taxType === 'Inclusive') {
+          // INCLUSIVE: Tax = (Taxable Amount × Tax%) / (100 + Tax%)
+          taxAmount = (taxableAmount * taxPercent) / (100 + taxPercent);
+        } else {
+          // EXCLUSIVE: Tax = Taxable Amount × Tax%
+          taxAmount = (taxableAmount * taxPercent) / 100;
+        }
+        return `(${taxPercent}% | ₹${taxAmount.toFixed(2)})`;
+      }
 
-                    const taxAmount = (taxableAmount * taxPercent) / 100;
+      return '';
+    }
+  },
+  hooks: {
+    onInit: (field: any) => {
+      const parentArray = field.parent;
 
-                    if (taxPercent > 0) {
-                      return `(${taxPercent}% | ₹${taxAmount.toFixed(2)})`;
-                    }
+      if (parentArray) {
+        const currentRowIndex = +parentArray.key;
 
-                    return '';
-                  }
-                },
-                hooks: {
-                  onInit: (field: any) => {
-                    const parentArray = field.parent;
+        if (
+          this.dataToPopulate &&
+          this.dataToPopulate.sale_invoice_items.length > currentRowIndex
+        ) {
+          const existingtax = this.dataToPopulate.sale_invoice_items[currentRowIndex].tax;
 
-                    if (parentArray) {
-                      const currentRowIndex = +parentArray.key;
-
-                      if (
-                        this.dataToPopulate &&
-                        this.dataToPopulate.sale_invoice_items.length > currentRowIndex
-                      ) {
-                        const existingtax =
-                          this.dataToPopulate.sale_invoice_items[currentRowIndex].tax;
-
-                        if (existingtax || existingtax === 0) {
-                          field.formControl.setValue(existingtax);
-                        }
-                      }
-                    }
-                  }
-                }
-              },
+          if (existingtax || existingtax === 0) {
+            field.formControl.setValue(existingtax);
+          }
+        }
+      }
+    }
+  }
+},
               
               // {
               //   type: 'input',
