@@ -592,7 +592,10 @@ import { AssetCategoriesConfig, AssetStatusConfig, cityConfig, CountryConfig, cu
               placeholder: ' Select Product GST Classifications',
               label: 'Product GST Classifications',
               dataKey: 'gst_classification_id',
-              dataLabel: 'name',
+              // `name` does not exist on ProductGstClassifications, so every option used to
+              // render with a blank label. `code` is what the picker lists, so the selected
+              // value reads back the same as the row that was clicked.
+              dataLabel: 'code',
               required: false,
               curdConfig: productGstClassificationsConfig
             }

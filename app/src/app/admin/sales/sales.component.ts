@@ -8640,53 +8640,54 @@ readonly ANDHRA_PRADESH_CITIES = ANDHRA_PRADESH_CITIES;
                 },
               },
               {
-  type: 'input',
-  key: 'tax',
-  templateOptions: {
-    type: "number",
-    step: 0.01,
-    label: 'Tax',
-    placeholder: 'Tax',
-    hideLabel: false
-  },
-  expressionProperties: {
-    'templateOptions.label': (model: any, formState: any, field: any) => {
-      const rate = Number(field?.form?.controls?.rate?.value || 0);
-      const qty = Number(field?.form?.controls?.quantity?.value || 0);
+                type: 'input',
+                key: 'tax',
+                templateOptions: {
+                  type: "number",
+                  step: 0.01,
+                  label: 'Tax',
+                  placeholder: 'Tax',
+                  hideLabel: false,
+                  disabled: true
+                },
+                expressionProperties: {
+                  'templateOptions.label': (model: any, formState: any, field: any) => {
+                    const rate = Number(field?.form?.controls?.rate?.value || 0);
+                    const qty = Number(field?.form?.controls?.quantity?.value || 0);
 
-      const discountPercent = Number(field?.form?.controls?.discount?.value || 0);
-      const discountAmountField = Number(field?.form?.controls?.discount_amount?.value || 0);
+                    const discountPercent = Number(field?.form?.controls?.discount?.value || 0);
+                    const discountAmountField = Number(field?.form?.controls?.discount_amount?.value || 0);
 
-      const taxPercent = Number(model?.tax || 0);
-      
-      // SIMPLE FIX: Get tax type from parent sale_order model
-      const saleOrderModel = this.formConfig?.model?.sale_order || {};
-      const taxType = saleOrderModel.tax || 'Exclusive';
-      console.log("Tax Type from sale_order model:", taxType);
+                    const taxPercent = Number(model?.tax || 0);
+                    
+                    // SIMPLE FIX: Get tax type from parent sale_order model
+                    const saleOrderModel = this.formConfig?.model?.sale_order || {};
+                    const taxType = saleOrderModel.tax || 'Exclusive';
+                    console.log("Tax Type from sale_order model:", taxType);
 
-      const grossAmount = rate * qty;
+                    const grossAmount = rate * qty;
 
-      // ERP priority
-      const discountAmount = model.discount_type === 'amount'
-        ? discountAmountField
-        : (grossAmount * discountPercent) / 100;
+                    // ERP priority
+                    const discountAmount = model.discount_type === 'amount'
+                      ? discountAmountField
+                      : (grossAmount * discountPercent) / 100;
 
-      const taxableAmount = grossAmount - discountAmount;
-      let taxAmount = 0;
+                    const taxableAmount = grossAmount - discountAmount;
+                    let taxAmount = 0;
 
-      if (taxPercent > 0) {
-        if (taxType === 'Inclusive') {
-          // INCLUSIVE: Tax = (Taxable Amount × Tax%) / (100 + Tax%)
-          taxAmount = (taxableAmount * taxPercent) / (100 + taxPercent);
-        } else {
-          // EXCLUSIVE: Tax = Taxable Amount × Tax%
-          taxAmount = (taxableAmount * taxPercent) / 100;
-        }
-        return `(${taxPercent}% | ₹${taxAmount.toFixed(2)})`;
-      }
+                    if (taxPercent > 0) {
+                      if (taxType === 'Inclusive') {
+                        // INCLUSIVE: Tax = (Taxable Amount × Tax%) / (100 + Tax%)
+                        taxAmount = (taxableAmount * taxPercent) / (100 + taxPercent);
+                      } else {
+                        // EXCLUSIVE: Tax = Taxable Amount × Tax%
+                        taxAmount = (taxableAmount * taxPercent) / 100;
+                      }
+                      return `(${taxPercent}% | ₹${taxAmount.toFixed(2)})`;
+                    }
 
-      return '';
-    }
+                    return '';
+                  }
   },
   hooks: {
     onInit: (field: any) => {

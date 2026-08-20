@@ -3352,74 +3352,75 @@ createSaleInovice() {
                 },
               },
               {
-  type: 'input',
-  key: 'tax',
-  templateOptions: {
-    type: "number",
-    step: 0.01,
-    label: 'Tax',
-    placeholder: 'Tax',
-    hideLabel: false
-  },
-  expressionProperties: {
-    'templateOptions.label': (model: any, formState: any, field: any) => {
-      const rate = Number(field?.form?.controls?.rate?.value || 0);
-      const qty = Number(field?.form?.controls?.quantity?.value || 0);
+                  type: 'input',
+                  key: 'tax',
+                  templateOptions: {
+                    type: "number",
+                    step: 0.01,
+                    label: 'Tax',
+                    placeholder: 'Tax',
+                    hideLabel: false,
+                    disabled: true
+                  },
+                  expressionProperties: {
+                    'templateOptions.label': (model: any, formState: any, field: any) => {
+                      const rate = Number(field?.form?.controls?.rate?.value || 0);
+                      const qty = Number(field?.form?.controls?.quantity?.value || 0);
 
-      const discountPercent = Number(field?.form?.controls?.discount?.value || 0);
-      const discountAmountField = Number(field?.form?.controls?.discount_amount?.value || 0);
+                      const discountPercent = Number(field?.form?.controls?.discount?.value || 0);
+                      const discountAmountField = Number(field?.form?.controls?.discount_amount?.value || 0);
 
-      const taxPercent = Number(model?.tax || 0);
-      
-      // Get tax type from parent sale_invoice model
-      const saleInvoiceModel = this.formConfig?.model?.sale_invoice_order || {};
-      const taxType = saleInvoiceModel.tax || 'Exclusive';
+                      const taxPercent = Number(model?.tax || 0);
+                      
+                      // Get tax type from parent sale_invoice model
+                      const saleInvoiceModel = this.formConfig?.model?.sale_invoice_order || {};
+                      const taxType = saleInvoiceModel.tax || 'Exclusive';
 
-      const grossAmount = rate * qty;
+                      const grossAmount = rate * qty;
 
-      // ERP priority
-      const discountAmount = model.discount_type === 'amount'
-        ? discountAmountField
-        : (grossAmount * discountPercent) / 100;
+                      // ERP priority
+                      const discountAmount = model.discount_type === 'amount'
+                        ? discountAmountField
+                        : (grossAmount * discountPercent) / 100;
 
-      const taxableAmount = grossAmount - discountAmount;
-      let taxAmount = 0;
+                      const taxableAmount = grossAmount - discountAmount;
+                      let taxAmount = 0;
 
-      if (taxPercent > 0) {
-        if (taxType === 'Inclusive') {
-          // INCLUSIVE: Tax = (Taxable Amount × Tax%) / (100 + Tax%)
-          taxAmount = (taxableAmount * taxPercent) / (100 + taxPercent);
-        } else {
-          // EXCLUSIVE: Tax = Taxable Amount × Tax%
-          taxAmount = (taxableAmount * taxPercent) / 100;
-        }
-        return `(${taxPercent}% | ₹${taxAmount.toFixed(2)})`;
-      }
+                      if (taxPercent > 0) {
+                        if (taxType === 'Inclusive') {
+                          // INCLUSIVE: Tax = (Taxable Amount × Tax%) / (100 + Tax%)
+                          taxAmount = (taxableAmount * taxPercent) / (100 + taxPercent);
+                        } else {
+                          // EXCLUSIVE: Tax = Taxable Amount × Tax%
+                          taxAmount = (taxableAmount * taxPercent) / 100;
+                        }
+                        return `(${taxPercent}% | ₹${taxAmount.toFixed(2)})`;
+                      }
 
-      return '';
-    }
-  },
-  hooks: {
-    onInit: (field: any) => {
-      const parentArray = field.parent;
+                      return '';
+                    }
+                  },
+                  hooks: {
+                    onInit: (field: any) => {
+                      const parentArray = field.parent;
 
-      if (parentArray) {
-        const currentRowIndex = +parentArray.key;
+                      if (parentArray) {
+                        const currentRowIndex = +parentArray.key;
 
-        if (
-          this.dataToPopulate &&
-          this.dataToPopulate.sale_invoice_items.length > currentRowIndex
-        ) {
-          const existingtax = this.dataToPopulate.sale_invoice_items[currentRowIndex].tax;
+                        if (
+                          this.dataToPopulate &&
+                          this.dataToPopulate.sale_invoice_items.length > currentRowIndex
+                        ) {
+                          const existingtax = this.dataToPopulate.sale_invoice_items[currentRowIndex].tax;
 
-          if (existingtax || existingtax === 0) {
-            field.formControl.setValue(existingtax);
-          }
-        }
-      }
-    }
-  }
-},
+                          if (existingtax || existingtax === 0) {
+                            field.formControl.setValue(existingtax);
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
               
               // {
               //   type: 'input',
