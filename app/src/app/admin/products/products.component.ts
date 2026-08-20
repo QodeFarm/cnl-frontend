@@ -1110,22 +1110,40 @@ preprocessFormData() {
                     },
                     {
                       className: 'col-md-4 col-sm-6 col-12',
-                      key: 'hsn_code',
-                      type: 'select',
+                      key: 'gst_classification',
+                      type: 'productGstClassifications-dropdown',
                       templateOptions: {
                         label: 'HSN',
-                        placeholder: 'Enter or Select HSN Code',
+                        placeholder: 'Select HSN Code',
+                        dataKey: 'gst_classification_id',
+                        dataLabel: 'code',
+                        options: [],
                         required: false,
-                        options: [
-                          { value: '0101', label: '0101' },
-                          { value: '0201', label: '0201' },
-                          { value: '0301', label: '0301' },
-                          { value: '0401', label: '0401' },
-                          { value: '0501', label: '0501' }
-                        ],
-                        // allowCustomValue: true // Allow users to enter their own value
+                        lazy: {
+                          url: 'products/product_gst_classifications/',
+                          lazyOneTime: true
+                        }
+                      },
+                      hooks: {
+                        onChanges: (field: any) => {
+                          // Subscribe once — onChanges can fire repeatedly for the same field.
+                          if (field._hsnSub) { return; }
+                          field._hsnSub = field.formControl.valueChanges.subscribe((data: any) => {
+                            const products = this.formConfig?.model?.['products'];
+                            if (!products) { return; }
+                            // Two things are written on purpose:
+                            // hsn_code is the plain string every invoice and print template
+                            // already reads, so nothing downstream changes; the FK links the
+                            // row to the master so the picker can show its value again on edit.
+                            products['gst_classification_id'] = data?.gst_classification_id || null;
+                            // Falls back to `code`: rows created outside the master form are
+                            // not guaranteed to carry hsn_or_sac_code, and an empty hsn_code
+                            // would print a blank HSN on the invoice.
+                            products['hsn_code'] = data?.hsn_or_sac_code || data?.code || null;
+                          });
+                        }
                       }
-                    }, 
+                    },
                     {
                       className: 'col-md-4 col-sm-6 col-12',
                       key: 'default_production_floor',

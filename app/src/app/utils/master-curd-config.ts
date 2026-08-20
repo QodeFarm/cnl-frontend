@@ -5409,24 +5409,17 @@ export const productGstClassificationsConfig: TaCurdConfig = {
         // defaultSort: { key: 'created_at', value: 'descend' },
               defaultSort: { key: 'is_deleted', value: 'ascend' },
         cols: [
-            {
-                fieldKey: 'type',
-                name: 'Type',
-                sort: true
-            },
+            // Code + Description only. `type` and `hsn_or_sac_code` are still captured on the
+            // add/edit form; they were dropped from the picker because it opens inside a
+            // product form, and hsn_or_sac_code repeated the same digits as code.
             {
                 fieldKey: 'code',
                 name: 'Code',
                 sort: true,
             },
             {
-                fieldKey: 'hsn_or_sac_code',
-                name: 'hsn or sac Code',
-                sort: true
-            },
-            {
                 fieldKey: 'hsn_description',
-                name: 'hsn Description',
+                name: 'Description',
                 sort: true
             },
             {

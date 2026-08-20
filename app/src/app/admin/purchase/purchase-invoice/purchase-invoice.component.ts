@@ -2134,7 +2134,11 @@ loadQuickpackProducts() {
                   step: 0.01,
                   label: 'Tax',
                   placeholder: 'Tax',
-                  hideLabel: false
+                  hideLabel: false,
+                  // Read-only: the rate comes from the product's GST and is applied by the
+                  // product-select handler. `disabled` rather than `readonly` because
+                  // type:"number" renders an nz-input-number, whose spinners ignore readonly.
+                  disabled: true
                 },
                 expressionProperties: {
                   'templateOptions.label': (model: any, formState: any, field: any) => {

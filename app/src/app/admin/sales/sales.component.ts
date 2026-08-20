@@ -8522,7 +8522,8 @@ createChildOrdersForProducts(productDetails, saleOrderDetails, orderAttachments,
                   step: 0.01,
                   label: 'Tax',
                   placeholder: 'Tax',
-                  hideLabel: false
+                  hideLabel: false,
+                  disabled: true
                 },
                 expressionProperties: {
                   'templateOptions.label': (model: any, formState: any, field: any) => {

@@ -1005,7 +1005,11 @@ export class DeliveryChallanComponent implements OnInit, OnDestroy {
                   step: 0.01,
                   label: 'Tax %',
                   placeholder: '0.00',
-                  hideLabel: true
+                  hideLabel: true,
+                  // Read-only: the rate comes from the product's GST and is applied by the
+                  // product-select handler. `disabled` rather than `readonly` because
+                  // type:'number' renders an nz-input-number, whose spinners ignore readonly.
+                  disabled: true
                 },
                 hooks: {
                   onInit: (field: any) => {
