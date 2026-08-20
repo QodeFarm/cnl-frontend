@@ -1332,6 +1332,218 @@ applyFilters(resetPage: boolean = true) {
     // }
   }
   
+// loadDataFromServer(startIntial?: boolean, bypassCache = false): void {
+//     // If startIntial is true, reset to page 1
+//     if (startIntial) {
+//         this.pageIndex = 1;
+//     }
+
+//     // For Account Ledger page - use applyFilters() logic
+//     if (this.isAccountLedgerPage) {
+//         if (this.selectedAccountId) {
+//             // This IS the paging call for that screen — keep the page the user asked for.
+//             this.applyFilters(false);
+//             return;
+//         } else {
+//             this.rows = [];
+//             this.total = 0;
+//             this.loading = false;
+//             if (this.options.showCheckbox) {
+//                 this.refreshCheckedStatus();
+//             }
+//             this.cdr.detectChanges();
+//             return;
+//         }
+//     }
+
+//     // ✅ Build the full URL with ALL active filters
+//     let apiUrl = this.options.apiUrl;
+//     const filterParams: string[] = [];
+    
+//     // 1. Date Filters (for non-account-ledger pages)
+//     if (this.isButtonVisible && !this.isStockForecastPage) {
+//         // Same builder generateQueryString() uses, so paging cannot query with different
+//         // filters than the ones the user applied.
+//         if (!this.isAccountLedgerPage) {
+//             filterParams.push(...this.buildDateFilterParams(this.fromDate, this.toDate, this.selectedQuickPeriod));
+//         }
+//     }
+    
+//     // 2. Stock Forecast specific filters
+//     if (this.isStockForecastPage) {
+//         if (this.selectedCategory) {
+//             filterParams.push(`category_id=${this.selectedCategory}`);
+//         }
+//         if (this.selectedGroup) {
+//             filterParams.push(`product_group_id=${this.selectedGroup}`);
+//         }
+//         if (this.selectedType) {
+//             filterParams.push(`item_type_id=${this.selectedType}`);
+//         }
+//         if (this.selectedQuickPeriod) {
+//             filterParams.push(`period_name=${encodeURIComponent(this.selectedQuickPeriod)}`);
+//         }
+//     }
+    
+//     // 3. Status filter (for pages that show status dropdown)
+//     if (this.isStatusButtonVisible && this.selectedStatus) {
+//         filterParams.push(`status_name=${encodeURIComponent(this.selectedStatus)}`);
+//     }
+    
+//     // 4. Employee filter
+//     if (this.isEmployeeFilterVisible && this.selectedEmployee) {
+//         filterParams.push(`employee_id=${encodeURIComponent(this.selectedEmployee)}`);
+//     }
+    
+//     // 5. Product/Inventory filters
+//     if (this.selectedGroup && (this.isProductFilterVisible || this.isInventoryFilterVisible || this.isStockSummaryFilterVisible)) {
+//         filterParams.push(`product_group_id=${encodeURIComponent(this.selectedGroup)}`);
+//     }
+//     if (this.selectedCategory && (this.isProductFilterVisible || this.isInventoryFilterVisible)) {
+//         filterParams.push(`category_id=${encodeURIComponent(this.selectedCategory)}`);
+//     }
+//     if (this.selectedType && (this.isProductFilterVisible || this.isInventoryFilterVisible)) {
+//         filterParams.push(`item_type_id=${encodeURIComponent(this.selectedType)}`);
+//     }
+//     if (this.selectedWarehouse && this.isInventoryFilterVisible && !this.isStockForecastPage) {
+//         filterParams.push(`warehouse_id=${encodeURIComponent(this.selectedWarehouse)}`);
+//     }
+    
+//     // 6. Ledger Account filter (for ledger reports)
+//     if (this.isLegerAccountFilterVisible && this.selectedLedgerAccount) {
+//         filterParams.push(`ledger_account_id=${encodeURIComponent(this.selectedLedgerAccount)}`);
+//     }
+    
+//     // 7. Stock Status filter (if enabled)
+//     if (this.isStockStatusFilterVisible && this.selectedStockStatus) {
+//         filterParams.push(`stock_status=${encodeURIComponent(this.selectedStockStatus)}`);
+//     }
+    
+//     // 8. Global Search
+//     if (this.options.globalSearch?.value) {
+//         filterParams.push(`s=${encodeURIComponent(this.options.globalSearch.value)}`);
+//     }
+    
+//     // 9. Column filters (from filter dropdowns)
+//     if (this.filters && this.filters.length > 0) {
+//         this.filters.forEach((filter: any) => {
+//             if (filter.value) {
+//                 filterParams.push(`${filter.key}=${encodeURIComponent(filter.value)}`);
+//             }
+//         });
+//     }
+    
+//     // 10. Fixed filters (from options)
+//     if (this.options.fixedFilters) {
+//         Object.keys(this.options.fixedFilters).forEach(key => {
+//             const value = this.options.fixedFilters[key];
+//             if (value !== null && value !== undefined) {
+//                 filterParams.push(`${key}=${encodeURIComponent(value)}`);
+//             }
+//         });
+//     }
+    
+//     // ✅ ALWAYS include pagination parameters
+//     filterParams.push(`page=${this.pageIndex}`);
+//     filterParams.push(`limit=${this.pageSize}`);
+    
+//     // 11. Sorting
+//     if (this.sort) {
+//         let sortDirection = 'ASC';
+//         if (this.sort.value === 'descend') {
+//             sortDirection = 'DESC';
+//         } else if (this.sort.value === 'ascend') {
+//             sortDirection = 'ASC';
+//         }
+//         filterParams.push(`sort[0]=${this.sort.key},${sortDirection}`);
+//     }
+    
+//     // ✅ Build the final URL with all filters
+//     if (filterParams.length > 0) {
+//         const connector = apiUrl.includes('?') ? '&' : '?';
+//         apiUrl = `${apiUrl}${connector}${filterParams.join('&')}`;
+//     }
+    
+//     // Log the URL for debugging
+//     console.log('Loading data with URL:', apiUrl);
+    
+//     // Configure table parameters
+//     const tableParamConfig: TaParamsConfig = {
+//         apiUrl: apiUrl, // Use the full URL with all filters
+//         pageIndex: this.pageIndex,
+//         pageSize: this.pageSize,
+//         sort: this.sort,
+//         filters: this.filters,
+//         globalSearch: this.options.globalSearch,
+//         fixedFilters: this.options.fixedFilters
+//     };
+    
+//     if (tableParamConfig.apiUrl) {
+//         // Cache is only used for selection popups (rowSelectionEnabled = true).
+//         const isSelectionPopup = !!this.options.rowSelectionEnabled;
+//         const cacheKey = isSelectionPopup
+//             ? `${tableParamConfig.apiUrl}|p${tableParamConfig.pageIndex}|s${tableParamConfig.pageSize}|q${tableParamConfig.globalSearch?.value || ''}`
+//             : null;
+
+//         if (isSelectionPopup && !bypassCache && cacheKey) {
+//             const cached = this.tableCache.get(cacheKey);
+//             if (cached) {
+//                 this.total = cached.totalCount;
+//                 this.rows = cached.data || cached;
+//                 if (this.options.showCheckbox) { this.refreshCheckedStatus(); }
+//                 this.cdr.detectChanges();
+//                 return;
+//             }
+//         }
+
+//         this.loading = true;
+//         this.taTableS.getTableData(tableParamConfig).subscribe((data: any) => {
+//             this.loading = false;
+//             this.total = data.totalCount || data.count || 0;
+//             this.rows = data.data || data || [];
+
+//             // Blink newly-arrived rows when requested
+//             if (this.options.newRowIds?.length) {
+//                 clearTimeout(this.blinkTimeout);
+//                 this.blinkingRowIds = new Set(this.options.newRowIds.map((id: any) => String(id)));
+//                 this.options.newRowIds = [];
+//                 this.blinkTimeout = setTimeout(() => {
+//                     this.blinkingRowIds.clear();
+//                     this.cdr.detectChanges();
+//                 }, 25000);
+//             }
+
+//             // Store in cache for selection popups
+//             if (isSelectionPopup && cacheKey) {
+//                 this.tableCache.set(cacheKey, data);
+//             }
+
+//             // Sync balance summary with Account Ledger Component during pagination
+//             if (window['accountLedgerComponentInstance'] && this.isAccountLedgerPage) {
+//                 const instance = window['accountLedgerComponentInstance'];
+//                 instance.openingBalance = data.opening_balance || '0.00';
+//                 instance.totalDebit = data.total_debit || '0.00';
+//                 instance.totalCredit = data.total_credit || '0.00';
+//                 instance.finalBalance = data.final_balance || data.closing_balance || '0.00';
+//                 instance.showBalanceSummary = !!(data.data && data.data.length > 0);
+//             }
+
+//             if (this.options.showCheckbox) {
+//                 this.refreshCheckedStatus();
+//             }
+//             this.cdr.detectChanges();
+//             // Emit full response so parent components can read summary, totals, etc.
+//             this.dataLoaded.emit(data);
+//         }, (error) => {
+//             this.loading = false;
+//             console.error('Error loading data from server:', error);
+//             this.rows = [];
+//             this.total = 0;
+//             this.cdr.detectChanges();
+//         });
+//     }
+// }
+
 loadDataFromServer(startIntial?: boolean, bypassCache = false): void {
     // If startIntial is true, reset to page 1
     if (startIntial) {
@@ -1354,6 +1566,16 @@ loadDataFromServer(startIntial?: boolean, bypassCache = false): void {
             this.cdr.detectChanges();
             return;
         }
+    }
+
+    // ✅ Check if apiUrl is valid before proceeding
+    if (!this.options.apiUrl) {
+        console.warn('No API URL provided for data loading');
+        this.loading = false;
+        this.rows = [];
+        this.total = 0;
+        this.cdr.detectChanges();
+        return;
     }
 
     // ✅ Build the full URL with ALL active filters
@@ -1443,9 +1665,17 @@ loadDataFromServer(startIntial?: boolean, bypassCache = false): void {
         });
     }
     
-    // ✅ ALWAYS include pagination parameters
-    filterParams.push(`page=${this.pageIndex}`);
-    filterParams.push(`limit=${this.pageSize}`);
+    // ✅ ALWAYS include pagination parameters (but avoid duplicates)
+    // Check if page and limit are already in filterParams to avoid duplication
+    const hasPageParam = filterParams.some(param => param.startsWith('page='));
+    const hasLimitParam = filterParams.some(param => param.startsWith('limit='));
+    
+    if (!hasPageParam) {
+        filterParams.push(`page=${this.pageIndex}`);
+    }
+    if (!hasLimitParam) {
+        filterParams.push(`limit=${this.pageSize}`);
+    }
     
     // 11. Sorting
     if (this.sort) {
