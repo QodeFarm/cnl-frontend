@@ -18,6 +18,7 @@ import { FormlyFieldConfig } from '@ngx-formly/core';
 import { ReturnorderslistComponent } from '../returnorderslist/returnorderslist.component';
 import { DrilldownEditService } from 'src/app/services/drilldown-edit.service';
 import { HelpIconComponent } from '../../help/help-icon.component';
+import { ANDHRA_PRADESH_CITIES } from '../../utils/andhra_cities';
 declare var bootstrap;
 
 
@@ -1244,6 +1245,8 @@ private processProducts(products: any[]) {
     document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
   }
 
+readonly ANDHRA_PRADESH_CITIES = ANDHRA_PRADESH_CITIES;
+
   setFormConfig() {
     this.SaleReturnOrderEditID = null;
 
@@ -1764,7 +1767,21 @@ private processProducts(products: any[]) {
                         .replace(/[0-9,\s]+/g, '')
                         .trim();
                       
-                      const isIntraState = !cleanAddress || cleanAddress.toLowerCase().includes('andhra pradesh');
+                      // Check if address is in Andhra Pradesh
+                      const isAPState = cleanAddress.toLowerCase().includes('andhra pradesh');
+                      const addressIsAPCity = this.ANDHRA_PRADESH_CITIES.includes(cleanAddress.toLowerCase());
+                      
+                      // Split address and check each part
+                      const addressParts = cleanAddress.toLowerCase().split(/[,.\-\s]+/);
+                      let isAPCity = false;
+                      for (const part of addressParts) {
+                        if (this.ANDHRA_PRADESH_CITIES.includes(part)) {
+                          isAPCity = true;
+                          break;
+                        }
+                      }
+                      
+                      const isIntraState = !cleanAddress || isAPState || addressIsAPCity || isAPCity;
 
                       const taxAmount = parseFloat(model.tax_amount || 0);
 
@@ -1781,7 +1798,19 @@ private processProducts(products: any[]) {
                       .replace(/[0-9,\s]+/g, '')
                       .trim();
                     
-                    const isIntraState = !cleanAddress || cleanAddress.toLowerCase().includes('andhra pradesh');
+                    const isAPState = cleanAddress.toLowerCase().includes('andhra pradesh');
+                    const addressIsAPCity = this.ANDHRA_PRADESH_CITIES.includes(cleanAddress.toLowerCase());
+                    
+                    const addressParts = cleanAddress.toLowerCase().split(/[,.\-\s]+/);
+                    let isAPCity = false;
+                    for (const part of addressParts) {
+                      if (this.ANDHRA_PRADESH_CITIES.includes(part)) {
+                        isAPCity = true;
+                        break;
+                      }
+                    }
+                    
+                    const isIntraState = !cleanAddress || isAPState || addressIsAPCity || isAPCity;
 
                     return !isIntraState;
                   }
@@ -1808,7 +1837,19 @@ private processProducts(products: any[]) {
                         .replace(/[0-9,\s]+/g, '')
                         .trim();
                       
-                      const isIntraState = !cleanAddress || cleanAddress.toLowerCase().includes('andhra pradesh');
+                      const isAPState = cleanAddress.toLowerCase().includes('andhra pradesh');
+                      const addressIsAPCity = this.ANDHRA_PRADESH_CITIES.includes(cleanAddress.toLowerCase());
+                      
+                      const addressParts = cleanAddress.toLowerCase().split(/[,.\-\s]+/);
+                      let isAPCity = false;
+                      for (const part of addressParts) {
+                        if (this.ANDHRA_PRADESH_CITIES.includes(part)) {
+                          isAPCity = true;
+                          break;
+                        }
+                      }
+                      
+                      const isIntraState = !cleanAddress || isAPState || addressIsAPCity || isAPCity;
 
                       const taxAmount = parseFloat(model.tax_amount || 0);
 
@@ -1825,7 +1866,19 @@ private processProducts(products: any[]) {
                       .replace(/[0-9,\s]+/g, '')
                       .trim();
                     
-                    const isIntraState = !cleanAddress || cleanAddress.toLowerCase().includes('andhra pradesh');
+                    const isAPState = cleanAddress.toLowerCase().includes('andhra pradesh');
+                    const addressIsAPCity = this.ANDHRA_PRADESH_CITIES.includes(cleanAddress.toLowerCase());
+                    
+                    const addressParts = cleanAddress.toLowerCase().split(/[,.\-\s]+/);
+                    let isAPCity = false;
+                    for (const part of addressParts) {
+                      if (this.ANDHRA_PRADESH_CITIES.includes(part)) {
+                        isAPCity = true;
+                        break;
+                      }
+                    }
+                    
+                    const isIntraState = !cleanAddress || isAPState || addressIsAPCity || isAPCity;
 
                     return !isIntraState;
                   }
@@ -1852,7 +1905,19 @@ private processProducts(products: any[]) {
                         .replace(/[0-9,\s]+/g, '')
                         .trim();
                       
-                      const isIntraState = !cleanAddress || cleanAddress.toLowerCase().includes('andhra pradesh');
+                      const isAPState = cleanAddress.toLowerCase().includes('andhra pradesh');
+                      const addressIsAPCity = this.ANDHRA_PRADESH_CITIES.includes(cleanAddress.toLowerCase());
+                      
+                      const addressParts = cleanAddress.toLowerCase().split(/[,.\-\s]+/);
+                      let isAPCity = false;
+                      for (const part of addressParts) {
+                        if (this.ANDHRA_PRADESH_CITIES.includes(part)) {
+                          isAPCity = true;
+                          break;
+                        }
+                      }
+                      
+                      const isIntraState = !cleanAddress || isAPState || addressIsAPCity || isAPCity;
 
                       const taxAmount = parseFloat(model.tax_amount || 0);
 
@@ -1869,7 +1934,19 @@ private processProducts(products: any[]) {
                       .replace(/[0-9,\s]+/g, '')
                       .trim();
                     
-                    const isIntraState = !cleanAddress || cleanAddress.toLowerCase().includes('andhra pradesh');
+                    const isAPState = cleanAddress.toLowerCase().includes('andhra pradesh');
+                    const addressIsAPCity = this.ANDHRA_PRADESH_CITIES.includes(cleanAddress.toLowerCase());
+                    
+                    const addressParts = cleanAddress.toLowerCase().split(/[,.\-\s]+/);
+                    let isAPCity = false;
+                    for (const part of addressParts) {
+                      if (this.ANDHRA_PRADESH_CITIES.includes(part)) {
+                        isAPCity = true;
+                        break;
+                      }
+                    }
+                    
+                    const isIntraState = !cleanAddress || isAPState || addressIsAPCity || isAPCity;
 
                     return isIntraState;
                   }
@@ -2710,14 +2787,10 @@ private processProducts(products: any[]) {
                   label: 'Tax',
                   placeholder: 'Tax',
                   hideLabel: false,
-                  // Read-only: the rate comes from the product's GST and is applied by the
-                  // product-select handler. `disabled` rather than `readonly` because
-                  // type:"number" renders an nz-input-number, whose spinners ignore readonly.
                   disabled: true
                 },
                 expressionProperties: {
                   'templateOptions.label': (model: any, formState: any, field: any) => {
-
                     const rate = Number(field?.form?.controls?.rate?.value || 0);
                     const qty = Number(field?.form?.controls?.quantity?.value || 0);
 
@@ -2725,20 +2798,29 @@ private processProducts(products: any[]) {
                     const discountAmountField = Number(field?.form?.controls?.discount_amount?.value || 0);
 
                     const taxPercent = Number(model?.tax || 0);
+                    
+                    // Get tax type from parent sale_return model
+                    const saleReturnModel = this.formConfig?.model?.sale_return_order || {};
+                    const taxType = saleReturnModel.tax || 'Exclusive';
 
                     const grossAmount = rate * qty;
 
                     // ERP priority
-                    const discountAmount =
-                      model.discount_type === 'amount'
-                        ? discountAmountField
-                        : (grossAmount * discountPercent) / 100;
+                    const discountAmount = model.discount_type === 'amount'
+                      ? discountAmountField
+                      : (grossAmount * discountPercent) / 100;
 
                     const taxableAmount = grossAmount - discountAmount;
-
-                    const taxAmount = (taxableAmount * taxPercent) / 100;
+                    let taxAmount = 0;
 
                     if (taxPercent > 0) {
+                      if (taxType === 'Inclusive') {
+                        // INCLUSIVE: Tax = (Taxable Amount × Tax%) / (100 + Tax%)
+                        taxAmount = (taxableAmount * taxPercent) / (100 + taxPercent);
+                      } else {
+                        // EXCLUSIVE: Tax = Taxable Amount × Tax%
+                        taxAmount = (taxableAmount * taxPercent) / 100;
+                      }
                       return `(${taxPercent}% | ₹${taxAmount.toFixed(2)})`;
                     }
 
@@ -2756,8 +2838,7 @@ private processProducts(products: any[]) {
                         this.dataToPopulate &&
                         this.dataToPopulate.sale_return_items.length > currentRowIndex
                       ) {
-                        const existingtax =
-                          this.dataToPopulate.sale_return_items[currentRowIndex].tax;
+                        const existingtax = this.dataToPopulate.sale_return_items[currentRowIndex].tax;
 
                         if (existingtax || existingtax === 0) {
                           field.formControl.setValue(existingtax);

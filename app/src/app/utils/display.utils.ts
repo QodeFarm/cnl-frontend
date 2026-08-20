@@ -1239,20 +1239,93 @@ export function calculateTotalAmount(data: any, modelName: string, form: any) {
   let shippingTaxAmount = 0;
 
   // -----------------------------
+  // ANDHRA PRADESH CITIES LIST
+  // -----------------------------
+  const ANDHRA_PRADESH_CITIES = [
+    // Major Cities
+    'adoni', 'anantapur', 'bhimavaram', 'chittoor', 'chirala',
+    'dharmavaram', 'eluru', 'gudivada', 'guntakal', 'guntur',
+    'hindupur', 'kadapa', 'kakinada', 'kurnool', 'machilipatnam',
+    'madanapalle', 'mangalagiri', 'tadepalli', 'nandyal', 'nellore',
+    'ongole', 'proddatur', 'rajahmundry', 'rajamahendravaram',
+    'srikakulam', 'tenali', 'tirupati', 'vijayawada', 'visakhapatnam',
+    'vizianagaram',
+    // Towns
+    'addanki', 'amalapuram', 'amudalavalasa', 'anakapalle', 'atmakur',
+    'badvel', 'banganapalle', 'bapatla', 'betamcherla', 'bobbili',
+    'chilakaluripet', 'cumbum', 'darsi', 'dhone', 'giddalur',
+    'gooty', 'gudur', 'ichchapuram', 'jaggayyapeta', 'jammalamadugu',
+    'kadiri', 'kaikalur', 'kalyandurg', 'kamalapuram', 'kandukur',
+    'kanigiri', 'kavali', 'kovvur', 'markapuram', 'narasaraopet',
+    'narsipatnam', 'palakollu', 'parvathipuram', 'piduguralla',
+    'pileru', 'ponnur', 'pulivendula', 'rayachoti', 'rayadurgam',
+    'repalle', 'salur', 'samalkot', 'sattenapalle', 'srikalahasti',
+    'tadepalligudem', 'tadpatri', 'tanuku', 'tuni', 'venkatagiri',
+    'vinukonda', 'yemmiganur'
+  ];
+
+  // -----------------------------
+  // HELPER FUNCTION TO CHECK IF ADDRESS IS IN ANDHRA PRADESH
+  // -----------------------------
+  function isAddressInAndhraPradesh(address: string): boolean {
+    // If address is empty, null, or 'none', default to intra-state
+    if (!address || address.toLowerCase().trim() === 'null' || address.toLowerCase().trim() === 'none' || address.toLowerCase().trim() === '') {
+      return true;
+    }
+
+    const cleanAddress = address.toLowerCase().trim();
+
+    // Check if address contains 'andhra pradesh'
+    if (cleanAddress.includes('andhra pradesh')) {
+      return true;
+    }
+
+    // Check if the entire address matches an AP city
+    if (ANDHRA_PRADESH_CITIES.includes(cleanAddress)) {
+      return true;
+    }
+
+    // Split address by common delimiters: comma, space, hyphen, etc.
+    const addressParts = cleanAddress.split(/[,.\-\s]+/);
+
+    // Check each part against AP cities list
+    for (const part of addressParts) {
+      if (ANDHRA_PRADESH_CITIES.includes(part)) {
+        return true;
+      }
+    }
+
+    // Check if any AP city is a substring of the address
+    for (const city of ANDHRA_PRADESH_CITIES) {
+      if (cleanAddress.includes(city)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  // -----------------------------
   // COMPANY & CUSTOMER DETAILS
   // -----------------------------
   const companyState = 'Andhra Pradesh';
 
   const billingAddress =
     data[parentModel]?.billing_address || '';
+  
+  const shippingAddress = data[parentModel]?.shipping_address || '';
+
+  // Check if either billing or shipping address is in Andhra Pradesh
+  const isBillingLocal = isAddressInAndhraPradesh(billingAddress);
+  const isShippingLocal = isAddressInAndhraPradesh(shippingAddress);
 
   // const isLocalState =
   //   !billingAddress ||
   //   billingAddress.includes(companyState);
-  const isLocalState = !billingAddress || 
-                     billingAddress.toLowerCase() === 'null' ||
-                     billingAddress.toLowerCase() === 'none' ||
-                     billingAddress.includes(companyState);
+  // If billing address exists, use it; otherwise fallback to shipping address
+  const isLocalState = billingAddress 
+    ? isBillingLocal 
+    : (shippingAddress ? isShippingLocal : true);
 
   // Tax types
   const productTaxType =
