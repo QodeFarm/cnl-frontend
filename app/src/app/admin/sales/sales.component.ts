@@ -6308,7 +6308,7 @@ readonly ANDHRA_PRADESH_CITIES = ANDHRA_PRADESH_CITIES;
                         { label: "Exclusive", value: 'Exclusive' }
                       ]
                     },
-                    defaultValue: 'Exclusive', // This sets default for new forms
+                    defaultValue: 'Inclusive', // This sets default for new forms
                     hooks: {
                       onInit: (field: any) => {
                         // Override with edit data if available
@@ -8663,7 +8663,7 @@ readonly ANDHRA_PRADESH_CITIES = ANDHRA_PRADESH_CITIES;
                     // SIMPLE FIX: Get tax type from parent sale_order model
                     const saleOrderModel = this.formConfig?.model?.sale_order || {};
                     const taxType = saleOrderModel.tax || 'Exclusive';
-                    console.log("Tax Type from sale_order model:", taxType);
+                    // console.log("Tax Type from sale_order model:", taxType);
 
                     const grossAmount = rate * qty;
 
