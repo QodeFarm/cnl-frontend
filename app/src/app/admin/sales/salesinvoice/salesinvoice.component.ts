@@ -2210,7 +2210,7 @@ createSaleInovice() {
                         { label: "Exclusive", value: 'Exclusive' }
                       ]
                     },
-                    defaultValue: 'Exclusive', // This sets default for new forms
+                    defaultValue: 'Inclusive', // This sets default for new forms
                     hooks: {
                       onInit: (field: any) => {
                         // Override with edit data if available
