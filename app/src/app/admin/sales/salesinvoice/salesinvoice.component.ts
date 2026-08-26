@@ -67,6 +67,12 @@ export class SalesinvoiceComponent {
     customerTransporterName: string = '';
     customerTransportNotes: string = '';
     showCustomerInfoBanner: boolean = false;
+    // null = not known yet (still loading, or the lookup failed). Distinct from 0,
+    // which is a real "nothing due".
+    customerOutstandingAmount: number | null = null;
+    // Guards against a slow reply for a previously-selected customer landing after a
+    // newer one and painting the wrong customer's balance on screen.
+    private outstandingRequestFor: string | null = null;
     // ===========================================
   
 
@@ -260,6 +266,8 @@ ngOnInit() {
         this.customerNotes = '';
         this.customerTransporterName = '';
         this.customerTransportNotes = '';
+        this.customerOutstandingAmount = null;
+        this.outstandingRequestFor = null;
         this.showCustomerInfoBanner = false;
         this.checkAndPopulateData();
         this.loadQuickpackOptions();
@@ -928,7 +936,13 @@ getPendingOrdersByCustomer(customerId: string) {
               if (custData.notes) { this.customerNotes = custData.notes; }
               if (custData.transport_notes) { this.customerTransportNotes = custData.transport_notes; }
 
-              this.showCustomerInfoBanner = !!(this.customerNotes || this.customerTransporterName || this.customerTransportNotes);
+              // The outstanding figure counts as content once it is known (incl. zero).
+              this.showCustomerInfoBanner = !!(
+                this.customerNotes ||
+                this.customerTransporterName ||
+                this.customerTransportNotes ||
+                this.customerOutstandingAmount !== null
+              );
             }
           },
           (error) => {
@@ -940,6 +954,36 @@ getPendingOrdersByCustomer(customerId: string) {
       (error) => {
         console.error('Error fetching custom fields for banner:', error);
         this.showCustomerInfoBanner = false;
+      }
+    );
+
+    // =========================
+    // FETCH CUSTOMER OUTSTANDING
+    // =========================
+    // Same AR ledger balance the sale-order strip and the Account Ledger screen show -
+    // one server-side source, so the three can never disagree.
+    // Clear first: without this the previous customer's balance stays on screen until
+    // the new reply lands, which reads as this customer owing that money.
+    this.customerOutstandingAmount = null;
+    this.outstandingRequestFor = customerId;
+
+    this.http.get(`customers/outstanding/${customerId}/`).subscribe(
+      (outRes: any) => {
+        // Drop a reply that arrived after the user already moved to another customer.
+        if (this.outstandingRequestFor !== customerId) { return; }
+
+        const totalOutstanding = parseFloat(outRes?.outstanding_amount);
+        this.customerOutstandingAmount = isNaN(totalOutstanding) ? null : totalOutstanding;
+
+        if (this.customerOutstandingAmount !== null) {
+          this.showCustomerInfoBanner = true;
+        }
+      },
+      (error) => {
+        console.error('Error fetching customer outstanding:', error);
+        if (this.outstandingRequestFor !== customerId) { return; }
+        // Leave it unknown rather than claiming zero.
+        this.customerOutstandingAmount = null;
       }
     );
   }
@@ -1821,6 +1865,8 @@ createSaleInovice() {
     this.customerNotes = '';
     this.customerTransporterName = '';
     this.customerTransportNotes = '';
+    this.customerOutstandingAmount = null;
+    this.outstandingRequestFor = null;
     this.showCustomerInfoBanner = false;
     this.setFormConfig();
     if (this.formConfig.model?.sale_invoice_order) {
@@ -2056,6 +2102,8 @@ createSaleInovice() {
                           this.customerNotes = '';
                           this.customerTransporterName = '';
                           this.customerTransportNotes = '';
+                          this.customerOutstandingAmount = null;
+                          this.outstandingRequestFor = null;
                         }
                         if (data.customer_addresses && data.customer_addresses.billing_address) {
                           field.form.controls.billing_address.setValue(data.customer_addresses.billing_address)
