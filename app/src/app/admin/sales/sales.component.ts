@@ -74,7 +74,13 @@ export class SalesComponent {
   customerTransporterName: string = '';
   customerTransportNotes: string = '';
   showCustomerInfoBanner: boolean = false;
-  customerOutstandingAmount: number = 0;
+  // null = not known yet (still loading, or the lookup failed). Distinct from 0,
+  // which is a real "nothing due" - showing "No Outstanding" for a failed lookup
+  // is worse than showing nothing at all.
+  customerOutstandingAmount: number | null = null;
+  // Guards against a slow reply for a previously-selected customer landing after a
+  // newer one and painting the wrong customer's balance on screen.
+  private outstandingRequestFor: string | null = null;
   // ===========================================
 
   // ========== DRAFT AUTO-SAVE PROPERTIES ==========
@@ -462,7 +468,8 @@ export class SalesComponent {
     this.customerNotes = '';
     this.customerTransporterName = '';
     this.customerTransportNotes = '';
-    this.customerOutstandingAmount = 0;
+    this.customerOutstandingAmount = null;
+    this.outstandingRequestFor = null;
     this.showCustomerInfoBanner = false;
     this.workflowStages = [];
     this.isLoadingStages = false;
@@ -1846,12 +1853,13 @@ editSaleOrder(event) {
               if (custData.notes) { this.customerNotes = custData.notes; }
               if (custData.transport_notes) { this.customerTransportNotes = custData.transport_notes; }
 
-              // Show banner only if there's something to display
+              // Show banner only if there's something to display. The outstanding
+              // figure counts as content once it is known (including zero).
               this.showCustomerInfoBanner = !!(
                 this.customerNotes ||
                 this.customerTransporterName ||
                 this.customerTransportNotes ||
-                this.customerOutstandingAmount > 0 || this.customerOutstandingAmount == 0 // Show if there's any outstanding, even if negative (advance)
+                this.customerOutstandingAmount !== null
               );
             }
           },
@@ -1867,27 +1875,36 @@ editSaleOrder(event) {
   // FETCH CUSTOMER OUTSTANDING
   // =========================
 
-  // Customer outstanding = live pending balance across the customer's invoices,
-  // computed server-side. Do NOT sum payment_transactions.outstanding_amount here:
-  // that column is a per-payment running snapshot, so multi-installment invoices
-  // double-count (an already-cleared balance still showed as outstanding).
+  // Customer outstanding = the customer's AR ledger balance, computed server-side by
+  // the same helper the Account Ledger screen uses, so the two can never disagree.
+  // Positive = they owe us, negative = they are in credit.
+  // Clear first: without this the previous customer's balance stays on screen until
+  // the new reply lands, which reads as this customer owing that money.
+  this.customerOutstandingAmount = null;
+  this.outstandingRequestFor = customerId;
+
   this.http.get(`customers/outstanding/${customerId}/`).subscribe(
 
     (outRes: any) => {
 
-      const totalOutstanding = parseFloat(outRes?.outstanding_amount) || 0;
+      // Drop a reply that arrived after the user already moved to another customer.
+      if (this.outstandingRequestFor !== customerId) { return; }
 
-      this.customerOutstandingAmount = totalOutstanding;
+      const totalOutstanding = parseFloat(outRes?.outstanding_amount);
 
-      // Show banner also if outstanding exists
-      if (totalOutstanding > 0) {
+      this.customerOutstandingAmount = isNaN(totalOutstanding) ? null : totalOutstanding;
+
+      // Show banner also if outstanding is known
+      if (this.customerOutstandingAmount !== null) {
         this.showCustomerInfoBanner = true;
       }
 
     },
     (error) => {
       console.error('Error fetching customer outstanding:', error);
-      this.customerOutstandingAmount = 0;
+      if (this.outstandingRequestFor !== customerId) { return; }
+      // Leave it unknown rather than claiming zero.
+      this.customerOutstandingAmount = null;
     }
 
   );
@@ -3766,7 +3783,8 @@ createSaleOrder() {
     this.customerNotes = '';
     this.customerTransporterName = '';
     this.customerTransportNotes = '';
-    this.customerOutstandingAmount = 0;
+    this.customerOutstandingAmount = null;
+    this.outstandingRequestFor = null;
     this.showCustomerInfoBanner = false;
     this.postUpdateAction = null;
     this.workflowStages = [];
@@ -6209,7 +6227,8 @@ readonly ANDHRA_PRADESH_CITIES = ANDHRA_PRADESH_CITIES;
           this.customerNotes = '';
           this.customerTransporterName = '';
           this.customerTransportNotes = '';
-          this.customerOutstandingAmount = 0;
+          this.customerOutstandingAmount = null;
+          this.outstandingRequestFor = null;
         }
         if (data?.customer_addresses?.billing_address) {
           field.form.controls.billing_address?.setValue(data.customer_addresses.billing_address);
