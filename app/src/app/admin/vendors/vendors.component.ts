@@ -516,6 +516,34 @@ editVendor(event) {
                         label: 'Name',
                         placeholder: 'Enter Name',
                         required: true,
+                      },
+                      hooks: {
+                        onInit: (field: any) => {
+                          console.log("field form get : ", field.form?.get('print_name'));
+                          const printNameControl = field.form?.get('print_name');
+                          
+                          if (printNameControl) {
+                            // Auto-fill print_name when name changes
+                            field.formControl.valueChanges.subscribe((value: string) => {
+                              if (value) {
+                                // Clear any validation errors immediately
+                                printNameControl.setValue(value, { 
+                                  emitEvent: false 
+                                });
+                                printNameControl.markAsTouched();
+                                printNameControl.updateValueAndValidity();
+                              }
+                            });
+                            
+                            // Initialize print_name with name if empty
+                            if (!printNameControl.value && field.formControl.value) {
+                              printNameControl.setValue(field.formControl.value, { 
+                                emitEvent: false 
+                              });
+                              printNameControl.updateValueAndValidity();
+                            }
+                          }
+                        }
                       }
                     },
                     {
@@ -525,29 +553,78 @@ editVendor(event) {
                       templateOptions: {
                         label: 'Print Name',
                         placeholder: 'Enter Print Name',
-                        required: true,
-                      }
-                    },               
-                    {
-                      className: 'col-md-4 col-sm-6 col-12',
-                      key: 'code',
-                      type: 'input',
-                      templateOptions: {
-                        label: 'Code',
-                        placeholder: 'Enter Code',
-                        required: false,
-                      },
-                      hooks: {
-                        onInit: (field: any) => {
-                          this.http.get('masters/generate_order_no/?type=vend').subscribe((res: any) => {
-                            if (res && res.data && res.data?.order_number) {
-                              console.log('Generated Code:', res.data.order_number);
-                              field.formControl.setValue(res.data?.order_number);
-                            }
-                          });
-                        }
+                        disabled: true,  // Keep this
+                        required: true,  // Keep this
                       }
                     },
+                    // {
+                    //   className: 'col-md-4 col-sm-6 col-12',
+                    //   key: 'name',
+                    //   type: 'input',
+                    //   templateOptions: {
+                    //     label: 'Name',
+                    //     placeholder: 'Enter Name',
+                    //     required: true,
+                    //   }
+                    // },
+                    // {
+                    //   className: 'col-md-4 col-sm-6 col-12',
+                    //   key: 'print_name',
+                    //   type: 'input',
+                    //   templateOptions: {
+                    //     label: 'Print Name',
+                    //     placeholder: 'Enter Print Name',
+                    //     required: true,
+                    //     disabled: true
+                    //   }
+                    // },
+                    {
+  className: 'col-md-4 col-sm-6 col-12',
+  key: 'code',
+  type: 'input',
+  templateOptions: {
+    label: 'Code',
+    placeholder: 'Enter Code',
+    required: false,
+  },
+  hooks: {
+    onInit: (field: any) => {
+      // Only generate code if this is a new vendor (no vendor_id)
+      const vendorId = field.model?.vendor_id;
+      if (!vendorId) {
+        this.http.get('masters/generate_order_no/?type=vend').subscribe((res: any) => {
+          if (res && res.data && res.data?.order_number) {
+            console.log('Generated Code:', res.data.order_number);
+            field.formControl.setValue(res.data?.order_number);
+          }
+        });
+      } else {
+        // For existing vendors, keep the existing code
+        console.log('Existing vendor, keeping code:', field.model?.code);
+      }
+    }
+  }
+},               
+                    // {
+                    //   className: 'col-md-4 col-sm-6 col-12',
+                    //   key: 'code',
+                    //   type: 'input',
+                    //   templateOptions: {
+                    //     label: 'Code',
+                    //     placeholder: 'Enter Code',
+                    //     required: false,
+                    //   },
+                    //   hooks: {
+                    //     onInit: (field: any) => {
+                    //       this.http.get('masters/generate_order_no/?type=vend').subscribe((res: any) => {
+                    //         if (res && res.data && res.data?.order_number) {
+                    //           console.log('Generated Code:', res.data.order_number);
+                    //           field.formControl.setValue(res.data?.order_number);
+                    //         }
+                    //       });
+                    //     }
+                    //   }
+                    // },
                   
                     {
                       className: 'col-md-4 col-sm-6 col-12',

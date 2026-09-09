@@ -122,7 +122,7 @@ export class VendorsListComponent {
     },
     export: {downloadName: 'VendorList'},
     // defaultSort: { key: 'created_at', value: 'descend' },
-    defaultSort: { key: 'is_deleted', value: 'ascend' },
+    defaultSort: { key: 'created_at', value: 'descend' },
     cols: [
       {
         fieldKey: 'name',

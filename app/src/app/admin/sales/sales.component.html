@@ -770,3 +770,56 @@
     </div>
   </div>
 </div>
+
+<!-- Production Warning Modal -->
+<nz-modal
+  [(nzVisible)]="isProductionWarningOpen"
+  nzTitle="⚠️ Production Required"
+  (nzOnCancel)="closeProductionWarningModal()"
+  [nzOkText]="'OK'"
+  [nzCancelText]="null"
+  (nzOnOk)="closeProductionWarningModal()"
+  nzWidth="550"
+  [nzCentered]="true"
+>
+  <ng-container *nzModalContent>
+    <div style="text-align: center; padding: 20px 0;">
+      
+      <!-- Icon -->
+      <div style="font-size: 48px; color: #041a61; margin-bottom: 16px;">
+        <i class="fas fa-industry"></i>
+      </div>
+      
+      <!-- Main Message -->
+      <h3 style="color: #041a61; margin-bottom: 12px; font-weight: 500;">
+        Products Need Production
+      </h3>
+      
+      <p style="font-size: 15px; color: #555; line-height: 1.8;">
+        Please process the production for the following items<br>
+        before creating the invoice. flow status should be Review Inventory.
+      </p>
+      
+      <!-- Show items needing production -->
+      <div *ngIf="productionItems && productionItems.length > 0" style="margin: 16px 0; text-align: left;">
+        <p style="font-weight: 500; color: #333; margin-bottom: 8px;">Items pending production:</p>
+        <div *ngFor="let item of productionItems" 
+             style="padding: 8px 12px; background: #fff7e6; margin-bottom: 6px; border-radius: 4px; border-left: 3px solid #faad14;">
+          <strong>{{ item.name || 'Product' }}</strong>
+          <span style="color: #888; margin-left: 10px; font-size: 13px;">
+            Production Qty: <strong style="color: #041a61;">{{ item.production_qty }}</strong>
+          </span>
+        </div>
+      </div>
+      
+      <!-- Note -->
+      <div style="margin-top: 16px; padding: 12px; background: #f0f0f0; border-radius: 6px;">
+        <p style="margin: 0; color: #666; font-size: 14px;">
+          <i class="fas fa-info-circle" style="color: #1890ff;"></i>
+          <strong>Note:</strong> Complete production first, then create invoice.
+        </p>
+      </div>
+      
+    </div>
+  </ng-container>
+</nz-modal>
