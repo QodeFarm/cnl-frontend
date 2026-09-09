@@ -48,6 +48,31 @@
     font-weight: 600;
   }
 
+  /* Outstanding chip - same treatment as the sale order strip */
+  .outstanding-box {
+    background: #fff4e5;
+    border: 1px solid #ffd8a8;
+    padding: 3px 8px;
+    border-radius: 6px;
+  }
+
+  .cis-outstanding {
+    color: #d9480f;
+    font-weight: 600;
+  }
+
+  .outstanding-due {
+    color: #d32f2f;
+    font-weight: 600;
+  }
+
+  /* Zero and credit both read as "nothing to chase" - green, not alarming red */
+  .outstanding-zero,
+  .outstanding-credit {
+    color: #2e7d32;
+    font-weight: 600;
+  }
+
   .cis-close {
     margin-left: auto;
     background: none;

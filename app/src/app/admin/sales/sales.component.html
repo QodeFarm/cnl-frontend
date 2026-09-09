@@ -210,7 +210,9 @@
                     <span class="cis-icon">📋</span> {{ customerTransportNotes }}
                 </span>
 
-                <!-- ⭐ Customer Outstanding Amount -->
+                <!-- ⭐ Customer Outstanding Amount (AR ledger balance) -->
+                <!-- null = still loading or lookup failed; render nothing rather than
+                     claiming zero, which would read as "nothing due". -->
                 <span class="cis-divider" *ngIf="customerOutstandingAmount !== null">|</span>
 
                 <span class="cis-item outstanding-box" *ngIf="customerOutstandingAmount !== null">
@@ -218,16 +220,22 @@
                     Outstanding:
                     <strong class="cis-outstanding"
                         [ngClass]="{
-                            'outstanding-zero': customerOutstandingAmount == 0,
-                            'outstanding-due': customerOutstandingAmount > 0
+                            'outstanding-zero': customerOutstandingAmount === 0,
+                            'outstanding-due': customerOutstandingAmount > 0,
+                            'outstanding-credit': customerOutstandingAmount < 0
                         }">
 
                         <ng-container *ngIf="customerOutstandingAmount > 0">
-                            ₹{{ customerOutstandingAmount | inr }}
+                            ₹{{ customerOutstandingAmount | inr }} Dr
                         </ng-container>
 
-                        <ng-container *ngIf="customerOutstandingAmount == 0">
+                        <ng-container *ngIf="customerOutstandingAmount === 0">
                             ₹0.00 (No Outstanding)
+                        </ng-container>
+
+                        <!-- Negative balance = customer is in credit (advance / overpayment) -->
+                        <ng-container *ngIf="customerOutstandingAmount < 0">
+                            ₹{{ -customerOutstandingAmount | inr }} Cr (In Credit)
                         </ng-container>
 
                     </strong>
