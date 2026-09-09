@@ -712,6 +712,7 @@ export class SalesComponent {
   isConfirmationInvoiceOpen: boolean = false;
   isInvoiceCreated: boolean = false;
   previouslyInvoicedProductIds: Set<string> = new Set();
+  productionItems: any[] = [];
 
   private getCurrentFlowStatusName(): string {
     return (this.formConfig?.model?.sale_order?.flow_status?.flow_status_name || '').trim();
@@ -723,27 +724,50 @@ export class SalesComponent {
 
 
   // Function to handle opening the confirmation modal
-  openSaleInvoiceModal() {
-    if (!this.SaleOrderEditID) {
-      this.notification.warning(
-        'Invoice Not Available',
-        'Open an existing Sales Order before creating a Sales Invoice.'
-      );
-      return;
-    }
 
-    const currentFlowStatus = this.getCurrentFlowStatusName();
-    if (!this.isReadyForInvoice(currentFlowStatus)) {
-      const safeStatus = currentFlowStatus || 'Unknown';
-      this.notification.warning(
-        'Order Not Ready for Invoice',
-        `Current flow status is "${safeStatus}". Move workflow to Ready for Invoice.`
-      );
-      return;
-    }
-
-    this.isConfirmationInvoiceOpen = true; // Show the confirmation modal
+openSaleInvoiceModal() {
+  if (!this.SaleOrderEditID) {
+    this.notification.warning(
+      'Invoice Not Available',
+      'Open an existing Sales Order before creating a Sales Invoice.'
+    );
+    return;
   }
+
+  const currentFlowStatus = this.getCurrentFlowStatusName();
+  if (!this.isReadyForInvoice(currentFlowStatus)) {
+    const safeStatus = currentFlowStatus || 'Unknown';
+    this.notification.warning(
+      'Order Not Ready for Invoice',
+      `Current flow status is "${safeStatus}". Move workflow to Ready for Invoice.`
+    );
+    return;
+  }
+
+  // 🔥 NEW: Check for production quantities first
+  this.checkProductionBeforeInvoice();
+}
+  // openSaleInvoiceModal() {
+  //   if (!this.SaleOrderEditID) {
+  //     this.notification.warning(
+  //       'Invoice Not Available',
+  //       'Open an existing Sales Order before creating a Sales Invoice.'
+  //     );
+  //     return;
+  //   }
+
+  //   const currentFlowStatus = this.getCurrentFlowStatusName();
+  //   if (!this.isReadyForInvoice(currentFlowStatus)) {
+  //     const safeStatus = currentFlowStatus || 'Unknown';
+  //     this.notification.warning(
+  //       'Order Not Ready for Invoice',
+  //       `Current flow status is "${safeStatus}". Move workflow to Ready for Invoice.`
+  //     );
+  //     return;
+  //   }
+
+  //   this.isConfirmationInvoiceOpen = true; // Show the confirmation modal
+  // }
 
   // Function to handle cancelling the invoice creation
   cancelInvoiceCreation() {
@@ -1148,28 +1172,6 @@ closeNoQuantityWarning() {
     );
   }
 
-  // // This function triggers the workflow pipeline API call using POST method
-  // private triggerWorkflowPipeline(saleOrderId: string, saleType: string) {
-
-  //   // Don't trigger workflow if saleType is "Others"
-  //   if (saleType === 'Others') {
-  //     console.log('Workflow trigger skipped: saleType is "Others"');
-  //     return;
-  //   }
-  //   const apiUrl = 'sales/SaleOrder/{saleOrderId}/move_next_stage/'; //correct url
-  //   const url = apiUrl.replace('{saleOrderId}', saleOrderId); // Replace placeholder with saleOrderId
-
-  //   // POST request without any additional payload
-  //   this.http.post(url, {}).subscribe(
-  //     response => {
-  //       console.log('POST request successful:', response);
-  //     },
-  //     error => {
-  //       console.error('Error triggering workflow pipeline:', error);
-  //     }
-  //   );
-  // }
-
   private triggerWorkflowPipeline(saleOrderId: string) {
 
     console.log("saleOrderId : ", saleOrderId)
@@ -1196,6 +1198,50 @@ closeNoQuantityWarning() {
       this.isInvoiceCreated = false; // Hide the message after 3 seconds
     }, 3000);
   }
+
+// Check for production quantities before invoice
+checkProductionBeforeInvoice() {
+  const selectedItems = this.invoiceData.sale_invoice_items.filter(item => item.selectItem);
+  const itemsToInvoice = selectedItems.length > 0 ? selectedItems : this.invoiceData.sale_invoice_items;
+  
+  // Debug - check what items we have
+  console.log('All items:', itemsToInvoice);
+  
+  // Get items with production_qty > 0
+  this.productionItems = itemsToInvoice.filter(item => {
+    const productionQty = Number(item.production_qty || 0);
+    console.log('Item:', item.product_name, 'Production Qty:', productionQty);
+    return productionQty > 0;
+  });
+  
+  console.log('Production Items found:', this.productionItems.length);
+  
+  if (this.productionItems.length > 0) {
+    this.showProductionWarningModal();
+  } else {
+    this.invoiceCreationHandler();
+  }
+}
+
+// Variable to control the warning modal
+isProductionWarningOpen: boolean = false;
+
+// Show production warning modal
+showProductionWarningModal() {
+  this.isProductionWarningOpen = true;
+}
+
+// Close production warning modal (only OK button)
+closeProductionWarningModal() {
+  this.isProductionWarningOpen = false;
+}
+
+// Proceed with invoice (user chose to continue anyway)
+// proceedWithInvoiceAfterWarning() {
+//   this.isProductionWarningOpen = false;
+//   this.invoiceCreationHandler();
+// }
+
   //Sale-Invoice =====================================================
 
   nowDate = () => {
