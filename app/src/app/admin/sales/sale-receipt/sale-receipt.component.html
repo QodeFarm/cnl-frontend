@@ -46,3 +46,28 @@
       </span>
     </div>
   </ng-template>
+
+<!-- Custom Alert Modal -->
+<div *ngIf="customAlertVisible" class="custom-alert-overlay" (click)="closeCustomAlert()">
+  <div class="custom-alert-box" (click)="$event.stopPropagation()">
+    <div class="custom-alert-header" [ngClass]="'alert-' + customAlertType">
+      <span class="custom-alert-icon">
+        <ng-container [ngSwitch]="customAlertType">
+          <span *ngSwitchCase="'success'">✓</span>
+          <span *ngSwitchCase="'error'">✕</span>
+          <span *ngSwitchCase="'warning'">⚠</span>
+          <span *ngSwitchDefault>ℹ</span>
+        </ng-container>
+      </span>
+      <span class="custom-alert-title">{{ customAlertTitle }}</span>
+    </div>
+    <div class="custom-alert-body">
+      <p>{{ customAlertMessage }}</p>
+    </div>
+    <div class="custom-alert-footer">
+      <button class="custom-alert-btn" [ngClass]="'btn-' + customAlertType" (click)="closeCustomAlert()">
+        OK
+      </button>
+    </div>
+  </div>
+</div>
