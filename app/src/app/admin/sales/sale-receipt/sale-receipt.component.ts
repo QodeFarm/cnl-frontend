@@ -218,28 +218,28 @@ export class SaleReceiptComponent implements OnInit {
     document.body.removeChild(fileInput);
   }
   
-  fetchSaleInvoiceId(saleOrderId: string): Promise<string | null> {
-    const apiUrl = `sales/sale_invoice_order_get/?sale_order_id=${saleOrderId}`;
-  
-    return this.http.get<any>(apiUrl).toPromise()
-      .then(response => {
-        console.log("Response from API:", response);
-  
-        if (response && Array.isArray(response.data) && response.data.length > 0 && response.data[0].sale_invoice_id) {
-          console.log("Sale Invoice ID:", response.data[0].sale_invoice_id);
-          return response.data[0].sale_invoice_id;
-        } else {
-          console.error("Sale invoice ID not found in response.");
-          alert("Could not retrieve sale invoice ID.");
-          return null;
-        }
-      })
-      .catch(error => {
-        console.error("Error fetching sale invoice ID:", error);
-        alert("Failed to fetch sale invoice ID. Please try again.");
+fetchSaleInvoiceId(saleOrderId: string): Promise<string | null> {
+  const apiUrl = `sales/sale_invoice_order_get/?sale_order_id=${saleOrderId}`;
+
+  return this.http.get<any>(apiUrl).toPromise()
+    .then(response => {
+      console.log("Response from API:", response);
+
+      if (response && Array.isArray(response.data) && response.data.length > 0 && response.data[0].sale_invoice_id) {
+        console.log("Sale Invoice ID:", response.data[0].sale_invoice_id);
+        return response.data[0].sale_invoice_id;
+      } else {
+        console.error("Sale invoice ID not found in response.");
+        this.showCustomAlert("Could not retrieve sale invoice ID, you have to create a sale invocie for this order first", 'error');
         return null;
-      });
-  }
+      }
+    })
+    .catch(error => {
+      console.error("Error fetching sale invoice ID:", error);
+      this.showCustomAlert("Failed to fetch sale invoice ID. Please try again.", 'error');
+      return null;
+    });
+}
   
 // Helper method to generate a unique identifier for file metadata
 generateUID(): string {
@@ -257,6 +257,85 @@ prepareFileMetadata(selectedFile: File): any {
     attachment_name: selectedFile.name,  // Use the same name here, or customize if needed
     attachment_path: `${fileUID}_${selectedFile.name}`, // Hypothetical saved file path
   };
+}
+
+// Add these properties near your other properties
+customAlertVisible = false;
+customAlertTitle = '';
+customAlertMessage = '';
+customAlertType: 'success' | 'error' | 'warning' | 'info' = 'info';
+private pendingAlertResolve: (() => void) | null = null;
+
+// Add this method to show custom alert
+showCustomAlert(
+  message: string,
+  type: 'success' | 'error' | 'warning' | 'info' = 'info',
+  title?: string
+): Promise<void> {
+  return new Promise((resolve) => {
+    this.customAlertType = type;
+    this.customAlertTitle = title || this.getDefaultAlertTitle(type);
+    this.customAlertMessage = message;
+    this.customAlertVisible = true;
+    this.pendingAlertResolve = resolve;
+  });
+}
+
+private getDefaultAlertTitle(type: string): string {
+  switch (type) {
+    case 'success': return 'Success';
+    case 'error': return 'Error';
+    case 'warning': return 'Warning';
+    default: return 'Information';
+  }
+}
+
+closeCustomAlert() {
+  this.customAlertVisible = false;
+  if (this.pendingAlertResolve) {
+    this.pendingAlertResolve();
+    this.pendingAlertResolve = null;
+  }
+}
+
+private fetchChildOrdersWithRetry(
+  parentOrderNo: string,
+  childSaleOrderId: number,
+  maxRetries = 3,
+  delayMs = 800
+): Promise<any> {
+  const url = `sales/sale_order/?parent_order_no=${parentOrderNo}`;
+
+  return new Promise((resolve, reject) => {
+    const attempt = (n: number) => {
+      this.http.get<any>(url).subscribe(
+        (res) => {
+          // Verify the just-updated child reflects 'Completed' in the response
+          const updatedChild = res?.data?.find(
+            (o: any) => o.sale_order_id === childSaleOrderId
+          );
+
+          const childIsFresh =
+            updatedChild &&
+            updatedChild.flow_status?.flow_status_name === 'Completed';
+
+          if (childIsFresh || n >= maxRetries) {
+            resolve(res);
+          } else {
+            console.warn(
+              `[Retry ${n}/${maxRetries}] Child ${childSaleOrderId} not yet Completed in response. Retrying in ${delayMs}ms...`
+            );
+            setTimeout(() => attempt(n + 1), delayMs);
+          }
+        },
+        (err) => {
+          if (n >= maxRetries) reject(err);
+          else setTimeout(() => attempt(n + 1), delayMs);
+        }
+      );
+    };
+    attempt(1);
+  });
 }
 
 async confirmReceipt() {
@@ -306,123 +385,31 @@ async confirmReceipt() {
               () => {
                 console.log(` Child Sale Order ${childSaleOrderId} updated to Completed.`);
                 console.log("this.selectedOrder : ", this.selectedOrder);
-                // Trigger replication if sale_type is "Other"
-                // if (this.selectedOrder.sale_type?.name === 'Other') {
-                //   const getUrl = `sales/sale_order/${childSaleOrderId}/`;
 
-                //   this.http.get(getUrl).subscribe(
-                //     (res: any) => {
-                //       const fullData = res?.data;
-                //       console.log("fullData : ", fullData);
-
-                //       if (!fullData?.sale_order || !fullData?.sale_order_items?.length) {
-                //         alert('Sale order or items are missing for replication.');
-                //         return;
-                //       }
-                      
-
-                //       const replicateUrl = `sales/sale_order/`;
-                //       this.http.post(replicateUrl, {
-                //                             sale_order: fullData.sale_order,
-                //                             sale_order_items: fullData.sale_order_items,
-                //                             order_attachments: fullData.order_attachments || [],
-                //                             order_shipments: fullData.order_shipments || []
-                //                             // custom_field_values: customFields
-                //                           }).subscribe(
-                //         (replicateRes: any) => {
-                //           console.log('Sale order replicated to mstcnl:', replicateRes);
-                //         },
-                //         (replicateErr) => {
-                //           console.error('Replication to mstcnl failed:', replicateErr);
-                //           alert('Sale order was marked Completed, but replication to mstcnl failed.');
-                //         }
-                //       )
-                //     },
-                //     (err) => {
-                //       console.error('Failed to fetch full sale order data:', err);
-                //       alert('Could not fetch sale order details for replication.');
-                //     }
-                //   );
-                // }
-                // if (this.selectedOrder.sale_type?.name === 'Other') {
-                //   const getUrl = `sales/sale_order/${childSaleOrderId}/`;
-
-                //   this.http.get(getUrl).subscribe(
-                //     (res: any) => {
-                //       const fullData = res?.data;
-                //       console.log("fullData : ", fullData);
-
-                //       if (!fullData?.sale_order || !fullData?.sale_order_items?.length) {
-                //         alert('Sale order or items are missing for replication.');
-                //         return;
-                //       }
-
-                //       //NEW: First check related sale invoice status
-                //       this.http.get(`sales/sale_invoice_order/?sale_order_id=${childSaleOrderId}`).subscribe(
-                //         (invoiceRes: any) => {
-                //           const saleInvoice = invoiceRes?.data?.[0];
-                //           if (!saleInvoice) {
-                //             alert('Sale invoice not found. Cannot replicate.');
-                //             return;
-                //           }
-
-                //           const invoiceStatusName = saleInvoice.order_status?.status_name;
-                //           console.log("Related Sale Invoice status:", invoiceStatusName);
-
-                //           if (invoiceStatusName !== 'Completed') {
-                //             alert('Related sale invoice is not Completed. Replication skipped.');
-                //             return;
-                //           }
-
-                //           //Invoice is Completed — do replicate
-                //           const replicateUrl = `sales/sale_order/`;
-                //           this.http.post(replicateUrl, {
-                //             sale_order: fullData.sale_order,
-                //             sale_order_items: fullData.sale_order_items,
-                //             order_attachments: fullData.order_attachments || [],
-                //             order_shipments: fullData.order_shipments || []
-                //             // custom_field_values: customFields
-                //           }).subscribe(
-                //             (replicateRes: any) => {
-                //               console.log('Sale order replicated to mstcnl:', replicateRes);
-                //             },
-                //             (replicateErr) => {
-                //               console.error('Replication to mstcnl failed:', replicateErr);
-                //               alert('Sale order was marked Completed, but replication to mstcnl failed.');
-                //             }
-                //           );
-
-                //         },
-                //         (err) => {
-                //           console.error('Failed to fetch related sale invoice:', err);
-                //           alert('Could not fetch related sale invoice. Replication aborted.');
-                //         }
-                //       );
-
-                //     },
-                //     (err) => {
-                //       console.error('Failed to fetch full sale order data:', err);
-                //       alert('Could not fetch sale order details for replication.');
-                //     }
-                //   );
-                // }
-
-                // The modal deliberately stays open here. The parent order is still being
-          
-                const childOrdersUrl = `sales/sale_order/?parent_order_no=${parentOrderNo}`;
-                console.log("Fetching child orders with URL:", childOrdersUrl);
-                this.http.get<any>(childOrdersUrl).subscribe(
-                  (childOrdersResponse) => {
+                console.log("Fetching child orders with retry for parent:", parentOrderNo);
+                this.fetchChildOrdersWithRetry(parentOrderNo, childSaleOrderId).then(
+                  (childOrdersResponse: any) => {
                     console.log(" Fetched child sale orders:", childOrdersResponse);
 
-                    console.log(" Checking all child orders' statuses:");
-                    childOrdersResponse.data.forEach((childOrder: any) => {
-                      console.log(`Order No: ${childOrder.order_no}, Flow Status: ${childOrder.flow_status.flow_status_name}`);
+                    // Extra safety: filter out the parent and any rows that are not children
+                    const children = childOrdersResponse.data.filter(
+                      (order: any) => order.order_no !== parentOrderNo
+                    );
+
+                    console.log(" Child count:", children.length);
+                    children.forEach((childOrder: any) => {
+                      console.log(
+                        `   → ${childOrder.order_no}: ${childOrder.flow_status?.flow_status_name}`
+                      );
                     });
 
-                    const allCompleted = childOrdersResponse.data
-                      .filter((order: any) => order.order_no !== parentOrderNo)
-                      .every((childOrder: any) => childOrder.flow_status.flow_status_name === 'Completed');
+                    // 🛡️ Guard: if no children found at all, treat as Completed (this is a single-order parent)
+                    const allCompleted =
+                      children.length === 0 ||
+                      children.every(
+                        (childOrder: any) =>
+                          childOrder.flow_status?.flow_status_name === 'Completed'
+                      );
 
                     console.log("allCompleted:", allCompleted);
 
@@ -430,83 +417,182 @@ async confirmReceipt() {
                       (order: any) => order.order_no === parentOrderNo
                     );
 
-                    if (parentSaleOrder) {
-                      const parentSaleOrderId = parentSaleOrder.sale_order_id;
-                      console.log(" Parent Sale Order ID:", parentSaleOrderId);
-                      const updateParentStatusUrl = `sales/sale_order/${parentSaleOrderId}/`;
-                      console.log(" updateParentStatusUrl:", updateParentStatusUrl);
-
-                      if (allCompleted) {
-                        this.http.get('masters/flow_status/?flow_status_name=Completed').subscribe((flowRes: any) => {
-                          const flow_status_id = flowRes?.data?.[0]?.flow_status_id;
-
-                          this.http.get('masters/order_status/?status_name=Completed').subscribe((orderRes: any) => {
-                            const order_status_id = orderRes?.data?.[0]?.order_status_id;
-
-                            const updateParentPayload = { flow_status_id, order_status_id };
-
-                            this.http.patch(updateParentStatusUrl, updateParentPayload).subscribe(
-                              () => {
-                                console.log(` Parent Sale Order ${parentOrderNo} updated to Completed.`);
-                                this.closeModal();
-                                this.refreshCurdConfig();
-                                this.showPostConfirmNotification(parentOrderNo, 'Completed');
-                              },
-                              error => {
-                                console.error(" Error updating parent sale order status:", error);
-                                
-                                this.closeModal();
-                                this.refreshCurdConfig();
-                                alert("Failed to update parent sale order status. Please try again.");
-                              }
-                            );
-                          });
-                        });
-                      } else {
-                        this.http.get('masters/flow_status/?flow_status_name=Partially Delivered').subscribe((flowRes: any) => {
-                          const flow_status_id = flowRes?.data?.[0]?.flow_status_id;
-
-                          this.http.get('masters/order_status/?status_name=Partially Delivered').subscribe((orderRes: any) => {
-                            const order_status_id = orderRes?.data?.[0]?.order_status_id;
-
-                            const updateParentPayload = { flow_status_id, order_status_id };
-
-                            this.http.patch(updateParentStatusUrl, updateParentPayload).subscribe(
-                              () => {
-                                console.log(` Parent Sale Order ${parentOrderNo} updated to Partially Delivered.`);
-                                this.closeModal();
-                                this.refreshCurdConfig();
-                                this.showPostConfirmNotification(parentOrderNo, 'Partially Delivered');
-                              },
-                              error => {
-                                console.error(" Error updating parent sale order status:", error);
-                                // The child order WAS updated, so the list is out of date either
-                                // way — close and reload so the screen shows what actually landed.
-                                this.closeModal();
-                                this.refreshCurdConfig();
-                                alert("Failed to update parent sale order status. Please try again.");
-                              }
-                            );
-                          });
-                        });
-                      }
-                    } else {
+                    if (!parentSaleOrder) {
                       console.error(` Parent Sale Order ${parentOrderNo} not found.`);
                       this.closeModal();
                       this.refreshCurdConfig();
+                      return;
                     }
+
+                    const parentSaleOrderId = parentSaleOrder.sale_order_id;
+                    const updateParentStatusUrl = `sales/sale_order/${parentSaleOrderId}/`;
+
+                    // 🛡️ Short-circuit: if parent is already in the correct target status, skip PATCH
+                    const targetStatus = allCompleted ? 'Completed' : 'Partially Delivered';
+                    const currentParentStatus = parentSaleOrder.flow_status?.flow_status_name;
+
+                    if (currentParentStatus === targetStatus && targetStatus === 'Completed') {
+                      console.log(`Parent already Completed — no update needed.`);
+                      this.closeModal();
+                      this.refreshCurdConfig();
+                      this.showPostConfirmNotification(parentOrderNo, 'Completed');
+                      return;
+                    }
+
+                    const statusToFetch = targetStatus;
+
+                    this.http
+                      .get(`masters/flow_status/?flow_status_name=${encodeURIComponent(statusToFetch)}`)
+                      .subscribe((flowRes: any) => {
+                        const flow_status_id = flowRes?.data?.[0]?.flow_status_id;
+
+                        this.http
+                          .get(`masters/order_status/?status_name=${encodeURIComponent(statusToFetch)}`)
+                          .subscribe((orderRes: any) => {
+                            const order_status_id = orderRes?.data?.[0]?.order_status_id;
+
+                            const updateParentPayload = { flow_status_id, order_status_id };
+
+                            this.http.patch(updateParentStatusUrl, updateParentPayload).subscribe(
+                              () => {
+                                console.log(
+                                  ` Parent Sale Order ${parentOrderNo} updated to ${statusToFetch}.`
+                                );
+                                this.closeModal();
+                                this.refreshCurdConfig();
+                                this.showPostConfirmNotification(parentOrderNo, statusToFetch);
+                              },
+                              (error) => {
+                                console.error(" Error updating parent sale order status:", error);
+                                this.closeModal();
+                                this.refreshCurdConfig();
+                                this.showCustomAlert(
+                                  'Failed to update parent sale order status. Please try again.',
+                                  'error'
+                                );
+                              }
+                            );
+                          });
+                      });
                   },
                   (error) => {
-                    console.error(" Error fetching child sale orders:", error);
+                    console.error(" Error fetching child sale orders after retries:", error);
                     this.closeModal();
                     this.refreshCurdConfig();
-                    alert("Failed to fetch child sale orders. Please try again.");
+                    this.showCustomAlert(
+                      'Failed to fetch child sale orders. Please try again.',
+                      'error'
+                    );
                   }
                 );
+
+                // const childOrdersUrl = `sales/sale_order/?parent_order_no=${parentOrderNo}`;
+                // console.log("Fetching child orders with URL:", childOrdersUrl);
+                // this.http.get<any>(childOrdersUrl).subscribe(
+                //   (childOrdersResponse) => {
+                //     console.log(" Fetched child sale orders:", childOrdersResponse);
+
+                //     console.log(" Checking all child orders' statuses:");
+                //     childOrdersResponse.data.forEach((childOrder: any) => {
+                //       console.log(`Order No: ${childOrder.order_no}, Flow Status: ${childOrder.flow_status.flow_status_name}`);
+                //     });
+
+                //     const allCompleted = childOrdersResponse.data
+                //       .filter((order: any) => order.order_no !== parentOrderNo)
+                //       .every((childOrder: any) => childOrder.flow_status.flow_status_name === 'Completed');
+
+                //     console.log("allCompleted:", allCompleted);
+
+                //     const parentSaleOrder = childOrdersResponse.data.find(
+                //       (order: any) => order.order_no === parentOrderNo
+                //     );
+
+                //     if (parentSaleOrder) {
+                //       const parentSaleOrderId = parentSaleOrder.sale_order_id;
+                //       console.log(" Parent Sale Order ID:", parentSaleOrderId);
+                //       const updateParentStatusUrl = `sales/sale_order/${parentSaleOrderId}/`;
+                //       console.log(" updateParentStatusUrl:", updateParentStatusUrl);
+
+                //       if (allCompleted) {
+                //         this.http.get('masters/flow_status/?flow_status_name=Completed').subscribe((flowRes: any) => {
+                //           const flow_status_id = flowRes?.data?.[0]?.flow_status_id;
+
+                //           this.http.get('masters/order_status/?status_name=Completed').subscribe((orderRes: any) => {
+                //             const order_status_id = orderRes?.data?.[0]?.order_status_id;
+
+                //             const updateParentPayload = { flow_status_id, order_status_id };
+
+                //             this.http.patch(updateParentStatusUrl, updateParentPayload).subscribe(
+                //               () => {
+                //                 console.log(` Parent Sale Order ${parentOrderNo} updated to Completed.`);
+                //                 this.closeModal();
+                //                 this.refreshCurdConfig();
+                //                 this.showPostConfirmNotification(parentOrderNo, 'Completed');
+                //               },
+                //               error => {
+                //                 console.error(" Error updating parent sale order status:", error);
+                //                 this.closeModal();
+                //                 this.refreshCurdConfig();
+                //                 this.showCustomAlert(
+                //                   'Failed to update parent sale order status. Please try again.',
+                //                   'error'
+                //                 );
+                //               }
+                //             );
+                //           });
+                //         });
+                //       } else {
+                //         this.http.get('masters/flow_status/?flow_status_name=Partially Delivered').subscribe((flowRes: any) => {
+                //           const flow_status_id = flowRes?.data?.[0]?.flow_status_id;
+
+                //           this.http.get('masters/order_status/?status_name=Partially Delivered').subscribe((orderRes: any) => {
+                //             const order_status_id = orderRes?.data?.[0]?.order_status_id;
+
+                //             const updateParentPayload = { flow_status_id, order_status_id };
+
+                //             this.http.patch(updateParentStatusUrl, updateParentPayload).subscribe(
+                //               () => {
+                //                 console.log(` Parent Sale Order ${parentOrderNo} updated to Partially Delivered.`);
+                //                 this.closeModal();
+                //                 this.refreshCurdConfig();
+                //                 this.showPostConfirmNotification(parentOrderNo, 'Partially Delivered');
+                //               },
+                //               error => {
+                //                 console.error(" Error updating parent sale order status:", error);
+                //                 this.closeModal();
+                //                 this.refreshCurdConfig();
+                //                 this.showCustomAlert(
+                //                   'Failed to update parent sale order status. Please try again.',
+                //                   'error'
+                //                 );
+                //               }
+                //             );
+                //           });
+                //         });
+                //       }
+                //     } else {
+                //       console.error(` Parent Sale Order ${parentOrderNo} not found.`);
+                //       this.closeModal();
+                //       this.refreshCurdConfig();
+                //     }
+                //   },
+                //   (error) => {
+                //     console.error(" Error fetching child sale orders:", error);
+                //     this.closeModal();
+                //     this.refreshCurdConfig();
+                //     this.showCustomAlert(
+                //       'Failed to fetch child sale orders. Please try again.',
+                //       'error'
+                //     );
+                //   }
+                // );
               },
               error => {
                 console.error(" Error updating child sale order status:", error);
-                alert("Failed to update child sale order status. Please try again.");
+                this.showCustomAlert(
+                  'Failed to update child sale order status. Please try again.',
+                  'error'
+                );
               }
             );
           });
@@ -514,7 +600,10 @@ async confirmReceipt() {
       },
       error => {
         console.error(' Error in creating sale receipt:', error);
-        alert('Failed to create sale receipt. Please try again.');
+        this.showCustomAlert(
+          'Failed to create sale receipt. Please try again.',
+          'error'
+        );
       }
     );
   } else {
